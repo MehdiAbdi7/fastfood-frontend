@@ -1,9 +1,11 @@
-const page = () => {
+import { Hero } from "@/components/Hero";
+
+const Page = () => {
   return (
     <div>
-      <h1>Home</h1>
+      <Hero />
     </div>
   );
 };
 
-export default page;
+export default Page;
