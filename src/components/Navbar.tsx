@@ -26,7 +26,7 @@ const Navbar = () => {
       }`}
     >
       <nav
-        className={`mx-auto flex min-w-screen items-center justify-evenly border-b px-6 py-2 transition-colors duration-300 ease-in-out ${
+        className={`mx-auto flex w-full items-center justify-evenly border-b px-6 py-2 transition-colors duration-300 ease-in-out ${
           isScrolled
             ? "border-on-primary/10 text-background"
             : "border-primary sm:border-transparent text-primary"

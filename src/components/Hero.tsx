@@ -3,34 +3,7 @@ import Link from "next/link";
 
 export function Hero() {
   return (
-    <section className="bg-background relative overflow-hidden px-6 min-h-dvh">
-      {/* Frites décoratives */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none hidden lg:block absolute left-0 inset-y-0 w-32 xl:w-40 opacity-90"
-      >
-        <Image
-          src="/frites-deco.png"
-          alt=""
-          fill
-          loading="eager"
-          className="object-contain object-left"
-        />
-      </div>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none hidden lg:block absolute right-0 inset-y-0 w-32 xl:w-40 opacity-90"
-      >
-        <Image
-          src="/frites-deco.png"
-          alt=""
-          width={284}
-          height={750}
-          loading="eager"
-          className="object-contain object-right -scale-x-100"
-        />
-      </div>
-
+    <section className=" relative overflow-hidden px-6 min-h-dvh">
       <div className="mx-auto py-32 grid max-w-6xl items-center gap-2 md:grid-cols-2">
         {/* Collage photos */}
         <div className="relative order-2 h-80 w-full sm:h-96 md:h-112 md:max-w-md">
