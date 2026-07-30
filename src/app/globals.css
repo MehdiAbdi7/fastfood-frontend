@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #fadbac;
+  --background: #ffd59b;
   --foreground: #0e0b0a;
 
   --color-primary: #7e4e38;
@@ -11,11 +11,11 @@
   --color-on-primary: #faf6f0;
   --color-accent-mustard: #d9a94d;
   --color-accent-bordeaux: #8b2e3a;
-  --color-accent-slate: #5dae6d;
+  --color-accent-slate: #b8860b;
 }
 
 .dark {
-  --background: #0c0a09;
+  --background: #210c00;
   --foreground: #faf6f0;
 
   --color-primary: #89553d;
@@ -23,7 +23,7 @@
   --color-on-primary: #1c1714;
   --color-accent-mustard: #e0b968;
   --color-accent-bordeaux: #a8434f;
-  --color-accent-slate: #5dae6d;
+  --color-accent-slate: #b8860b;
 }
 
 @theme inline {
@@ -37,6 +37,10 @@
   --color-accent-slate: var(--color-accent-slate);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --shadow-food-sm: drop-shadow(0 8px 10px rgb(139 90 68 / 0.5));
+  --shadow-food-md: drop-shadow(0 16px 20px rgb(139 90 68 / 0.5));
+  --shadow-food-lg: drop-shadow(0 24px 32px rgb(139 90 68 / 0.5));
 }
 
 body {
