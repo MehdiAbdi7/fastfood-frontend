@@ -46,15 +46,13 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed z-50 w-full transition-all duration-300 ease-in ${
+      className={`fixed z-40 w-full transition-all duration-300 ease-in ${
         isScrolled || isMenuOpen ? "bg-primary shadow-md" : "bg-transparent"
       }`}
     >
       <nav
-        className={`mx-auto flex w-full items-center justify-between border-b px-6 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
-          isScrolled || isMenuOpen
-            ? "border-on-primary/10 text-background"
-            : "border-primary text-primary sm:border-transparent"
+        className={`mx-auto flex w-full items-center justify-between px-6 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
+          isScrolled || isMenuOpen ? "text-background" : "text-primary "
         }`}
       >
         <Link
@@ -69,18 +67,18 @@ const Navbar = () => {
             height={55}
             priority
           />
-          <span className="font-heading text-sm font-semibold sm:text-xl hover:text-accent-slate hover:scale-105">
-            <span className="text-lg text-accent-slate sm:text-xl">Niwa</span>{" "}
+          <span className="font-heading text-sm font-semibold sm:text-xl hover:text-on-primary hover:scale-105">
+            <span className="text-lg text-on-primary sm:text-xl">Niwa</span>{" "}
             Food
           </span>
         </Link>
 
         {/* Liens desktop */}
-        <div className="hidden items-center gap-8 font-heading text-sm font-bold md:flex">
+        <div className="hidden items-center gap-8 font-heading text-sm font-bold md:flex md:bg-primary md:rounded-4xl md:px-4 md:py-1">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              className="group relative py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
+              className="group relative text-on-primary py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
               href={link.href}
             >
               {link.label}
@@ -96,7 +94,7 @@ const Navbar = () => {
             className={`hidden rounded-full px-5 py-2 font-bold transition-all duration-200 ease-in-out sm:inline-block ${
               isScrolled || isMenuOpen
                 ? "bg-background text-primary hover:bg-background hover:text-accent-slate hover:scale-105"
-                : "bg-primary text-on-primary hover:bg-accent-slate hover:scale-105"
+                : "bg-primary text-on-primary hover:text-accent-slate hover:scale-105"
             }`}
           >
             Commander

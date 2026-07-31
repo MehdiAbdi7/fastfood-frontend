@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f6d5a6;
+  --background: #faf6f0;
   --foreground: #0e0b0a;
 
   --color-primary: #7a4d3a;
@@ -11,19 +11,19 @@
   --color-on-primary: #faf6f0;
   --color-accent-mustard: #d9a94d;
   --color-accent-bordeaux: #8b2e3a;
-  --color-accent-slate: #ed8f0c;
+  --color-accent-slate: #ffcf31;
 }
 
 .dark {
   --background: #210c00;
   --foreground: #b3b2b0;
 
-  --color-primary: #89553d;
+  --color-primary: #975e44;
   --color-primary-dark: #8b5a44;
   --color-on-primary: #1c1714;
   --color-accent-mustard: #e0b968;
   --color-accent-bordeaux: #a8434f;
-  --color-accent-slate: #b8860b;
+  --color-accent-slate: #e7b924;
 }
 
 @theme inline {
@@ -67,7 +67,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-slate);
+  background: var(--color-foreground);
 }
 
 a,
