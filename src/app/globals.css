@@ -3,20 +3,20 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffd59b;
+  --background: #f6d5a6;
   --foreground: #0e0b0a;
 
-  --color-primary: #7e4e38;
+  --color-primary: #7a4d3a;
   --color-primary-dark: #5c3a2c;
   --color-on-primary: #faf6f0;
   --color-accent-mustard: #d9a94d;
   --color-accent-bordeaux: #8b2e3a;
-  --color-accent-slate: #b8860b;
+  --color-accent-slate: #ed8f0c;
 }
 
 .dark {
   --background: #210c00;
-  --foreground: #faf6f0;
+  --foreground: #b3b2b0;
 
   --color-primary: #89553d;
   --color-primary-dark: #8b5a44;
@@ -35,9 +35,8 @@
   --color-accent-mustard: var(--color-accent-mustard);
   --color-accent-bordeaux: var(--color-accent-bordeaux);
   --color-accent-slate: var(--color-accent-slate);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
   --shadow-food-sm: drop-shadow(0 8px 10px rgb(139 90 68 / 0.5));
   --shadow-food-md: drop-shadow(0 16px 20px rgb(139 90 68 / 0.5));
   --shadow-food-lg: drop-shadow(0 24px 32px rgb(139 90 68 / 0.5));
@@ -47,6 +46,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  cursor:
+    url("/cursor.png") 6 6,
+    auto;
 }
 
 /* Chrome, Edge, Safari */
@@ -66,4 +68,12 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent-slate);
+}
+
+a,
+button,
+[role="button"] {
+  cursor:
+    url("/cursor-click.png") 8 8,
+    pointer;
 }
