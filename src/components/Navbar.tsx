@@ -69,7 +69,7 @@ const Navbar = () => {
             height={55}
             priority
           />
-          <span className="font-heading text-sm font-semibold sm:text-xl">
+          <span className="font-heading text-sm font-semibold sm:text-xl hover:text-accent-slate hover:scale-105">
             <span className="text-lg text-accent-slate sm:text-xl">Niwa</span>{" "}
             Food
           </span>
@@ -80,10 +80,11 @@ const Navbar = () => {
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              className="transition-colors duration-300 ease-out hover:text-accent-slate"
+              className="group relative py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
               href={link.href}
             >
               {link.label}
+              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-slate transition-transform duration-500 ease-out group-hover:scale-x-100" />
             </Link>
           ))}
         </div>
@@ -94,8 +95,8 @@ const Navbar = () => {
             href="/commande"
             className={`hidden rounded-full px-5 py-2 font-bold transition-all duration-200 ease-in-out sm:inline-block ${
               isScrolled || isMenuOpen
-                ? "bg-background text-primary hover:bg-background hover:text-accent-slate"
-                : "bg-primary text-on-primary hover:bg-accent-slate"
+                ? "bg-background text-primary hover:bg-background hover:text-accent-slate hover:scale-105"
+                : "bg-primary text-on-primary hover:bg-accent-slate hover:scale-105"
             }`}
           >
             Commander

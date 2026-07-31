@@ -55,7 +55,7 @@ export function Hero() {
           <div>
             <Link
               href="/commande"
-              className="inline-block rounded-full bg-primary px-7 py-3 font-bold text-on-primary transition-colors duration-300 ease-in-out hover:bg-accent-slate"
+              className="inline-block rounded-full bg-primary px-7 py-3 font-bold text-on-primary transition-colors duration-300 ease-in-out hover:bg-accent-slate hover:scale-105"
             >
               Voir le menu
             </Link>
