@@ -74,17 +74,17 @@ export function Hero() {
 
           <div className="mt-2 grid grid-cols-3 gap-4 text-sm">
             <div>
-              <p className="font-semibold text-primary">1. Choisissez</p>
+              <p className="font-semibold text-accent-green">1. Choisissez</p>
               <p className="text-foreground">
                 Sur place, à emporter ou livraison
               </p>
             </div>
             <div>
-              <p className="font-semibold text-primary">2. Composez</p>
+              <p className="font-semibold text-accent-green">2. Composez</p>
               <p className="text-foreground">Votre commande sur mesure</p>
             </div>
             <div>
-              <p className="font-semibold text-primary">3. Dégustez</p>
+              <p className="font-semibold text-accent-green">3. Dégustez</p>
               <p className="text-foreground">Prêt en quelques minutes</p>
             </div>
           </div>
