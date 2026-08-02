@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ThemeToggle } from "./themeToggle";
+
 import { useNavbar } from "@/features/navbar/useNavbar";
+import { ThemeToggle } from "./themeToggle";
 
 const NAV_LINKS = [
   { href: "/#accueil", label: "Accueil" },
