@@ -23,7 +23,7 @@ export function About() {
   return (
     <section
       id="a-propos"
-      className="relative isolate overflow-hidden px-6 py-10 bg-transparent backdrop-blur-lg shadow-2xl shadow-primary rounded-2xl mx-4 my-4"
+      className="relative isolate overflow-hidden px-6 py-10 bg-transparent backdrop-blur-lg shadow-2xl shadow-primary rounded-2xl mx-4 md:mx-18 my-4"
     >
       {/* Décoration — tout en dessous */}
       <Image
