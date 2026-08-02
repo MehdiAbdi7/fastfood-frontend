@@ -60,13 +60,13 @@ const Navbar = () => {
       }`}
     >
       <nav
-        className={`mx-auto flex w-full items-center justify-between border-b border-accent-slate lg:border-transparent px-6 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
+        className={`mx-auto flex w-full items-center justify-between border border-primary lg:border-none px-6 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
           isScrolled || isMenuOpen ? "text-background" : "text-primary "
         }`}
       >
         <Link
           href="/"
-          className="flex items-center justify-center gap-0.5 sm:gap-1"
+          className="flex items-center justify-center gap-0.5 sm:gap-1 px-4 py-0.5 bg-linear-to-bl from-transparent via-transparent to-primary backdrop-blur-2xl rounded-4xl shadow-sm sm:shadow-lg shadow-primary"
           onClick={() => setIsMenuOpen(false)}
         >
           <Image
@@ -77,9 +77,7 @@ const Navbar = () => {
             priority
           />
           <span className="font-heading text-sm font-semibold sm:text-xl hover:scale-110">
-            <span className="text-lg text-accent-slate lg:text-on-primary sm:text-xl">
-              Niwa
-            </span>{" "}
+            <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
             Food
           </span>
         </Link>
@@ -120,17 +118,17 @@ const Navbar = () => {
             className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-current/10 md:hidden"
           >
             <span
-              className={`absolute h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-in-out ${
+              className={`absolute h-0.5 w-5 rounded-full bg-foreground/80 transition-all duration-300 ease-in-out ${
                 isMenuOpen ? "rotate-45" : "-translate-y-1.5"
               }`}
             />
             <span
-              className={`absolute h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-in-out ${
+              className={`absolute h-0.5 w-5 rounded-full bg-foreground/80 transition-all duration-300 ease-in-out ${
                 isMenuOpen ? "opacity-0" : "opacity-100"
               }`}
             />
             <span
-              className={`absolute h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-in-out ${
+              className={`absolute h-0.5 w-5 rounded-full bg-foreground/80 transition-all duration-300 ease-in-out ${
                 isMenuOpen ? "-rotate-45" : "translate-y-1.5"
               }`}
             />
@@ -152,7 +150,7 @@ const Navbar = () => {
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        className={`fixed top-0 right-0 z-40 h-dvh w-72 max-w-[80vw] bg-primary text-on-primary shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-40 h-dvh w-72 max-w-[80vw] bg-primary-dark text-on-primary shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -176,7 +174,7 @@ const Navbar = () => {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-5 w-5"
+                className="h-7 w-7"
               >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
@@ -185,7 +183,7 @@ const Navbar = () => {
           </div>
 
           {/* Liens */}
-          <div className="flex flex-1 flex-col gap-1 px-6 pt-6">
+          <div className="flex flex-1 flex-col gap-8 px-6 pt-6">
             {NAV_LINKS.map((link, index) => (
               <Link
                 key={link.href}
@@ -194,7 +192,7 @@ const Navbar = () => {
                 style={{
                   transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
                 }}
-                className={`rounded-lg px-3 py-3 font-heading text-lg font-semibold transition-all duration-300 ease-out hover:bg-on-primary/10 hover:text-accent-slate ${
+                className={`rounded-full px-3 py-1 font-heading text-lg font-semibold border-b border-l border-accent-slate transition-all duration-300 ease-out hover:bg-on-primary/10 hover:text-accent-slate ${
                   isMenuOpen
                     ? "translate-x-0 opacity-100"
                     : "translate-x-4 opacity-0"

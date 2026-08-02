@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@iconify/tailwind4";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -16,11 +17,11 @@
 }
 
 .dark {
-  --background: #210c00;
-  --foreground: #b3b2b0;
+  --background: #000000ed;
+  --foreground: #ececec;
 
-  --color-primary: #975e44;
-  --color-primary-dark: #8b5a44;
+  --color-primary: #ab7258;
+  --color-primary-dark: #5c3a2c;
   --color-on-primary: #1c1714;
   --color-accent-mustard: #e0b968;
   --color-accent-bordeaux: #a8434f;
@@ -79,4 +80,15 @@ button,
   cursor:
     url("/cursor-click.png") 8 8,
     pointer;
+}
+
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

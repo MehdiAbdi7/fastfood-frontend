@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { nextHeroSlide } from "@/features/heroCarousel/heroCarouselSlice";
 
 const SHARED_IMAGE_CLASSNAME =
-  "absolute left-1/2 top-40 sm:top-50 w-[100%] -translate-x-1/2 object-contain shadow-food-md transition-[transform,opacity] duration-700 ease-out ";
+  "absolute left-1/2 top-35 sm:top-50 w-[95%] -translate-x-1/2 object-contain shadow-food-md transition-[transform,opacity] duration-700 ease-out ";
 
 const AUTOPLAY_INTERVAL_MS = 4000;
 const SLIDE_START_OFFSET = "7rem";
@@ -42,7 +42,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
   }, [dispatch, slides.length]);
 
   return (
-    <div className="relative order-2 mx-auto aspect-square w-full max-w-100 sm:max-w-120 bg-primary/10 backdrop-blur-2xl rounded-full ">
+    <div className="relative order-2 mx-auto aspect-square w-full max-w-80 sm:max-w-120 bg-linear-to-t from-transparent to-primary/60 lg:to-transparent backdrop-blur-lg shadow-2xl shadow-primary sm:-bg-linear-0  rounded-full ">
       <div
         className="absolute bottom-[6%] left-1/2 h-[8%] w-[70%] -translate-x-1/2 rounded-full blur-2xl bg-black/20 dark:bg-black/40"
         aria-hidden="true"
@@ -85,8 +85,10 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
           <span
             key={slide.src}
             aria-hidden="true"
-            className={`h-2 w-2 rounded-full bg-primary transition-opacity duration-300 ${
-              index === currentIndex ? "opacity-100" : "opacity-40"
+            className={` rounded-full transition-opacity duration-300 ${
+              index === currentIndex
+                ? "bg-accent-green opacity-100 h-2.5 w-2.5"
+                : "bg-primary opacity-80 h-2 w-2"
             }`}
           />
         ))}
