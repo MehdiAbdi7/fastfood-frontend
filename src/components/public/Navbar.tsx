@@ -23,7 +23,7 @@ const Navbar = () => {
       }`}
     >
       <nav
-        className={`mx-auto flex w-full items-center justify-between border border-primary lg:border-none px-6 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
+        className={`mx-auto flex w-full items-center justify-between border-b border-primary lg:border-none px-6 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
           isScrolled || isMenuOpen ? "text-background" : "text-primary "
         }`}
       >
