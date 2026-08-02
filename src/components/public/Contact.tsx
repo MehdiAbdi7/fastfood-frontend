@@ -17,7 +17,7 @@ export function Contact() {
   return (
     <section
       id="contact"
-      className="relative isolate overflow-hidden px-6 py-10"
+      className="relative isolate overflow-hidden px-6 py-10 bg-transparent backdrop-blur-lg shadow-2xl shadow-primary sm:-bg-linear-0 rounded-2xl mx-4 mt-4"
     >
       {/* Décoration — tout en dessous */}
       <Image

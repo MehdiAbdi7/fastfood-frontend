@@ -32,7 +32,7 @@ const heroSlides: HeroSlide[] = [
 
 export function Hero() {
   return (
-    <section className="relative isolate flex min-h-dvh items-center overflow-hidden py-3 px-6">
+    <section className="relative isolate overflow-hidden px-6 py-10 bg-transparent backdrop-blur-lg shadow-2xl shadow-primary  ">
       {/* Décoration */}
       <Image
         src="/deco-fastfood2.png"

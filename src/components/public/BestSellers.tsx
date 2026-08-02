@@ -14,7 +14,10 @@ export function BestSellers() {
     .slice(0, BEST_SELLERS_COUNT);
 
   return (
-    <section id="menu" className="relative isolate overflow-hidden px-6 py-20">
+    <section
+      id="menu"
+      className="relative isolate overflow-hidden px-6 py-10 bg-transparent backdrop-blur-lg shadow-2xl shadow-primary rounded-2xl mx-4 my-4"
+    >
       {/* Décoration — tout en dessous */}
       <Image
         src="/deco-fastfood2.png"
