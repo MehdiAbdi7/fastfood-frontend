@@ -99,7 +99,7 @@ export function Hero() {
       </div>
 
       {/* Badges de confiance */}
-      <div className="absolute bottom-6 left-0 right-0 z-10 px-6">
+      <div className="absolute bottom-0 left-0 right-0 z-10 px-6">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-3 sm:gap-4 md:justify-between">
           {[
             { icon: "icon-[line-md--home]", text: "Livraison à domicile" },
