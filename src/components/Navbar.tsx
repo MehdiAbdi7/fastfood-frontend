@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "./themeToggle";
+import { useNavbar } from "@/features/navbar/useNavbar";
 
 const NAV_LINKS = [
   { href: "/#accueil", label: "Accueil" },
@@ -13,45 +13,7 @@ const NAV_LINKS = [
 ];
 
 const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Bloque le scroll du body quand le menu mobile est ouvert
-  useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isMenuOpen]);
-
-  // Ferme le menu automatiquement si on repasse en desktop
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) setIsMenuOpen(false);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Ferme le menu avec la touche Échap
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsMenuOpen(false);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  const { isScrolled, isMenuOpen, toggleMenu, closeMenu } = useNavbar();
 
   return (
     <header
@@ -67,7 +29,7 @@ const Navbar = () => {
         <Link
           href="/"
           className="flex items-center justify-center gap-0.5 sm:gap-1 px-4 py-0.5 bg-linear-to-bl from-transparent via-transparent to-primary backdrop-blur-2xl rounded-4xl shadow-sm sm:shadow-lg shadow-primary"
-          onClick={() => setIsMenuOpen(false)}
+          onClick={closeMenu}
         >
           <Image
             src="/logo-niwa.png"
@@ -111,7 +73,7 @@ const Navbar = () => {
 
           {/* Bouton hamburger — visible uniquement mobile */}
           <button
-            onClick={() => setIsMenuOpen((prev) => !prev)}
+            onClick={toggleMenu}
             aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
@@ -138,7 +100,7 @@ const Navbar = () => {
 
       {/* Overlay sombre derrière le panneau */}
       <div
-        onClick={() => setIsMenuOpen(false)}
+        onClick={closeMenu}
         className={`fixed inset-0 -z-10 bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           isMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
@@ -162,7 +124,7 @@ const Navbar = () => {
             </span>
 
             <button
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
               aria-label="Fermer le menu"
               className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-on-primary/10"
             >
@@ -188,7 +150,7 @@ const Navbar = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMenu}
                 style={{
                   transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
                 }}
@@ -207,7 +169,7 @@ const Navbar = () => {
           <div className="px-6 pb-8">
             <Link
               href="/commande"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
               className="block rounded-full bg-on-primary px-5 py-3 text-center font-bold text-primary transition-colors duration-200 hover:bg-background hover:text-accent-slate"
             >
               Commander
