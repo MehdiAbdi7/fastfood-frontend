@@ -23,13 +23,13 @@ const Navbar = () => {
       }`}
     >
       <nav
-        className={`mx-auto flex w-full items-center justify-between border-b border-primary lg:border-none px-6 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
+        className={`mx-auto flex w-full items-center justify-between border-b border-primary lg:border-none px-8 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
           isScrolled || isMenuOpen ? "text-background" : "text-primary "
         }`}
       >
         <Link
           href="/"
-          className="flex items-center justify-center gap-0.5 sm:gap-1 px-4 py-0.5 bg-linear-to-bl from-transparent via-transparent to-primary backdrop-blur-2xl rounded-4xl shadow-sm sm:shadow-lg shadow-primary"
+          className="flex items-center justify-center gap-0.5 sm:gap-1 "
           onClick={closeMenu}
         >
           <Image
@@ -50,7 +50,7 @@ const Navbar = () => {
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              className="group relative text-on-primary py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
+              className="group relative text-white py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
               href={link.href}
             >
               {link.label}

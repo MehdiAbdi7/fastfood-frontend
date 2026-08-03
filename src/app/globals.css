@@ -17,15 +17,15 @@
 }
 
 .dark {
-  --background: #000000ed;
-  --foreground: #ececec;
+  --background: #311603;
+  --foreground: #f3ece3;
 
-  --color-primary: #ab7258;
-  --color-primary-dark: #5c3a2c;
-  --color-on-primary: #1c1714;
-  --color-accent-mustard: #e0b968;
-  --color-accent-bordeaux: #a8434f;
-  --color-accent-green: #2e8b5e;
+  --color-primary: #976d5b;
+  --color-primary-dark: #8b5a44;
+  --color-on-primary: #1a1310;
+  --color-accent-mustard: #e6b856;
+  --color-accent-bordeaux: #d1495c;
+  --color-accent-green: #3ba44e;
   --color-accent-slate: #e7b924;
 }
 
@@ -76,7 +76,8 @@ body {
 
 a,
 button,
-[role="button"] {
+[role="button"],
+.cursor-pointer {
   cursor:
     url("/cursor-click.png") 8 8,
     pointer;

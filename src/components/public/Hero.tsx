@@ -32,7 +32,7 @@ const heroSlides: HeroSlide[] = [
 
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden px-6 py-10 bg-transparent backdrop-blur-lg shadow-2xl shadow-primary  ">
+    <section className="relative isolate overflow-hidden px-4 sm:px-2 py-10 bg-transparent backdrop-blur-lg">
       {/* Décoration */}
       <Image
         src="/deco-fastfood2.png"
@@ -50,34 +50,36 @@ export function Hero() {
       />
 
       {/* Contenu */}
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-1 py-20 md:grid-cols-2 md:gap-6">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center text-center justify-center gap-1 py-20 md:grid-cols-2 md:gap-6 md:text-left md:justify-start">
         <HeroCarousel slides={heroSlides} />
 
-        {/* Texte avec stagger */}
-        <div className="order-1 flex flex-col gap-2">
-          <span className="animate-[slideInLeft_0.6s_ease-out_0.1s_both] font-heading text-sm font-bold uppercase tracking-wide text-accent-green">
-            Fast-food fait maison
-          </span>
-
-          <h1 className="animate-[slideInLeft_0.6s_ease-out_0.2s_both] font-heading text-4xl font-bold leading-tight text-primary sm:text-5xl">
-            Commandez vos plats préférés en toute simplicité
-          </h1>
-
-          <p className="animate-[slideInLeft_0.6s_ease-out_0.3s_both] max-w-md text-foreground">
-            <span className="text-base text-accent-green">
-              Tacos, pizzas, burgers et salades{" "}
+        <div className="flex flex-col justify-between items-center md:items-start">
+          {/* Texte avec stagger */}
+          <div className="flex flex-col items-center gap-4 sm:gap-3 md:items-start">
+            <span className="animate-[slideInLeft_0.6s_ease-out_0.1s_both] font-heading text-md font-bold uppercase tracking-wide text-accent-green">
+              Fast-food fait maison
             </span>
-            préparés minute, 100% faits maison. Sur place, à emporter, ou livrés
-            directement chez vous.
-          </p>
 
-          <Link
-            href="/commande"
-            className="animate-[slideInLeft_0.6s_ease-out_0.4s_both] inline-flex w-fit items-center gap-2 rounded-full bg-primary my-4 px-3 py-3 font-bold text-on-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
-          >
-            Passer votre commande
-            <span className="icon-[line-md--arrow-right-circle-twotone] text-2xl" />
-          </Link>
+            <h1 className="animate-[slideInLeft_0.6s_ease-out_0.2s_both] font-heading text-4xl font-bold leading-tight text-primary sm:text-5xl">
+              Commandez vos plats préférés en toute simplicité
+            </h1>
+
+            <p className="animate-[slideInLeft_0.6s_ease-out_0.3s_both] mx-auto max-w-md text-foreground md:mx-0">
+              <span className="text-base text-accent-green">
+                Tacos, pizzas, burgers et salades{" "}
+              </span>
+              préparés minute, 100% faits maison. Sur place, à emporter, ou
+              livrés directement chez vous.
+            </p>
+
+            <Link
+              href="/commande"
+              className="animate-[slideInLeft_0.6s_ease-out_0.4s_both] inline-flex w-fit items-center gap-2 rounded-full bg-primary my-4 px-3 py-3 font-bold text-on-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
+            >
+              Passer votre commande
+              <span className="icon-[line-md--arrow-right-circle-twotone] text-2xl" />
+            </Link>
+          </div>
 
           <div className="animate-[slideInLeft_0.6s_ease-out_0.5s_both] mt-2 grid grid-cols-3 gap-4 text-sm">
             <div>
