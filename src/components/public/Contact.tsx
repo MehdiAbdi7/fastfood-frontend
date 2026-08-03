@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const LOCATIONS = [
   {
@@ -79,15 +80,26 @@ export function Contact() {
 
         <div className="mt-10 flex flex-col items-center gap-3">
           <p className="text-sm teontext-background">Suivez-nous</p>
-          <a
-            href="https://www.instagram.com/niwafood/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-on-primary transition-transform duration-300 hover:scale-110"
-            aria-label="Niwa Food sur Instagram"
-          >
-            <span className="icon-[mdi--instagram] text-2xl" />
-          </a>
+          <div className="flex justify-center items-center gap-2">
+            <Link
+              href="https://www.instagram.com/niwafood/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-rose-500/10 transition-transform duration-300 hover:scale-110"
+              aria-label="Niwa Food sur Instagram"
+            >
+              <span className="icon-[line-md--instagram] bg-rose-500 text-2xl"></span>
+            </Link>
+            <Link
+              href="https://www.facebook.com/niwafood"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-700/10 transition-transform duration-300 hover:scale-110"
+              aria-label="Niwa Food sur facebook"
+            >
+              <span className="icon-[line-md--facebook] bg-blue-700 text-2xl"></span>
+            </Link>
+          </div>
         </div>
       </div>
     </section>
