@@ -40,7 +40,7 @@ export function BestSellers() {
         className="pointer-events-none absolute inset-0 z-10 bg-linear-to-r from-background/10 via-background/5 to-background/5 dark:from-background/10 dark:via-background/10 dark:to-background/10"
       />
 
-      <div className="relative z-10 mx-auto max-w-6xl rounded-4xl shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-2xl px-2 sm:px-8 py-8 bg-primary/80">
+      <div className="relative z-10 mx-auto max-w-6xl rounded-4xl shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-2xl px-2 sm:px-8 py-8 bg-primary/60">
         <div className="mb-10 grid grid-cols-1 items-center gap-6 sm:mb-14 sm:grid-cols-[1fr_auto_1fr]">
           <div className="hidden sm:block" aria-hidden="true" />
 

@@ -34,7 +34,7 @@ export function Contact() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-10 bg-linear-to-r from-background/10 via-background/5 to-background/5 dark:from-background/10 dark:via-background/10 dark:to-background/10"
       />
-      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] shadow-accent-mustard backdrop-blur-2xl px-8 py-6 bg-accent-slate/70">
+      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] shadow-accent-mustard backdrop-blur-2xl px-8 py-6 bg-accent-slate/30">
         <div className="mb-10 flex flex-col gap-2 text-center">
           <span className="font-heading text-lg font-bold uppercase tracking-wide text-accent-green">
             Où nous trouver
