@@ -34,7 +34,7 @@ export function Contact() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-10 bg-linear-to-r from-background/10 via-background/5 to-background/5 dark:from-background/10 dark:via-background/10 dark:to-background/10"
       />
-      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] shadow-accent-mustard backdrop-blur-2xl px-8 py-6 bg-accent-slate/30">
+      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-2xl px-8 py-6 bg-primary/60">
         <div className="mb-10 flex flex-col gap-2 text-center">
           <span className="font-heading text-lg font-bold uppercase tracking-wide text-accent-green">
             Où nous trouver
@@ -48,11 +48,11 @@ export function Contact() {
           {LOCATIONS.map((location) => (
             <div
               key={location.name}
-              className="flex flex-col gap-4 rounded-3xl bg-accent-mustard/70 backdrop-blur-2xl p-6 shadow-food-sm sm:p-8"
+              className="flex flex-col gap-4 rounded-3xl bg-primary/70 backdrop-blur-2xl p-6 shadow-food-sm sm:p-8"
             >
               <div className="flex items-center gap-3">
                 <span className="icon-[mdi--map-marker] text-3xl text-accent-green" />
-                <h3 className="font-heading text-xl font-bold text-accent-green">
+                <h3 className="font-heading text-xl font-bold text-foreground">
                   {location.name}
                 </h3>
               </div>
@@ -61,7 +61,7 @@ export function Contact() {
 
               <a
                 href={`tel:${location.phone.replace(/\s/g, "")}`}
-                className="flex items-center gap-2 font-semibold text-accent-green hover:underline"
+                className="flex items-center gap-2 font-semibold text-foreground hover:underline"
               >
                 <span className="icon-[mdi--phone] text-xl" />
                 {location.phone}
