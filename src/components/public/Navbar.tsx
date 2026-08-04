@@ -50,7 +50,7 @@ const Navbar = () => {
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              className="group relative text-white py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
+              className="group relative text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
               href={link.href}
             >
               {link.label}
@@ -121,7 +121,7 @@ const Navbar = () => {
           {/* En-tête du panneau : logo + croix de fermeture */}
           <div className="flex items-center justify-between border-b border-on-primary/10 px-6 py-4">
             <span className="font-heading text-lg font-semibold">
-              <span className="text-accent-slate">Niwa</span> Food
+              <span className="text-background">Niwa</span> Food
             </span>
 
             <button
@@ -155,7 +155,7 @@ const Navbar = () => {
                 style={{
                   transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
                 }}
-                className={`rounded-full px-3 py-1 font-heading text-lg font-semibold border-b border-l border-accent-slate transition-all duration-300 ease-out hover:bg-on-primary/10 hover:text-accent-slate ${
+                className={`rounded-full px-3 py-1 font-heading text-lg font-semibold border-b border-foreground transition-all duration-300 ease-out ${
                   isMenuOpen
                     ? "translate-x-0 opacity-100"
                     : "translate-x-4 opacity-0"

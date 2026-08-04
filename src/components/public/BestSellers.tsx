@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useGetMenuItemsQuery } from "@/features/menu/menuApi";
 import { BestSellerCard } from "./BestSellerCard";
-import Image from "next/image";
 
 const BEST_SELLER_NAMES = [
   "PIRELLI",
@@ -23,7 +22,7 @@ export function BestSellers() {
   return (
     <section
       id="menu"
-      className="relative isolate overflow-hidden px-6 sm:px-8 py-16 sm:py-24 bg-linear-to-bl from-background via-background to-primary/60 "
+      className="relative isolate overflow-hidden px-6 sm:px-8 py-16 sm:py-24 bg-transparent sm:bg-linear-to-bl from-primary/55 via-background to-primary/60 "
     >
       <div className="relative z-10 mx-auto max-w-6xl rounded-4xl shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-2 sm:px-8 py-8 bg-primary/50 dark:bg-primary/30 border border-foreground">
         <div className="mb-10 grid grid-cols-1 items-center gap-6 sm:mb-14 sm:grid-cols-[1fr_auto_1fr]">

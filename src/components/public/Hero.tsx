@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { HeroCarousel, type HeroSlide } from "./HeroCarousel";
 
@@ -32,17 +31,7 @@ const heroSlides: HeroSlide[] = [
 
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden px-4 sm:px-2 py-18 sm:py-10 bg-linear-to-tr from-background via-background to-primary/60 backdrop-blur-lg">
-      {/* Glow radial doré — dark uniquement, remplace le PNG */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-20 hidden dark:block "
-        style={{
-          background:
-            "radial-gradient(circle at 78% 38%, rgba(230,184,86,0.35), rgba(230,184,86,0.1) 35%, transparent 55%)",
-        }}
-      />
-
+    <section className="relative isolate overflow-hidden px-4 sm:px-2 py-18 sm:py-10 bg-linear-to-br from-background via-background to-primary/60 ">
       {/* Contenu */}
       <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center text-center justify-center gap-10 py-20 md:grid-cols-2 md:gap-16 md:text-left md:justify-start">
         <HeroCarousel slides={heroSlides} />

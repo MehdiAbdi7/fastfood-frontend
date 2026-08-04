@@ -10,7 +10,7 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label="Basculer le thème clair/sombre"
-      className="flex h-9 w-9 cursor-pointer items-center justify-center border-2 border-foreground/60 sm:border-on-primary rounded-full font-bold bg-primary/20 backdrop-blur-2xl text-foreground/60 sm:text-on-primary transition-colors hover:border-2 hover:border-foreground hover:text-foreground"
+      className="flex h-9 w-9 cursor-pointer items-center justify-center border-2 border-foreground/80 rounded-full font-bold bg-primary/20 backdrop-blur-2xl text-foreground/80 transition-colors hover:border-2 hover:border-accent-green hover:text-accent-green"
     >
       {isDark ? (
         <span className="icon-[line-md--moon-filled-to-sunny-filled-loop-transition] size-5"></span>
