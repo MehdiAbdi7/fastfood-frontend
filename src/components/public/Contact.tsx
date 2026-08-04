@@ -18,28 +18,14 @@ export function Contact() {
   return (
     <section
       id="contact"
-      className="relative isolate overflow-hidden px-8 py-16 sm:py-24 "
+      className="relative isolate overflow-hidden px-6 sm:px-8 py-16 sm:py-24 bg-linear-to-br from-background via-background to-primary "
     >
-      {/* Décoration */}
-      <Image
-        src="/deco-fastfood2.png"
-        alt=""
-        fill
-        priority
-        aria-hidden="true"
-        className="pointer-events-none -z-20 -scale-y-100 -scale-x-100 hidden object-cover object-top lg:block"
-      />
-      {/* Fondu — au-dessus de la déco, en dessous du contenu */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-10 bg-linear-to-r from-background/10 via-background/5 to-background/5 dark:from-background/10 dark:via-background/10 dark:to-background/10"
-      />
-      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-2xl px-8 py-6 bg-primary/60">
+      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-8 py-6 bg-primary/60 dark:bg-primary/30 border border-foreground">
         <div className="mb-10 flex flex-col gap-2 text-center">
-          <span className="font-heading text-lg font-bold uppercase tracking-wide text-accent-green">
+          <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
             Où nous trouver
           </span>
-          <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
+          <h2 className="font-heading text-3xl font-bold text-accent-green sm:text-4xl">
             Deux adresses, un seul régal
           </h2>
         </div>
@@ -82,22 +68,31 @@ export function Contact() {
           <p className="text-sm teontext-background">Suivez-nous</p>
           <div className="flex justify-center items-center gap-2">
             <Link
-              href="https://www.instagram.com/niwafood/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-rose-500/10 transition-transform duration-300 hover:scale-110"
-              aria-label="Niwa Food sur Instagram"
-            >
-              <span className="icon-[line-md--instagram] bg-rose-500 text-2xl"></span>
-            </Link>
-            <Link
               href="https://www.facebook.com/niwafood"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-700/10 transition-transform duration-300 hover:scale-110"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-700/30 transition-transform duration-300 hover:scale-110"
               aria-label="Niwa Food sur facebook"
             >
-              <span className="icon-[line-md--facebook] bg-blue-700 text-2xl"></span>
+              <span className="icon-[mdi--facebook] bg-blue-700 text-2xl"></span>
+            </Link>
+            <Link
+              href="https://www.instagram.com/niwafood/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-rose-500/20 transition-transform duration-300 hover:scale-110"
+              aria-label="Niwa Food sur Instagram"
+            >
+              <span className="icon-[line-md--instagram] bg-rose-600 text-2xl"></span>
+            </Link>
+            <Link
+              href="https://www.tiktok.com/@niwafood"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-black/80 transition-transform duration-300 hover:scale-110"
+              aria-label="Niwa Food sur Tiktok"
+            >
+              <span className="icon-[line-md--tiktok] bg-white text-2xl"></span>
             </Link>
           </div>
         </div>

@@ -7,7 +7,7 @@ interface BestSellerCardProps {
 
 export function BestSellerCard({ item }: BestSellerCardProps) {
   return (
-    <div className="group relative flex flex-col overflow-hidden border-2 border-accent-green rounded-2xl bg-background ring-1 ring-primary/10 backdrop-blur-2xl hover:shadow-[0_0_20px_10px_rgba(217,169,77,0.45)] hover:shadow-accent-green transition-all duration-300 motion-safe:hover:-translate-y-1.5 cursor-pointer ">
+    <div className="group relative flex flex-col overflow-hidden border-2 border-primary rounded-2xl bg-background ring-1 ring-primary/10 backdrop-blur-2xl hover:shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] hover:shadow-primary transition-all duration-300 motion-safe:hover:-translate-y-1.5 cursor-pointer ">
       {/* Photo */}
       <div className="relative aspect-square w-full overflow-hidden bg-primary/20">
         {item.imageUrl ? (

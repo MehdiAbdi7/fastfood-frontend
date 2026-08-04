@@ -17,8 +17,14 @@ const heroCarouselSlice = createSlice({
       const totalSlides = action.payload;
       state.currentIndex = (state.currentIndex + 1) % totalSlides;
     },
+    // même logique en sens inverse — on ajoute totalSlides avant le modulo
+    // pour éviter un résultat négatif quand currentIndex vaut 0
+    prevHeroSlide(state, action: PayloadAction<number>) {
+      const totalSlides = action.payload;
+      state.currentIndex = (state.currentIndex - 1 + totalSlides) % totalSlides;
+    },
   },
 });
 
-export const { nextHeroSlide } = heroCarouselSlice.actions;
+export const { nextHeroSlide, prevHeroSlide } = heroCarouselSlice.actions;
 export default heroCarouselSlice.reducer;

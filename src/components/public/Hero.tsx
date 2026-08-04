@@ -32,25 +32,19 @@ const heroSlides: HeroSlide[] = [
 
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden px-4 sm:px-2 py-10 bg-transparent backdrop-blur-lg">
-      {/* Décoration */}
-      <Image
-        src="/deco-fastfood2.png"
-        alt=""
-        fill
-        priority
-        aria-hidden="true"
-        className="pointer-events-none -z-20 hidden object-cover object-top lg:block"
-      />
-
-      {/* Fondu */}
+    <section className="relative isolate overflow-hidden px-4 sm:px-2 py-18 sm:py-10 bg-linear-to-tr from-background via-background to-primary/60 backdrop-blur-lg">
+      {/* Glow radial doré — dark uniquement, remplace le PNG */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-r from-background/10 via-background/5 to-background/5 dark:from-background/10 dark:via-background/10 dark:to-background/10"
+        className="pointer-events-none absolute inset-0 -z-20 hidden dark:block "
+        style={{
+          background:
+            "radial-gradient(circle at 78% 38%, rgba(230,184,86,0.35), rgba(230,184,86,0.1) 35%, transparent 55%)",
+        }}
       />
 
       {/* Contenu */}
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center text-center justify-center gap-1 py-20 md:grid-cols-2 md:gap-6 md:text-left md:justify-start">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center text-center justify-center gap-10 py-20 md:grid-cols-2 md:gap-16 md:text-left md:justify-start">
         <HeroCarousel slides={heroSlides} />
 
         <div className="flex flex-col justify-between items-center md:items-start">
@@ -60,12 +54,14 @@ export function Hero() {
               Fast-food fait maison
             </span>
 
-            <h1 className="animate-[slideInLeft_0.6s_ease-out_0.2s_both] font-heading text-4xl font-bold leading-tight text-primary sm:text-5xl">
-              Commandez vos plats préférés en toute simplicité
+            <h1 className="animate-[slideInLeft_0.6s_ease-out_0.2s_both] font-heading text-4xl font-bold leading-tight text-foreground sm:text-5xl">
+              Commandez vos
+              <br /> <span className="text-primary">plats préférés</span> en
+              toute simplicité
             </h1>
 
-            <p className="animate-[slideInLeft_0.6s_ease-out_0.3s_both] mx-auto max-w-md text-foreground md:mx-0">
-              <span className="text-base text-accent-green">
+            <p className="animate-[slideInLeft_0.6s_ease-out_0.3s_both] mx-auto max-w-md text-foreground font-semibold md:mx-0">
+              <span className="text-lg  text-accent-green">
                 Tacos, pizzas, burgers et salades{" "}
               </span>
               préparés minute, 100% faits maison. Sur place, à emporter, ou
@@ -82,17 +78,17 @@ export function Hero() {
           </div>
 
           <div className="animate-[slideInLeft_0.6s_ease-out_0.5s_both] mt-2 grid grid-cols-3 gap-4 text-sm">
-            <div>
+            <div className="border-l-2 border-accent-green/20 px-2">
               <p className="font-semibold text-accent-green">1. Choisissez</p>
               <p className="text-foreground">
                 Sur place, à emporter ou livraison
               </p>
             </div>
-            <div>
+            <div className="border-l-2 border-accent-green/20 px-2">
               <p className="font-semibold text-accent-green">2. Composez</p>
               <p className="text-foreground">Votre commande sur mesure</p>
             </div>
-            <div>
+            <div className="border-l-2 border-accent-green/20 px-2">
               <p className="font-semibold text-accent-green">3. Dégustez</p>
               <p className="text-foreground">Prêt en quelques minutes</p>
             </div>
@@ -104,17 +100,26 @@ export function Hero() {
       <div className="absolute bottom-5 md:bottom-12 left-0 right-0 z-10 px-6">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-3 sm:gap-4 md:justify-between">
           {[
-            { icon: "icon-[line-md--home]", text: "Livraison à domicile" },
-            { icon: "icon-[mdi--food]", text: "100% frais & maison" },
-            { icon: "icon-[mdi--cash-check]", text: "Paiement à la livraison" },
             {
-              icon: "icon-[line-md--star-alt-filled]",
+              icon: "icon-[line-md--home] text-xl text-primary",
+              text: "Livraison à domicile",
+            },
+            {
+              icon: "icon-[mdi--food] text-xl text-primary",
+              text: "100% frais & maison",
+            },
+            {
+              icon: "icon-[mdi--cash-check] text-xl text-primary",
+              text: "Paiement à la livraison",
+            },
+            {
+              icon: "icon-[line-md--star-alt-filled] text-xl text-primary",
               text: "4.2/5 Avis Google ",
             },
           ].map((badge, i) => (
             <div
               key={badge.text}
-              className="animate-[slideInLeft_0.6s_ease-out_both] flex items-center gap-2.5 rounded-full bg-accent-green/15 px-4 py-2 backdrop-blur-sm sm:px-5 sm:py-2.5"
+              className="animate-[slideInLeft_0.6s_ease-out_both] flex items-center gap-2.5 rounded-full bg-primary/10 px-4 py-2 backdrop-blur-sm sm:px-5 sm:py-2.5"
               style={{ animationDelay: `${0.6 + i * 0.1}s` }}
             >
               <span className={badge.icon} />

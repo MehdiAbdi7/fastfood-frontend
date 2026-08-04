@@ -14,7 +14,7 @@ export default function Home() {
       <div className="relative">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-7 top-50 z-20 hidden h-96 w-48 -translate-y-1/2 sm:h-112 sm:w-56 lg:block"
+          className="pointer-events-none absolute -left-7 top-50 z-20 hidden h-96 w-48 -translate-y-1/2 sm:h-112 sm:w-56 xl:block"
         >
           <Image
             src="/sauces.png"
@@ -30,7 +30,7 @@ export default function Home() {
       <div className="relative">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-4 top-0 z-20 hidden -translate-y-1/2 sm:h-240 sm:w-56 lg:block"
+          className="pointer-events-none absolute -right-4 top-0 z-20 hidden -translate-y-1/2 sm:h-240 sm:w-56 xl:block"
         >
           <Image
             src="/deco.png"
@@ -45,7 +45,7 @@ export default function Home() {
       <div className="relative">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-7 top-0 z-20 hidden -translate-y-1/2 sm:h-240 sm:w-56 lg:block"
+          className="pointer-events-none absolute -left-7 top-0 z-20 hidden -translate-y-1/2 sm:h-240 sm:w-56 xl:block"
         >
           <Image
             src="/deco.png"
@@ -60,7 +60,7 @@ export default function Home() {
       <div className="relative">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-7 top-125 z-20 -scale-x-100 hidden -translate-y-1/2 sm:h-112 sm:w-56 lg:block"
+          className="pointer-events-none absolute -right-7 top-125 z-20 -scale-x-100 hidden -translate-y-1/2 sm:h-112 sm:w-56 xl:block"
         >
           <Image
             src="/sauces2.png"
