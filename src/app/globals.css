@@ -4,16 +4,18 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #fff2c7;
-  --foreground: #0f0d0b;
+  --background: #fbf5ef;
+  --foreground: #3d2716;
 
-  --color-primary: #8f6959;
-  --color-primary-dark: #5c3a2c;
+  --color-primary: #b17865;
+  --color-primary-dark: #8b4530;
   --color-on-primary: #faf6f0;
-  --color-accent-mustard: #d9a94d;
+  --color-accent-mustard: #e8a020;
   --color-accent-bordeaux: #8b2e3a;
-  --color-accent-green: #1b6a39;
+  --color-accent-green: #1e7f4e;
   --color-accent-slate: #0e5f2d;
+
+  --hero-bg-image: url("/bg-white.png");
 }
 
 .dark {
@@ -27,6 +29,8 @@
   --color-accent-bordeaux: #d1495c;
   --color-accent-green: #3ba467;
   --color-accent-slate: #3cb972;
+
+  --hero-bg-image: url("/bg-dark.png");
 }
 
 @theme inline {
@@ -41,9 +45,9 @@
   --color-accent-slate: var(--color-accent-slate);
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);
-  --shadow-food-sm: drop-shadow(0 8px 10px rgb(139 90 68 / 0.5));
-  --shadow-food-md: drop-shadow(0 16px 20px rgb(139 90 68 / 0.5));
-  --shadow-food-lg: drop-shadow(0 24px 32px rgb(139 90 68 / 0.5));
+  --shadow-food-sm: drop-shadow(0 8px 10px rgb(195 105 74 / 0.5));
+  --shadow-food-md: drop-shadow(0 16px 20px rgb(195 105 74 / 0.5));
+  --shadow-food-lg: drop-shadow(0 24px 32px rgb(195 105 74 / 0.5));
 }
 
 body {
@@ -92,4 +96,12 @@ button,
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.background {
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.3s ease-in-out;
 }

@@ -23,13 +23,13 @@ const Navbar = () => {
       }`}
     >
       <nav
-        className={`mx-auto flex w-full items-center justify-between border-b border-primary lg:border-none px-8 py-2 transition-colors duration-300 ease-in-out sm:justify-evenly ${
+        className={`mx-auto max-w-7xl flex w-full items-center justify-between border-b border-primary lg:border-none px-2 py-2 transition-colors duration-300 ease-in-out sm:justify-between ${
           isScrolled || isMenuOpen ? "text-background" : "text-primary "
         }`}
       >
         <Link
           href="/"
-          className="flex items-center justify-center gap-0.5 sm:gap-1 "
+          className="flex items-center justify-center gap-0.5 sm:gap-1 shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 rounded-4xl px-4 "
           onClick={closeMenu}
         >
           <Image
@@ -39,22 +39,22 @@ const Navbar = () => {
             height={55}
             priority
           />
-          <span className="font-heading text-sm font-semibold sm:text-xl hover:scale-110">
+          <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
             <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
             Food
           </span>
         </Link>
 
         {/* Liens desktop */}
-        <div className="hidden items-center gap-8 font-heading text-sm font-bold md:flex md:bg-primary md:rounded-4xl md:px-4 md:py-1">
+        <div className="hidden items-center gap-8 font-heading text-sm font-bold shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 md:flex md:bg-background md:rounded-4xl md:px-6 md:py-2">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              className="group relative text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-slate"
+              className="group relative text-foreground dark:text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-mustard"
               href={link.href}
             >
               {link.label}
-              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-slate transition-transform duration-500 ease-out group-hover:scale-x-100" />
+              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-mustard transition-transform duration-500 ease-out group-hover:scale-x-100" />
             </Link>
           ))}
         </div>
@@ -65,8 +65,8 @@ const Navbar = () => {
             href="/commande"
             className={`hidden rounded-full px-5 py-2 font-bold transition-all duration-200 ease-in-out sm:inline-block ${
               isScrolled || isMenuOpen
-                ? "bg-background text-primary hover:bg-background hover:text-accent-slate hover:scale-105"
-                : "bg-primary text-on-primary hover:text-accent-slate hover:scale-105"
+                ? "bg-background text-primary dark:text-foreground hover:bg-background hover:text-accent-slate hover:scale-105"
+                : "bg-primary text-background dark:text-foreground hover:text-accent-slate hover:scale-105"
             }`}
           >
             Commander

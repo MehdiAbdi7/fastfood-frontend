@@ -9,7 +9,7 @@ import {
 } from "@/features/heroCarousel/heroCarouselSlice";
 
 const SHARED_IMAGE_CLASSNAME =
-  "absolute left-1/2 top-35 sm:top-50 w-[80%] sm:w-[95%] -translate-x-1/2 object-contain shadow-food-md transition-[transform,opacity] duration-700 ease-out ";
+  "absolute left-1/2 top-35 sm:top-50 w-[70%] sm:w-[80%] -translate-x-1/2 object-contain shadow-food-md transition-[transform,opacity] duration-700 ease-out ";
 
 const AUTOPLAY_INTERVAL_MS = 4000;
 const SLIDE_START_OFFSET = "7rem";
@@ -78,10 +78,10 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
     <div
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative order-2 mx-auto aspect-square w-full max-w-80 sm:max-w-120 bg-linear-to-t from-primary via-transparent to-transparent rounded-full border-2 border-primary shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary"
+      className="relative order-2 mx-auto sm:mx-0 aspect-square w-full max-w-80 max-h-80 sm:max-w-120 sm:max-h-120 bg-linear-to-t from-accent-mustard/50 via-transparent to-transparent rounded-full  shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-accent-mustard/50"
     >
       <div
-        className="absolute bottom-[6%] left-1/2 h-[8%] w-[70%] -translate-x-1/2 rounded-full "
+        className="absolute bottom-[6%] left-1/2 h-[8%] w-[70%]  rounded-full "
         aria-hidden="true"
       />
 
@@ -108,7 +108,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
       {slides.map((slide, index) => (
         <span
           key={`label-${slide.src}`}
-          className={`absolute bottom-[13%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-background/70 px-4 py-1.5 text-xs font-semibold text-primary border-0.5 border-primary backdrop-blur-sm transition-opacity duration-700 ease-in-out sm:text-sm ${
+          className={`absolute bottom-[17%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-background/70 px-4 py-1.5 text-xs font-semibold text-primary border-0.5 border-primary backdrop-blur-sm transition-opacity duration-700 ease-in-out sm:text-sm ${
             index === currentIndex ? "opacity-100" : "opacity-0"
           }`}
         >
