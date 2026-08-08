@@ -17,9 +17,9 @@ export function Contact() {
   return (
     <section
       id="contact"
-      className="relative isolate overflow-hidden px-6 sm:px-8 py-16 sm:py-24 bg-transparent sm:bg-linear-to-tr from-background via-background to-primary/40 "
+      className="relative isolate overflow-hidden px-6 sm:px-8 py-16 sm:py-24"
     >
-      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-8 py-6 bg-primary/60 dark:bg-primary/30 border border-foreground">
+      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_15px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-8 py-6 bg-background dark:bg-primary/30 border border-foreground">
         <div className="mb-10 flex flex-col gap-2 text-center">
           <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
             Où nous trouver
@@ -33,7 +33,7 @@ export function Contact() {
           {LOCATIONS.map((location) => (
             <div
               key={location.name}
-              className="flex flex-col gap-4 rounded-3xl bg-primary/70 backdrop-blur-2xl p-6 shadow-food-sm sm:p-8"
+              className="flex flex-col gap-4 border border-primary rounded-3xl bg-background backdrop-blur-2xl p-6 shadow-food-sm sm:p-8"
             >
               <div className="flex items-center gap-3">
                 <span className="icon-[mdi--map-marker] text-3xl text-accent-green" />
@@ -42,7 +42,7 @@ export function Contact() {
                 </h3>
               </div>
 
-              <p className="text-background">{location.address}</p>
+              <p className="text-accent-green">{location.address}</p>
 
               <a
                 href={`tel:${location.phone.replace(/\s/g, "")}`}
@@ -52,7 +52,7 @@ export function Contact() {
                 {location.phone}
               </a>
 
-              <div className="mt-2 flex items-start gap-2 text-sm text-background">
+              <div className="mt-2 flex items-start gap-2 text-sm text-accent-green">
                 <span className="icon-[mdi--clock-outline] mt-0.5 text-lg" />
                 <div>
                   <p>Lun – Jeu, Sam – Dim : 11h00 – 00h30</p>

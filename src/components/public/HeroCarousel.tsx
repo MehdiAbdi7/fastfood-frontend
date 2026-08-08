@@ -9,7 +9,7 @@ import {
 } from "@/features/heroCarousel/heroCarouselSlice";
 
 const SHARED_IMAGE_CLASSNAME =
-  "absolute left-1/2 top-35 sm:top-50 w-[70%] sm:w-[80%] -translate-x-1/2 object-contain shadow-food-md transition-[transform,opacity] duration-700 ease-out ";
+  "absolute left-1/2 top-35 sm:top-50 w-[75%] sm:w-[80%] -translate-x-1/2 object-contain shadow-food-md transition-[transform,opacity] duration-700 ease-out ";
 
 const AUTOPLAY_INTERVAL_MS = 4000;
 const SLIDE_START_OFFSET = "7rem";
@@ -78,7 +78,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
     <div
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative order-2 mx-auto sm:mx-0 aspect-square w-full max-w-80 max-h-80 sm:max-w-120 sm:max-h-120 bg-linear-to-t from-accent-mustard/50 via-transparent to-transparent rounded-full  shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-accent-mustard/50"
+      className="relative order-2 mx-auto sm:mx-0 aspect-square w-full max-w-80 max-h-80 sm:max-w-120 sm:max-h-120 bg-linear-to-t from-primary/50 via-transparent to-transparent rounded-full  shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary"
     >
       <div
         className="absolute bottom-[6%] left-1/2 h-[8%] w-[70%]  rounded-full "

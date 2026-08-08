@@ -22,9 +22,9 @@ export function About() {
   return (
     <section
       id="a-propos"
-      className="relative isolate overflow-hidden contain-paint px-6 py-16 sm:px-8 sm:py-24 bg-transparent sm:bg-linear-to-tl from-primary/40 via-background to-primary/60"
+      className="relative isolate overflow-hidden contain-paint px-6 py-16 sm:px-8 sm:py-24 "
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-8 rounded-4xl bg-primary/60 dark:bg-primary/30 px-4 py-8 shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-2xl sm:gap-10 sm:px-8 sm:py-12 md:grid-cols-2 md:gap-16 border border-foreground">
+      <div className="mx-auto grid max-w-6xl items-center gap-8 rounded-4xl bg-background dark:bg-primary/30 px-4 py-8 shadow-[0_0_15px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-2xl sm:gap-10 sm:px-8 sm:py-12 md:grid-cols-2 md:gap-16 border border-foreground">
         <div className="flex flex-col items-center gap-4 text-center sm:text-left md:items-start">
           <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground ">
             Notre histoire
@@ -45,7 +45,7 @@ export function About() {
           </p>
 
           <div className="mt-4 grid w-full grid-cols-3 gap-1 sm:gap-3 md:gap-4">
-            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4">
+            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4 bg-background">
               <p className="font-heading text-xl font-bold text-accent-green/80 sm:text-2xl">
                 2
               </p>
@@ -53,7 +53,7 @@ export function About() {
                 Adresses à Alger
               </p>
             </div>
-            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4">
+            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4 bg-background">
               <p className="font-heading text-xl font-bold text-accent-green/80 sm:text-2xl">
                 100%
               </p>
@@ -61,7 +61,7 @@ export function About() {
                 Fait maison
               </p>
             </div>
-            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4">
+            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4 bg-background">
               <p className="font-heading text-xl font-bold text-accent-green/80 sm:text-2xl">
                 13h+
               </p>
