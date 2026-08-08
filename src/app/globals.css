@@ -59,6 +59,15 @@ body {
     auto;
 }
 
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
 /* Chrome, Edge, Safari */
 ::-webkit-scrollbar {
   width: 7px;
