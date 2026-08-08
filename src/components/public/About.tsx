@@ -45,7 +45,7 @@ export function About() {
           </p>
 
           <div className="mt-4 grid w-full grid-cols-3 gap-1 sm:gap-3 md:gap-4">
-            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4 bg-background">
+            <div className="min-w-0 rounded-2xl text-center border border-primary p-2 sm:p-3 md:p-4 bg-background">
               <p className="font-heading text-xl font-bold text-accent-green/80 sm:text-2xl">
                 2
               </p>
@@ -53,7 +53,7 @@ export function About() {
                 Adresses à Alger
               </p>
             </div>
-            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4 bg-background">
+            <div className="min-w-0 rounded-2xl text-center border border-primary p-2 sm:p-3 md:p-4 bg-background">
               <p className="font-heading text-xl font-bold text-accent-green/80 sm:text-2xl">
                 100%
               </p>
@@ -61,7 +61,7 @@ export function About() {
                 Fait maison
               </p>
             </div>
-            <div className="min-w-0 rounded-2xl text-center border border-accent-green p-2 sm:p-3 md:p-4 bg-background">
+            <div className="min-w-0 rounded-2xl text-center border border-primary p-2 sm:p-3 md:p-4 bg-background">
               <p className="font-heading text-xl font-bold text-accent-green/80 sm:text-2xl">
                 13h+
               </p>
