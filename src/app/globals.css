@@ -8,7 +8,7 @@
   --foreground: #3d2716;
 
   --color-primary: #b17865;
-  --color-primary-dark: #8b4530;
+  --color-primary-dark: #b17865;
   --color-on-primary: #faf6f0;
   --color-accent-mustard: #e8a020;
   --color-accent-bordeaux: #8b2e3a;
@@ -19,11 +19,11 @@
 }
 
 .dark {
-  --background: #0f0d0b;
+  --background: #110f0d;
   --foreground: #ebe8b8;
 
   --color-primary: #8a6107;
-  --color-primary-dark: #664704;
+  --color-primary-dark: #775305;
   --color-on-primary: #1a1310;
   --color-accent-mustard: #e6b856;
   --color-accent-bordeaux: #d1495c;

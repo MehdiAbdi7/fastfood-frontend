@@ -23,13 +23,13 @@ const Navbar = () => {
       }`}
     >
       <nav
-        className={`mx-auto max-w-7xl flex w-full items-center justify-between border-b border-primary lg:border-none px-2 py-2 transition-colors duration-300 ease-in-out sm:justify-between ${
+        className={`mx-auto max-w-5xl flex w-full items-center justify-between border-b border-primary lg:border-none px-2 py-2 transition-colors duration-300 ease-in-out sm:justify-between ${
           isScrolled || isMenuOpen ? "text-background" : "text-primary "
         }`}
       >
         <Link
           href="/"
-          className="flex items-center justify-center gap-0.5 sm:gap-1 shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 rounded-4xl px-4 "
+          className="flex items-center justify-center gap-0.5 sm:gap-1 "
           onClick={closeMenu}
         >
           <Image
@@ -65,8 +65,8 @@ const Navbar = () => {
             href="/commande"
             className={`hidden rounded-full px-5 py-2 font-bold transition-all duration-200 ease-in-out sm:inline-block ${
               isScrolled || isMenuOpen
-                ? "bg-background text-primary dark:text-foreground hover:bg-background hover:text-accent-slate hover:scale-105"
-                : "bg-primary text-background dark:text-foreground hover:text-accent-slate hover:scale-105"
+                ? "bg-background text-primary dark:text-foreground hover:text-accent-green hover:scale-105"
+                : "bg-primary text-background dark:text-foreground hover:bg-accent-green hover:scale-105"
             }`}
           >
             Commander
@@ -102,7 +102,7 @@ const Navbar = () => {
       {/* Overlay sombre derrière le panneau */}
       <div
         onClick={closeMenu}
-        className={`fixed inset-0 -z-10 bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 -z-10 bg-black/10 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           isMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         aria-hidden="true"
@@ -113,17 +113,30 @@ const Navbar = () => {
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        className={`fixed top-0 right-0 z-40 h-dvh w-72 max-w-[80vw] bg-primary-dark text-on-primary shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-40 h-dvh w-full  bg-primary-dark text-white shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
           {/* En-tête du panneau : logo + croix de fermeture */}
-          <div className="flex items-center justify-between border-b border-on-primary/10 px-6 py-4">
-            <span className="font-heading text-lg font-semibold">
-              <span className="text-background">Niwa</span> Food
-            </span>
-
+          <div className="flex items-center justify-between border-b border-on-primary/10 px-4 py-4">
+            <Link
+              href="/"
+              className="flex items-center justify-center gap-0.5 sm:gap-1 shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 rounded-4xl px-4 "
+              onClick={closeMenu}
+            >
+              <Image
+                src="/logo-niwa.png"
+                alt="Niwa Food"
+                width={55}
+                height={55}
+                priority
+              />
+              <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
+                <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
+                Food
+              </span>
+            </Link>
             <button
               onClick={closeMenu}
               aria-label="Fermer le menu"
