@@ -1,3 +1,4 @@
+import Footer from "@/components/public/Footer";
 import Navbar from "@/components/public/Navbar";
 
 export default function PublicLayout({
@@ -9,9 +10,7 @@ export default function PublicLayout({
     <div className="flex min-h-screen flex-col justify-between bg-background text-foreground">
       <Navbar />
       <main className="flex-1">{children}</main>
-      <footer className="border-t border-primary/20 py-8 text-center text-sm text-foreground/60">
-        © {new Date().getFullYear()} Niwa Food — Tous droits réservés
-      </footer>
+      <Footer />
     </div>
   );
 }
