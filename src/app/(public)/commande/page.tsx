@@ -91,7 +91,7 @@ export default function CommandePage() {
   const isEmpty = sections ? sections.length === 0 : itemsInTab.length === 0;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-24 sm:px-8">
+    <div className="mx-4  max-w-8xl rounded-4xl shadow-[0_0_15px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-4 sm:px-8 py-8 my-32 bg-background dark:bg-primary/30 border border-foreground">
       <div className="mb-8 flex flex-col items-center gap-2 text-center">
         <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
           Notre carte
@@ -153,7 +153,7 @@ export default function CommandePage() {
                 <div className="h-px flex-1 bg-primary/20" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
                 {section.items.map((item) => (
                   <BestSellerCard key={item._id} item={item} />
                 ))}
@@ -165,7 +165,7 @@ export default function CommandePage() {
 
       {/* "Tout le menu" ou tab simple -> grille plate */}
       {!isLoading && !isError && !sections && itemsInTab.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
           {itemsInTab.map((item) => (
             <BestSellerCard key={item._id} item={item} />
           ))}
