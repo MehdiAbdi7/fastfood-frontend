@@ -1,12 +1,6 @@
 import { api } from "@/server/api";
+import type { ApiEnvelope } from "@/types/api";
 import type { MenuItem, MenuCategory } from "@/types/menuItem";
-
-// Forme exacte de la réponse de ton backend (successResponse)
-interface ApiEnvelope<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
 
 export const menuApi = api.injectEndpoints({
   endpoints: (builder) => ({

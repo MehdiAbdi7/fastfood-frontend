@@ -16,6 +16,19 @@
   --color-accent-slate: #0e5f2d;
 
   --hero-bg-image: url("/bg-white.png");
+
+  /* --- Dashboard : mêmes teintes, grammaire plus dense --- */
+  /* Surfaces empilables (carte sur fond, carte sur carte) sans dépendre du glow */
+  --color-surface: #ffffff;
+  --color-surface-2: #f4ece2;
+  --color-border-subtle: #e7d9c9;
+
+  /* Statuts de commande — vocabulaire couleur constant partout dans l'app */
+  --color-status-pending: var(--color-accent-mustard);
+  --color-status-ready: var(--color-accent-green);
+  --color-status-out_for_delivery: var(--color-primary);
+  --color-status-completed: #6b7280;
+  --color-status-cancelled: var(--color-accent-bordeaux);
 }
 
 .dark {
@@ -31,6 +44,16 @@
   --color-accent-slate: #3cb972;
 
   --hero-bg-image: url("/bg-dark.png");
+
+  --color-surface: #1c1815;
+  --color-surface-2: #24201c;
+  --color-border-subtle: #352e27;
+
+  --color-status-pending: var(--color-accent-mustard);
+  --color-status-ready: var(--color-accent-green);
+  --color-status-out_for_delivery: #c99a4a;
+  --color-status-completed: #8a8580;
+  --color-status-cancelled: var(--color-accent-bordeaux);
 }
 
 @theme inline {
@@ -48,6 +71,15 @@
   --shadow-food-sm: drop-shadow(0 8px 10px rgb(195 105 74 / 0.5));
   --shadow-food-md: drop-shadow(0 16px 20px rgb(195 105 74 / 0.5));
   --shadow-food-lg: drop-shadow(0 24px 32px rgb(195 105 74 / 0.5));
+
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-border-subtle: var(--color-border-subtle);
+  --color-status-pending: var(--color-status-pending);
+  --color-status-ready: var(--color-status-ready);
+  --color-status-out_for_delivery: var(--color-status-out_for_delivery);
+  --color-status-completed: var(--color-status-completed);
+  --color-status-cancelled: var(--color-status-cancelled);
 }
 
 body {
@@ -59,16 +91,27 @@ body {
     auto;
 }
 
+/* Le dashboard garde le curseur système : précision requise pour cliquer vite
+   sur des cartes de commande en heure de pointe. */
+.dashboard-shell,
+.dashboard-shell * {
+  cursor: auto;
+}
+.dashboard-shell a,
+.dashboard-shell button,
+.dashboard-shell [role="button"] {
+  cursor: pointer;
+}
+
 .scrollbar-hide {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge legacy */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
 }
 
-/* Chrome, Edge, Safari */
 ::-webkit-scrollbar {
   width: 7px;
 }
@@ -104,6 +147,17 @@ button,
   100% {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
