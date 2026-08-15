@@ -1,6 +1,5 @@
 import { io, type Socket } from "socket.io-client";
-import type { Middleware } from "@reduxjs/toolkit";
-import type { RootState } from "@/lib/store";
+import type { Dispatch, Middleware, UnknownAction } from "@reduxjs/toolkit";
 import { api } from "@/server/api";
 import { credentialsReceived, loggedOut } from "@/features/auth/authSlice";
 
@@ -8,7 +7,7 @@ import { credentialsReceived, loggedOut } from "@/features/auth/authSlice";
 // login/logout — pas de reconnexion à chaque action Redux.
 let socket: Socket | null = null;
 
-function connectSocket(token: string, dispatch: (action: unknown) => void) {
+function connectSocket(token: string, dispatch: Dispatch<UnknownAction>) {
   if (socket) return;
 
   socket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
@@ -71,17 +70,20 @@ function disconnectSocket() {
   socket = null;
 }
 
-export const socketMiddleware: Middleware<{}, RootState> =
-  (store) => (next) => (action) => {
-    const result = next(action);
+// Pas de generic RootState ici : le store importe ce middleware, et RootState
+// est inféré depuis le store — la boucle casserait l'inférence de types (voir
+// le commentaire équivalent dans server/api.ts). Ce middleware ne lit de
+// toute façon jamais l'état, il ne fait que dispatcher.
+export const socketMiddleware: Middleware = (store) => (next) => (action) => {
+  const result = next(action);
 
-    if (credentialsReceived.match(action)) {
-      connectSocket(action.payload.token, store.dispatch);
-    }
+  if (credentialsReceived.match(action)) {
+    connectSocket(action.payload.token, store.dispatch);
+  }
 
-    if (loggedOut.match(action)) {
-      disconnectSocket();
-    }
+  if (loggedOut.match(action)) {
+    disconnectSocket();
+  }
 
-    return result;
-  };
+  return result;
+};

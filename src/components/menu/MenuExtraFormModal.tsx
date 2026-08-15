@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
@@ -7,7 +8,10 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { Switch } from "@/components/ui/Switch";
 import { useGetMenuExtraTypesQuery } from "@/features/menu/menuExtraTypeApi";
-import { useCreateMenuExtraMutation, useUpdateMenuExtraMutation } from "@/features/menu/menuExtraApi";
+import {
+  useCreateMenuExtraMutation,
+  useUpdateMenuExtraMutation,
+} from "@/features/menu/menuExtraApi";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import type { ExtraPriceType, MenuExtra } from "@/types/menuItem";
@@ -18,7 +22,11 @@ interface MenuExtraFormModalProps {
   extra: MenuExtra | null;
 }
 
-export function MenuExtraFormModal({ isOpen, onClose, extra }: MenuExtraFormModalProps) {
+export function MenuExtraFormModal({
+  isOpen,
+  onClose,
+  extra,
+}: MenuExtraFormModalProps) {
   const isEditing = extra !== null;
   const { data: types } = useGetMenuExtraTypesQuery();
 
@@ -39,7 +47,9 @@ export function MenuExtraFormModal({ isOpen, onClose, extra }: MenuExtraFormModa
   useEffect(() => {
     if (!isOpen) return;
     setName(extra?.name ?? "");
-    setTypeId(typeof extra?.type === "object" ? extra.type._id : extra?.type ?? "");
+    setTypeId(
+      typeof extra?.type === "object" ? extra.type._id : (extra?.type ?? ""),
+    );
     setPriceType(extra?.priceType ?? "fixed");
     setPrice(extra?.price?.toString() ?? "");
     setPriceM(extra?.pricesBySize?.M.toString() ?? "");
@@ -98,8 +108,18 @@ export function MenuExtraFormModal({ isOpen, onClose, extra }: MenuExtraFormModa
         </>
       }
     >
-      <form id="extra-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Input id="name" label="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
+      <form
+        id="extra-form"
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
+        <Input
+          id="name"
+          label="Nom"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
         <Select
           id="type"
           label="Type"
@@ -152,7 +172,11 @@ export function MenuExtraFormModal({ isOpen, onClose, extra }: MenuExtraFormModa
           </div>
         )}
 
-        <Switch checked={available} onChange={setAvailable} label="Extra disponible" />
+        <Switch
+          checked={available}
+          onChange={setAvailable}
+          label="Extra disponible"
+        />
         {error && <p className="text-sm text-accent-bordeaux">{error}</p>}
       </form>
     </Modal>

@@ -32,10 +32,15 @@ export interface OrdersHistoryPage {
 }
 
 export const historyApi = api.injectEndpoints({
+  // Chaque endpoint déclare providesTags: Order/LIST — sans ça, supprimer une
+  // commande depuis l'historique la retirerait bien de la base mais la ligne
+  // resterait affichée jusqu'à un F5 (RTK Query ignore que ces vues dépendent
+  // des commandes). La mutation deleteOrder invalide déjà ce tag.
   endpoints: (builder) => ({
     getHistoryYears: builder.query<HistoryYearEntry[], BaseHistoryParams>({
       query: (params) => ({ url: "/orders/history/years", params }),
       transformResponse: (response: ApiEnvelope<HistoryYearEntry[]>) => response.data,
+      providesTags: [{ type: "Order", id: "LIST" }],
     }),
 
     getHistoryMonths: builder.query<
@@ -44,6 +49,7 @@ export const historyApi = api.injectEndpoints({
     >({
       query: (params) => ({ url: "/orders/history/months", params }),
       transformResponse: (response: ApiEnvelope<HistoryMonthEntry[]>) => response.data,
+      providesTags: [{ type: "Order", id: "LIST" }],
     }),
 
     getHistoryDays: builder.query<
@@ -52,6 +58,7 @@ export const historyApi = api.injectEndpoints({
     >({
       query: (params) => ({ url: "/orders/history/days", params }),
       transformResponse: (response: ApiEnvelope<HistoryDayEntry[]>) => response.data,
+      providesTags: [{ type: "Order", id: "LIST" }],
     }),
 
     getHistoryOrders: builder.query<OrdersHistoryPage, HistoryOrdersParams>({
@@ -62,6 +69,7 @@ export const historyApi = api.injectEndpoints({
         totalPages: response.totalPages,
         currentPage: response.currentPage,
       }),
+      providesTags: [{ type: "Order", id: "LIST" }],
     }),
   }),
 });

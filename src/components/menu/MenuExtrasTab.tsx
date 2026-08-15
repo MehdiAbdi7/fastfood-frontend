@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useGetMenuExtrasQuery } from "@/features/menu/menuExtraApi";
 import { useDeleteMenuExtraMutation } from "@/features/menu/menuExtraApi";
+import { useAuth } from "@/features/auth/useAuth";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { formatDA } from "@/lib/format";
@@ -19,6 +20,7 @@ function formatExtraPrice(extra: MenuExtra): string {
 }
 
 export function MenuExtrasTab() {
+  const { isAdmin } = useAuth();
   const { data: extras, isLoading, isError } = useGetMenuExtrasQuery();
   const [deleteExtra, { isLoading: isDeleting }] = useDeleteMenuExtraMutation();
   const toast = useToast();
@@ -53,11 +55,13 @@ export function MenuExtrasTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
-          Nouvel extra
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
+            Nouvel extra
+          </Button>
+        </div>
+      )}
 
       {!extras || extras.length === 0 ? (
         <EmptyState icon="icon-[mdi--cheese]" title="Aucun extra" />
@@ -68,7 +72,7 @@ export function MenuExtrasTab() {
             return (
               <div
                 key={extra._id}
-                className="flex items-center justify-between rounded-xl border border-border-subtle bg-surface px-4 py-3"
+                className="surface-card flex items-center justify-between px-4 py-3 transition-shadow hover:shadow-food-sm"
               >
                 <div className="flex flex-col">
                   <span className="font-semibold text-foreground">
@@ -83,22 +87,24 @@ export function MenuExtrasTab() {
                     {typeName} · {formatExtraPrice(extra)}
                   </span>
                 </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setEditingExtra(extra)}
-                    aria-label="Modifier"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
-                  >
-                    <span className="icon-[mdi--pencil-outline] text-base" />
-                  </button>
-                  <button
-                    onClick={() => setDeletingExtra(extra)}
-                    aria-label="Supprimer"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
-                  >
-                    <span className="icon-[mdi--trash-can-outline] text-base" />
-                  </button>
-                </div>
+                {isAdmin && (
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setEditingExtra(extra)}
+                      aria-label="Modifier"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                    >
+                      <span className="icon-[mdi--pencil-outline] text-base" />
+                    </button>
+                    <button
+                      onClick={() => setDeletingExtra(extra)}
+                      aria-label="Supprimer"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                    >
+                      <span className="icon-[mdi--trash-can-outline] text-base" />
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}

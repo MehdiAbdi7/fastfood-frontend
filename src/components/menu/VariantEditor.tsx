@@ -9,18 +9,38 @@ interface VariantEditorProps {
   onChange: (variants: MenuItemVariant[]) => void;
 }
 
+// Défensif comme formatVariantLabel : des produits créés avant le dashboard
+// (Postman, imports) peuvent avoir `combination` absent en base — le default
+// {} de Mongoose ne s'applique qu'à la création. Object.keys(undefined) lève
+// une exception qui casse toute la modale d'édition.
+function readCombination(
+  variant: MenuItemVariant,
+): { attribute: string; value: string } {
+  const combination = variant.combination ?? {};
+  return {
+    attribute: Object.keys(combination)[0] ?? "",
+    value: Object.values(combination)[0] ?? "",
+  };
+}
+
 // Chaque variante = un attribut optionnel (ex: "taille") + sa valeur (ex: "M")
 // + un prix. Un attribut vide = variante "Standard" (combination: {}).
 // Couvre tous les cas présents dans le menu actuel (une seule dimension de
 // variation à la fois) ; une combinaison multi-attributs resterait éditable
 // uniquement via l'API directement si un jour le besoin apparaît.
 export function VariantEditor({ variants, onChange }: VariantEditorProps) {
-  function updateVariant(index: number, patch: Partial<{ attribute: string; value: string; price: number }>) {
-    const next = variants.map((v, i) => {
-      if (i !== index) return v;
-      const attribute = patch.attribute ?? Object.keys(v.combination)[0] ?? "";
-      const value = patch.value ?? Object.values(v.combination)[0] ?? "";
-      const price = patch.price ?? v.price;
+  function updateVariant(
+    index: number,
+    patch: Partial<{ attribute: string; value: string; price: number }>,
+  ) {
+    const next = variants.map((variant, i) => {
+      if (i !== index) return variant;
+
+      const current = readCombination(variant);
+      const attribute = patch.attribute ?? current.attribute;
+      const value = patch.value ?? current.value;
+      const price = patch.price ?? variant.price;
+
       return {
         combination: attribute && value ? { [attribute]: value } : {},
         price,
@@ -42,8 +62,7 @@ export function VariantEditor({ variants, onChange }: VariantEditorProps) {
       <label className="text-sm font-semibold text-foreground">Variantes / prix</label>
 
       {variants.map((variant, index) => {
-        const attribute = Object.keys(variant.combination)[0] ?? "";
-        const value = Object.values(variant.combination)[0] ?? "";
+        const { attribute, value } = readCombination(variant);
 
         return (
           <div key={index} className="flex items-end gap-2">

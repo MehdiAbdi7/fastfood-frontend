@@ -6,7 +6,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  icon = "icon-[mdi--tray-remove-outline]",
+  icon = "icon-[mdi--tray-remove]",
   title,
   description,
   action,

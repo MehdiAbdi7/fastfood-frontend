@@ -13,7 +13,7 @@ export function Sidebar() {
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   return (
-    <aside className="hidden h-screen w-60 shrink-0 flex-col border-r border-border-subtle bg-surface lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto border-r border-border-subtle bg-surface lg:flex">
       <Link href="/dashboard" className="flex items-center gap-2 px-5 py-5">
         <Image src="/logo-niwa.png" alt="Niwa Food" width={36} height={36} />
         <span className="font-heading text-base font-bold text-foreground">

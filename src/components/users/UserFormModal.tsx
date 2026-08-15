@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
@@ -5,7 +6,10 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { useCreateUserMutation, useUpdateUserMutation } from "@/features/auth/authApi";
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+} from "@/features/auth/authApi";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { STORES, STORE_LABELS, type Store } from "@/types/store";
@@ -101,7 +105,11 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
         </>
       }
     >
-      <form id="user-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        id="user-form"
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
         <div className="grid grid-cols-2 gap-3">
           <Input
             id="firstname"
@@ -164,7 +172,10 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
               label="Magasin"
               value={store}
               onChange={(e) => setStore(e.target.value as Store)}
-              options={STORES.map((s) => ({ value: s, label: STORE_LABELS[s] }))}
+              options={STORES.map((s) => ({
+                value: s,
+                label: STORE_LABELS[s],
+              }))}
             />
           )}
         </div>

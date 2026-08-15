@@ -5,13 +5,21 @@ import {
   type FetchArgs,
   type FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
-import type { RootState } from "@/lib/store";
 import { loggedOut } from "@/features/auth/authSlice";
+
+// On NE PEUT PAS importer RootState depuis @/lib/store ici : le store importe
+// `api` pour son reducer/middleware, et RootState est inféré depuis le store —
+// la boucle empêche TypeScript de résoudre le type, qui retombe alors
+// silencieusement en `any` et fait échouer le typecheck du build ailleurs
+// (ex: STORE_LABELS[user.store]). On type donc juste la tranche d'état lue ici.
+interface AuthSliceShape {
+  auth: { token: string | null };
+}
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL,
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.token;
+    const token = (getState() as AuthSliceShape).auth.token;
     if (token) headers.set("Authorization", `Bearer ${token}`);
     return headers;
   },

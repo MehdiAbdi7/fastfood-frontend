@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
@@ -27,8 +28,10 @@ export function MenuExtraTypeFormModal({
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const [createType, { isLoading: isCreating }] = useCreateMenuExtraTypeMutation();
-  const [updateType, { isLoading: isUpdating }] = useUpdateMenuExtraTypeMutation();
+  const [createType, { isLoading: isCreating }] =
+    useCreateMenuExtraTypeMutation();
+  const [updateType, { isLoading: isUpdating }] =
+    useUpdateMenuExtraTypeMutation();
   const toast = useToast();
   const isLoading = isCreating || isUpdating;
 
@@ -72,7 +75,11 @@ export function MenuExtraTypeFormModal({
         </>
       }
     >
-      <form id="extra-type-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        id="extra-type-form"
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
         <Input
           id="name"
           label="Nom (ex: Gratinage, Sauce...)"

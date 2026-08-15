@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/useAuth";
+import { ThemeToggle } from "@/components/public/themeToggle";
 
 // Type le corps d'erreur RTK Query tel que renvoyé par errorResponse() backend
 interface ApiError {
@@ -37,7 +38,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="background flex min-h-screen items-center justify-center px-4">
+    <div className="background relative flex min-h-screen items-center justify-center px-4">
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-sm rounded-3xl border border-foreground bg-background p-8 shadow-food-md dark:bg-primary/20">
         <div className="mb-8 flex flex-col items-center gap-2 text-center">
           <Image src="/logo-niwa.png" alt="Niwa Food" width={56} height={56} />

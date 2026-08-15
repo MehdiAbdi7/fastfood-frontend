@@ -37,7 +37,7 @@ export function ServiceManagementCard() {
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border-subtle bg-surface p-5">
+    <section className="surface-card flex flex-col gap-4 p-5">
       <h2 className="font-heading text-base font-bold text-foreground">Service</h2>
       <p className="text-sm text-foreground/60">
         Ouvrir un nouveau service remet la numérotation des commandes à zéro pour

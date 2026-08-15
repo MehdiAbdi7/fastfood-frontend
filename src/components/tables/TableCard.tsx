@@ -47,7 +47,7 @@ export function TableCard({ table, isAdmin, onEdit }: TableCardProps) {
   return (
     <>
       <div
-        className={`flex flex-col gap-3 rounded-2xl border p-4 transition-colors ${
+        className={`flex flex-col gap-3 rounded-[1.25rem] border p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-food-sm ${
           isOccupied
             ? "border-accent-mustard/40 bg-accent-mustard/5"
             : "border-accent-green/30 bg-accent-green/5"

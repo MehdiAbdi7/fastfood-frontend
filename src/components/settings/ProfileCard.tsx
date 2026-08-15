@@ -39,7 +39,7 @@ export function ProfileCard() {
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border-subtle bg-surface p-5">
+    <section className="surface-card flex flex-col gap-4 p-5">
       <h2 className="font-heading text-base font-bold text-foreground">Mon profil</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">

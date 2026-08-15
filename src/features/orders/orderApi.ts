@@ -3,6 +3,7 @@ import type { ApiEnvelope, PaginatedEnvelope } from "@/types/api";
 import type {
   CounterState,
   CreateOrderItemPayload,
+  CreateOrderPayload,
   Order,
   OrderStatus,
   OrdersQueryParams,
@@ -40,6 +41,17 @@ export const orderApi = api.injectEndpoints({
               { type: "Order" as const, id: "LIST" },
             ]
           : [{ type: "Order" as const, id: "LIST" }],
+    }),
+
+    // Même route que le formulaire public /commande — pas de CheckAuth côté
+    // backend sur POST /orders (juste un rate-limit). Le dashboard s'en sert
+    // pour les commandes prises au comptoir ou par téléphone.
+    createOrder: builder.mutation<Order, CreateOrderPayload>({
+      query: (body) => ({ url: "/orders", method: "POST", body }),
+      invalidatesTags: [
+        { type: "Order", id: "LIST" },
+        { type: "Table", id: "LIST" }, // dine_in occupe la table choisie
+      ],
     }),
 
     getOrderById: builder.query<Order, string>({
@@ -131,6 +143,7 @@ export const orderApi = api.injectEndpoints({
 
 export const {
   useGetOrdersQuery,
+  useCreateOrderMutation,
   useGetOrderByIdQuery,
   useUpdateOrderStatusMutation,
   useAddItemsToOrderMutation,

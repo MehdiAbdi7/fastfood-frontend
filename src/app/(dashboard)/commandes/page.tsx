@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { OrderColumn } from "@/components/orders/OrderColumn";
 import { OrderFilters } from "@/components/orders/OrderFilters";
 import { OrderDetailModal } from "@/components/orders/OrderDetailModal";
 import { useNewOrderAlert } from "@/components/orders/useNewOrderAlert";
+import { Button } from "@/components/ui/Button";
 import { SkeletonGrid } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useGetOrdersQuery } from "@/features/orders/orderApi";
@@ -17,6 +19,7 @@ import type { Order, OrderType } from "@/types/order";
 const POLL_INTERVAL_MS = 20_000;
 
 function CommandesContent() {
+  const router = useRouter();
   const { activeStore } = useActiveStore();
   const [typeFilter, setTypeFilter] = useState<OrderType | "all">("all");
   const [search, setSearch] = useState("");
@@ -32,7 +35,7 @@ function CommandesContent() {
     { pollingInterval: POLL_INTERVAL_MS },
   );
 
-  const orders = data?.orders ?? [];
+  const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
 
   const filteredOrders = useMemo(() => {
     if (!search.trim()) return orders;
@@ -48,7 +51,9 @@ function CommandesContent() {
     () => ({
       pending: filteredOrders.filter((o) => o.status === "pending"),
       ready: filteredOrders.filter((o) => o.status === "ready"),
-      out_for_delivery: filteredOrders.filter((o) => o.status === "out_for_delivery"),
+      out_for_delivery: filteredOrders.filter(
+        (o) => o.status === "out_for_delivery",
+      ),
     }),
     [filteredOrders],
   );
@@ -70,12 +75,23 @@ function CommandesContent() {
 
   return (
     <div className="flex flex-col gap-4">
-      <OrderFilters
-        typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
-        search={search}
-        onSearchChange={setSearch}
-      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <OrderFilters
+          typeFilter={typeFilter}
+          onTypeFilterChange={setTypeFilter}
+          search={search}
+          onSearchChange={setSearch}
+        />
+        {/* Page dédiée (pas une modale) : parcours visuel du menu pour un
+            client au comptoir qui ne sait pas scanner le QR code. */}
+        <Button
+          icon="icon-[mdi--plus]"
+          onClick={() => router.push("/commandes/nouvelle")}
+          className="shrink-0"
+        >
+          Nouvelle commande
+        </Button>
+      </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-4">
         <OrderColumn
@@ -98,7 +114,10 @@ function CommandesContent() {
         />
       </div>
 
-      <OrderDetailModal orderId={openOrderId} onClose={() => setOpenOrderId(null)} />
+      <OrderDetailModal
+        orderId={openOrderId}
+        onClose={() => setOpenOrderId(null)}
+      />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
@@ -29,8 +30,10 @@ export function MenuCategoryFormModal({
   const [isActive, setIsActive] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [createCategory, { isLoading: isCreating }] = useCreateMenuCategoryMutation();
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateMenuCategoryMutation();
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateMenuCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateMenuCategoryMutation();
   const toast = useToast();
   const isLoading = isCreating || isUpdating;
 
@@ -46,7 +49,10 @@ export function MenuCategoryFormModal({
     setError(null);
     try {
       if (isEditing) {
-        await updateCategory({ id: category._id, body: { name, isActive } }).unwrap();
+        await updateCategory({
+          id: category._id,
+          body: { name, isActive },
+        }).unwrap();
         toast.success("Catégorie mise à jour");
       } else {
         await createCategory({ name, isActive }).unwrap();
@@ -75,9 +81,23 @@ export function MenuCategoryFormModal({
         </>
       }
     >
-      <form id="category-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Input id="name" label="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
-        <Switch checked={isActive} onChange={setIsActive} label="Catégorie active" />
+      <form
+        id="category-form"
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
+        <Input
+          id="name"
+          label="Nom"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <Switch
+          checked={isActive}
+          onChange={setIsActive}
+          label="Catégorie active"
+        />
         {error && <p className="text-sm text-accent-bordeaux">{error}</p>}
       </form>
     </Modal>

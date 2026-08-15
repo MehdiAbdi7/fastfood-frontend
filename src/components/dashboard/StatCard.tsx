@@ -14,7 +14,7 @@ const ACCENT_CLASSES: Record<NonNullable<StatCardProps["accent"]>, string> = {
 
 export function StatCard({ icon, label, value, accent = "primary" }: StatCardProps) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border-subtle bg-surface p-4">
+    <div className="surface-card flex items-center gap-3 p-4">
       <div
         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${ACCENT_CLASSES[accent]}`}
       >

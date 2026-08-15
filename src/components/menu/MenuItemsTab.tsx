@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useGetMenuItemsQuery } from "@/features/menu/menuApi";
 import { useDeleteMenuItemMutation } from "@/features/menu/menuItemApi";
+import { useAuth } from "@/features/auth/useAuth";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { formatDA } from "@/lib/format";
@@ -14,6 +15,7 @@ import { MenuItemFormModal } from "./MenuItemFormModal";
 import type { MenuItem } from "@/types/menuItem";
 
 export function MenuItemsTab() {
+  const { isAdmin } = useAuth();
   const { data: items, isLoading, isError } = useGetMenuItemsQuery();
   const [deleteItem, { isLoading: isDeleting }] = useDeleteMenuItemMutation();
   const toast = useToast();
@@ -40,11 +42,13 @@ export function MenuItemsTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
-          Nouveau produit
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
+            Nouveau produit
+          </Button>
+        </div>
+      )}
 
       {!items || items.length === 0 ? (
         <EmptyState icon="icon-[mdi--food-outline]" title="Aucun produit" />
@@ -58,10 +62,8 @@ export function MenuItemsTab() {
             return (
               <div
                 key={item._id}
-                className={`flex gap-3 rounded-2xl border p-3 ${
-                  item.available
-                    ? "border-border-subtle bg-surface"
-                    : "border-border-subtle bg-surface opacity-60"
+                className={`surface-card flex gap-3 p-3 transition-shadow hover:shadow-food-sm ${
+                  item.available ? "" : "opacity-60"
                 }`}
               >
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-surface-2">
@@ -85,22 +87,24 @@ export function MenuItemsTab() {
                       {item.variants.length > 1 ? "dès " : ""}
                       {formatDA(minPrice)}
                     </span>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => setEditingItem(item)}
-                        aria-label="Modifier"
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
-                      >
-                        <span className="icon-[mdi--pencil-outline] text-sm" />
-                      </button>
-                      <button
-                        onClick={() => setDeletingItem(item)}
-                        aria-label="Supprimer"
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
-                      >
-                        <span className="icon-[mdi--trash-can-outline] text-sm" />
-                      </button>
-                    </div>
+                    {isAdmin && (
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setEditingItem(item)}
+                          aria-label="Modifier"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                        >
+                          <span className="icon-[mdi--pencil-outline] text-sm" />
+                        </button>
+                        <button
+                          onClick={() => setDeletingItem(item)}
+                          aria-label="Supprimer"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                        >
+                          <span className="icon-[mdi--trash-can-outline] text-sm" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

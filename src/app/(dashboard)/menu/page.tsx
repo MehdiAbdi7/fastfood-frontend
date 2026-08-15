@@ -45,9 +45,12 @@ function MenuContent() {
   );
 }
 
+// Pas de adminOnly ici : un employé doit pouvoir consulter le menu et les prix
+// pour prendre une commande — seules les actions de création/édition/suppression
+// sont réservées admin (voir les Tab* qui masquent leurs boutons selon isAdmin).
 export default function MenuPage() {
   return (
-    <DashboardShell adminOnly>
+    <DashboardShell>
       <MenuContent />
     </DashboardShell>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useGetMenuCategoriesQuery } from "@/features/menu/menuApi";
 import { useDeleteMenuCategoryMutation } from "@/features/menu/menuCategoryApi";
+import { useAuth } from "@/features/auth/useAuth";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { Button } from "@/components/ui/Button";
@@ -13,6 +14,7 @@ import { MenuCategoryFormModal } from "./MenuCategoryFormModal";
 import type { MenuCategory } from "@/types/menuItem";
 
 export function MenuCategoriesTab() {
+  const { isAdmin } = useAuth();
   const { data: categories, isLoading, isError } = useGetMenuCategoriesQuery();
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteMenuCategoryMutation();
   const toast = useToast();
@@ -49,11 +51,13 @@ export function MenuCategoriesTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
-          Nouvelle catégorie
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
+            Nouvelle catégorie
+          </Button>
+        </div>
+      )}
 
       {!categories || categories.length === 0 ? (
         <EmptyState icon="icon-[mdi--shape-outline]" title="Aucune catégorie" />
@@ -64,7 +68,7 @@ export function MenuCategoriesTab() {
             .map((category) => (
               <div
                 key={category._id}
-                className="flex items-center justify-between rounded-xl border border-border-subtle bg-surface px-4 py-3"
+                className="surface-card flex items-center justify-between px-4 py-3 transition-shadow hover:shadow-food-sm"
               >
                 <div className="flex items-center gap-2.5">
                   <span
@@ -77,22 +81,24 @@ export function MenuCategoriesTab() {
                     <span className="text-xs text-foreground/40">(inactive)</span>
                   )}
                 </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setEditingCategory(category)}
-                    aria-label="Modifier"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
-                  >
-                    <span className="icon-[mdi--pencil-outline] text-base" />
-                  </button>
-                  <button
-                    onClick={() => setDeletingCategory(category)}
-                    aria-label="Supprimer"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
-                  >
-                    <span className="icon-[mdi--trash-can-outline] text-base" />
-                  </button>
-                </div>
+                {isAdmin && (
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setEditingCategory(category)}
+                      aria-label="Modifier"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                    >
+                      <span className="icon-[mdi--pencil-outline] text-base" />
+                    </button>
+                    <button
+                      onClick={() => setDeletingCategory(category)}
+                      aria-label="Supprimer"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                    >
+                      <span className="icon-[mdi--trash-can-outline] text-base" />
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useGetMenuExtraTypesQuery, useDeleteMenuExtraTypeMutation } from "@/features/menu/menuExtraTypeApi";
+import { useAuth } from "@/features/auth/useAuth";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +13,7 @@ import { MenuExtraTypeFormModal } from "./MenuExtraTypeFormModal";
 import type { MenuExtraType } from "@/types/menuItem";
 
 export function MenuExtraTypesTab() {
+  const { isAdmin } = useAuth();
   const { data: types, isLoading, isError } = useGetMenuExtraTypesQuery();
   const [deleteType, { isLoading: isDeleting }] = useDeleteMenuExtraTypeMutation();
   const toast = useToast();
@@ -46,11 +48,13 @@ export function MenuExtraTypesTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
-          Nouveau type
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
+            Nouveau type
+          </Button>
+        </div>
+      )}
 
       {!types || types.length === 0 ? (
         <EmptyState icon="icon-[mdi--tag-outline]" title="Aucun type d'extra" />
@@ -59,25 +63,27 @@ export function MenuExtraTypesTab() {
           {types.map((type) => (
             <div
               key={type._id}
-              className="flex items-center justify-between rounded-xl border border-border-subtle bg-surface px-4 py-3"
+              className="surface-card flex items-center justify-between px-4 py-3 transition-shadow hover:shadow-food-sm"
             >
               <span className="font-semibold text-foreground">{type.name}</span>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setEditingType(type)}
-                  aria-label="Modifier"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
-                >
-                  <span className="icon-[mdi--pencil-outline] text-base" />
-                </button>
-                <button
-                  onClick={() => setDeletingType(type)}
-                  aria-label="Supprimer"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
-                >
-                  <span className="icon-[mdi--trash-can-outline] text-base" />
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setEditingType(type)}
+                    aria-label="Modifier"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                  >
+                    <span className="icon-[mdi--pencil-outline] text-base" />
+                  </button>
+                  <button
+                    onClick={() => setDeletingType(type)}
+                    aria-label="Supprimer"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                  >
+                    <span className="icon-[mdi--trash-can-outline] text-base" />
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

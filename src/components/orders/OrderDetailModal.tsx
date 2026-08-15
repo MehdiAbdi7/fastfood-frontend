@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
-import { AddItemsPanel } from "./AddItemsPanel";
+import { EmptyState } from "@/components/ui/EmptyState";
 import {
   useGetOrderByIdQuery,
   useUpdateOrderStatusMutation,
@@ -28,17 +29,20 @@ interface OrderDetailModalProps {
 }
 
 export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
+  const router = useRouter();
   const { isAdmin } = useAuth();
   const toast = useToast();
 
-  const { data: order, isLoading } = useGetOrderByIdQuery(orderId ?? "", {
-    skip: !orderId,
-  });
+  const {
+    data: order,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetOrderByIdQuery(orderId ?? "", { skip: !orderId });
   const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateOrderStatusMutation();
   const [setDeliveryFee, { isLoading: isSavingFee }] = useSetDeliveryFeeMutation();
   const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
-  const [isAddingItems, setIsAddingItems] = useState(false);
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [feeInput, setFeeInput] = useState("");
@@ -47,7 +51,6 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   const isOpen = orderId !== null;
 
   function handleClose() {
-    setIsAddingItems(false);
     setIsEditingFee(false);
     onClose();
   }
@@ -128,7 +131,10 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                   Annuler la commande
                 </Button>
               )}
-              {isAdmin && ["pending", "cancelled"].includes(order.status) && (
+              {/* Un admin peut supprimer à tout statut, y compris "completed" :
+                  c'est le seul moyen de retirer une commande erronée de
+                  l'historique, celui-ci n'étant qu'une agrégation sur orders. */}
+              {isAdmin && (
                 <Button
                   variant="danger"
                   size="sm"
@@ -151,9 +157,30 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
         )
       }
     >
-      {isLoading && <p className="text-sm text-foreground/50">Chargement...</p>}
+      {/* Ces trois états sont mutuellement exclusifs et couvrent tout le cycle
+          de vie de la requête — avant ce correctif, une erreur réseau ou une
+          permission refusée laissait la modale vide (en-tête affiché, corps
+          totalement blanc), sans aucun message. */}
+      {isLoading && (
+        <div className="flex justify-center py-10">
+          <span className="icon-[mdi--loading] animate-spin text-3xl text-primary" />
+        </div>
+      )}
 
-      {order && (
+      {!isLoading && isError && (
+        <EmptyState
+          icon="icon-[mdi--cloud-off-outline]"
+          title="Impossible de charger cette commande"
+          description="Vérifie ta connexion, ou que la commande n'a pas été supprimée entretemps."
+          action={
+            <Button variant="secondary" icon="icon-[mdi--refresh]" onClick={() => refetch()}>
+              Réessayer
+            </Button>
+          }
+        />
+      )}
+
+      {!isLoading && !isError && order && (
         <div className="flex flex-col gap-5">
           {/* En-tête */}
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -270,17 +297,20 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
           {/* Ajout d'articles */}
           {!["completed", "cancelled"].includes(order.status) && (
             <div className="border-t border-border-subtle pt-4">
-              {isAddingItems ? (
-                <AddItemsPanel orderId={order._id} onDone={() => setIsAddingItems(false)} />
-              ) : (
-                <Button
-                  variant="secondary"
-                  icon="icon-[mdi--plus]"
-                  onClick={() => setIsAddingItems(true)}
-                >
-                  Ajouter des articles
-                </Button>
-              )}
+              {/* Page dédiée plutôt qu'un panneau dans la modale : le choix
+                  d'articles a besoin des images, des catégories et des extras,
+                  impossibles à présenter correctement dans cet espace. */}
+              <Button
+                variant="secondary"
+                icon="icon-[mdi--plus]"
+                className="w-full"
+                onClick={() => {
+                  handleClose();
+                  router.push(`/commandes/${order._id}/ajouter`);
+                }}
+              >
+                Ajouter des articles
+              </Button>
             </div>
           )}
         </div>
@@ -303,7 +333,11 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
             onClose={() => setIsDeleteConfirmOpen(false)}
             onConfirm={handleDelete}
             title={`Supprimer la commande #${order.dailyNumber} ?`}
-            description="Suppression définitive, à réserver aux erreurs de saisie."
+            description={
+              order.status === "completed"
+                ? `Cette vente de ${formatDA(order.totalPrice)} sera retirée du chiffre d'affaires et de l'historique, définitivement.`
+                : "Suppression définitive, à réserver aux erreurs de saisie."
+            }
             confirmLabel="Supprimer"
             variant="danger"
             isLoading={isDeleting}

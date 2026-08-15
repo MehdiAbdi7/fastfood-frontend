@@ -9,7 +9,7 @@ export function SessionCard() {
   if (!user) return null;
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border-subtle bg-surface p-5">
+    <section className="surface-card flex flex-col gap-4 p-5">
       <h2 className="font-heading text-base font-bold text-foreground">Session</h2>
 
       <div className="flex flex-col gap-1 text-sm text-foreground/70">

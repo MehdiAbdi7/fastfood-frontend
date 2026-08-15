@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState, type FormEvent, type ChangeEvent } from "react";
@@ -24,7 +25,11 @@ interface MenuItemFormModalProps {
   item: MenuItem | null; // null = création
 }
 
-export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalProps) {
+export function MenuItemFormModal({
+  isOpen,
+  onClose,
+  item,
+}: MenuItemFormModalProps) {
   const isEditing = item !== null;
   const { data: categories } = useGetMenuCategoriesQuery();
   const { data: extras } = useGetMenuExtrasQuery();
@@ -32,7 +37,9 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [variants, setVariants] = useState<MenuItemVariant[]>([{ combination: {}, price: 0 }]);
+  const [variants, setVariants] = useState<MenuItemVariant[]>([
+    { combination: {}, price: 0 },
+  ]);
   const [removableIngredients, setRemovableIngredients] = useState("");
   const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
   const [available, setAvailable] = useState(true);
@@ -42,7 +49,8 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
 
   const [createItem, { isLoading: isCreating }] = useCreateMenuItemMutation();
   const [updateItem, { isLoading: isUpdating }] = useUpdateMenuItemMutation();
-  const [uploadImage, { isLoading: isUploading }] = useUploadMenuItemImageMutation();
+  const [uploadImage, { isLoading: isUploading }] =
+    useUploadMenuItemImageMutation();
   const toast = useToast();
   const isLoading = isCreating || isUpdating || isUploading;
 
@@ -52,11 +60,25 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
     if (!isOpen) return;
     setName(item?.name ?? "");
     setDescription(item?.description ?? "");
-    setCategoryId(typeof item?.category === "object" ? item.category._id : item?.category ?? "");
-    setVariants(item?.variants ?? [{ combination: {}, price: 0 }]);
-    setRemovableIngredients(item?.removableIngredients.join(", ") ?? "");
+    setCategoryId(
+      typeof item?.category === "object"
+        ? item.category._id
+        : (item?.category ?? ""),
+    );
+    // Normalise `combination` dès le chargement : les produits antérieurs au
+    // dashboard peuvent l'avoir absent en base, ce qui casserait VariantEditor
+    // et renverrait des variantes invalides au backend à l'enregistrement.
+    setVariants(
+      (item?.variants ?? [{ combination: {}, price: 0 }]).map((variant) => ({
+        combination: variant.combination ?? {},
+        price: variant.price,
+      })),
+    );
+    setRemovableIngredients(item?.removableIngredients?.join(", ") ?? "");
     setSelectedExtraIds(
-      (item?.availableExtras ?? []).map((e) => (typeof e === "object" ? e._id : e)),
+      (item?.availableExtras ?? []).map((e) =>
+        typeof e === "object" ? e._id : e,
+      ),
     );
     setAvailable(item?.available ?? true);
     setImageFile(null);
@@ -141,7 +163,11 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
         </>
       }
     >
-      <form id="menu-item-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        id="menu-item-form"
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
         <div className="flex gap-4">
           <div className="flex flex-col items-center gap-2">
             <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-surface-2">
@@ -151,7 +177,11 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
                 // servir — seuls les chemins locaux ou remotePatterns déclarés
                 // sont acceptés par son loader.
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={imagePreview} alt="" className="h-full w-full object-cover" />
+                <img
+                  src={imagePreview}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <div className="flex h-full items-center justify-center">
                   <span className="icon-[mdi--image-outline] text-3xl text-foreground/30" />
@@ -160,7 +190,12 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
             </div>
             <label className="cursor-pointer text-xs font-semibold text-primary hover:underline">
               Choisir une image
-              <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </label>
           </div>
 
@@ -178,13 +213,19 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               placeholder="Choisir une catégorie"
-              options={(categories ?? []).map((c) => ({ value: c._id, label: c.name }))}
+              options={(categories ?? []).map((c) => ({
+                value: c._id,
+                label: c.name,
+              }))}
             />
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="description" className="text-sm font-semibold text-foreground">
+          <label
+            htmlFor="description"
+            className="text-sm font-semibold text-foreground"
+          >
             Description
           </label>
           <textarea
@@ -208,7 +249,9 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
 
         {extras && extras.length > 0 && (
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-foreground">Extras disponibles</label>
+            <label className="text-sm font-semibold text-foreground">
+              Extras disponibles
+            </label>
             <div className="flex flex-wrap gap-1.5">
               {extras.map((extra) => (
                 <button
@@ -228,7 +271,11 @@ export function MenuItemFormModal({ isOpen, onClose, item }: MenuItemFormModalPr
           </div>
         )}
 
-        <Switch checked={available} onChange={setAvailable} label="Produit disponible à la vente" />
+        <Switch
+          checked={available}
+          onChange={setAvailable}
+          label="Produit disponible à la vente"
+        />
 
         {error && <p className="text-sm text-accent-bordeaux">{error}</p>}
       </form>
