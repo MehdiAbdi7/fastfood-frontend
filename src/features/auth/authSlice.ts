@@ -1,24 +1,20 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { User } from "@/types/user";
 
-export const TOKEN_STORAGE_KEY = "niwa_token";
-export const USER_STORAGE_KEY = "niwa_user";
+// Plus aucune clé de stockage : le token vit dans un cookie httpOnly que le
+// JavaScript ne peut pas lire, et le user est fourni par le serveur au rendu.
+// C'est tout l'intérêt du changement — il n'y a plus rien de sensible côté
+// client à voler.
+
+type AuthStatus = "idle" | "authenticated" | "unauthenticated";
 
 interface AuthState {
   user: User | null;
-  token: string | null;
-  // "idle" tant que le localStorage n'a pas été lu (uniquement possible côté
-  // client, dans un useEffect — voir AuthHydrator.tsx). Rester neutre ici,
-  // plutôt que de lire localStorage directement dans initialState, évite un
-  // mismatch d'hydratation Next (le rendu serveur n'a pas accès à window et
-  // afficherait "déconnecté" pendant que le client afficherait "connecté" dès
-  // le tout premier rendu). Même précaution que useTheme.ts pour le thème.
-  status: "idle" | "authenticated" | "unauthenticated";
+  status: AuthStatus;
 }
 
 const initialState: AuthState = {
   user: null,
-  token: null,
   status: "idle",
 };
 
@@ -26,47 +22,28 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // Appelé une fois au montage par AuthHydrator, avec ce qui a été trouvé
-    // (ou non) dans le localStorage.
-    authHydrated(
-      state,
-      action: PayloadAction<{ user: User; token: string } | null>,
-    ) {
-      if (action.payload) {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.status = "authenticated";
-      } else {
-        state.status = "unauthenticated";
-      }
+    // Posé une seule fois par le layout dashboard, avec le user déjà résolu
+    // côté serveur. Le status ne reste "idle" que sur les pages publiques,
+    // là où personne ne le consulte.
+    sessionLoaded(state, action: PayloadAction<User | null>) {
+      state.user = action.payload;
+      state.status = action.payload ? "authenticated" : "unauthenticated";
     },
-    credentialsReceived(
-      state,
-      action: PayloadAction<{ user: User; token: string }>,
-    ) {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.status = "authenticated";
 
-      localStorage.setItem(TOKEN_STORAGE_KEY, action.payload.token);
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload.user));
-    },
-    // Après qu'un admin modifie son propre profil (PATCH /auth/users/:id)
+    // Après PATCH /auth/me : la sidebar et la topbar reflètent le nouveau nom
+    // sans recharger la page.
     currentUserUpdated(state, action: PayloadAction<User>) {
       state.user = action.payload;
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload));
     },
-    loggedOut(state) {
-      state.user = null;
-      state.token = null;
-      state.status = "unauthenticated";
 
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-      localStorage.removeItem(USER_STORAGE_KEY);
+    sessionCleared(state) {
+      state.user = null;
+      state.status = "unauthenticated";
     },
   },
 });
 
-export const { authHydrated, credentialsReceived, currentUserUpdated, loggedOut } =
+export const { sessionLoaded, currentUserUpdated, sessionCleared } =
   authSlice.actions;
+
 export default authSlice.reducer;

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { HistoryBreadcrumb, MONTH_NAMES } from "@/components/history/HistoryBreadcrumb";
+import {
+  HistoryBreadcrumb,
+  MONTH_NAMES,
+} from "@/components/history/HistoryBreadcrumb";
 import { HistoryDrillList } from "@/components/history/HistoryDrillList";
 import { OrderDetailModal } from "@/components/orders/OrderDetailModal";
 import { Button } from "@/components/ui/Button";
@@ -23,7 +25,7 @@ import type { OrderType } from "@/types/order";
 
 const TYPE_TABS: OrderType[] = ["dine_in", "takeaway", "delivery"];
 
-function HistoriqueContent() {
+export default function HistoriquePage() {
   const { activeStore } = useActiveStore();
   const [type, setType] = useState<OrderType>("dine_in");
   const [year, setYear] = useState<number | null>(null);
@@ -52,7 +54,9 @@ function HistoriqueContent() {
     resetTo("root");
   }
 
-  const yearsQuery = useGetHistoryYearsQuery(baseParams, { skip: year !== null });
+  const yearsQuery = useGetHistoryYearsQuery(baseParams, {
+    skip: year !== null,
+  });
   const monthsQuery = useGetHistoryMonthsQuery(
     { ...baseParams, year: year ?? 0 },
     { skip: year === null || month !== null },
@@ -62,7 +66,14 @@ function HistoriqueContent() {
     { skip: year === null || month === null || day !== null },
   );
   const ordersQuery = useGetHistoryOrdersQuery(
-    { ...baseParams, year: year ?? 0, month: month ?? 0, day: day ?? 0, page, limit: 20 },
+    {
+      ...baseParams,
+      year: year ?? 0,
+      month: month ?? 0,
+      day: day ?? 0,
+      page,
+      limit: 20,
+    },
     { skip: year === null || month === null || day === null },
   );
 
@@ -75,7 +86,12 @@ function HistoriqueContent() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <HistoryBreadcrumb year={year} month={month} day={day} onNavigate={resetTo} />
+        <HistoryBreadcrumb
+          year={year}
+          month={month}
+          day={day}
+          onNavigate={resetTo}
+        />
 
         <div className="flex gap-1.5">
           {TYPE_TABS.map((t) => (
@@ -159,7 +175,10 @@ function HistoriqueContent() {
           </div>
 
           {!ordersQuery.data || ordersQuery.data.orders.length === 0 ? (
-            <EmptyState icon="icon-[mdi--receipt-text-outline]" title="Aucune commande ce jour-là" />
+            <EmptyState
+              icon="icon-[mdi--receipt-text-outline]"
+              title="Aucune commande ce jour-là"
+            />
           ) : (
             <div className="flex flex-col gap-2">
               {ordersQuery.data.orders.map((order) => (
@@ -172,7 +191,9 @@ function HistoriqueContent() {
                     <span className="font-heading text-lg font-bold text-foreground">
                       #{order.dailyNumber}
                     </span>
-                    <span className="text-sm text-foreground/70">{order.client.fullName}</span>
+                    <span className="text-sm text-foreground/70">
+                      {order.client.fullName}
+                    </span>
                     {order.completedAt && (
                       <span className="text-xs text-foreground/40">
                         {formatTime(order.completedAt)}
@@ -216,15 +237,10 @@ function HistoriqueContent() {
         </div>
       )}
 
-      <OrderDetailModal orderId={openOrderId} onClose={() => setOpenOrderId(null)} />
+      <OrderDetailModal
+        orderId={openOrderId}
+        onClose={() => setOpenOrderId(null)}
+      />
     </div>
-  );
-}
-
-export default function HistoriquePage() {
-  return (
-    <DashboardShell>
-      <HistoriqueContent />
-    </DashboardShell>
   );
 }

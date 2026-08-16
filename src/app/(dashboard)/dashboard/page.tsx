@@ -1,6 +1,5 @@
 "use client";
 
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { SkeletonGrid, Skeleton } from "@/components/ui/Skeleton";
@@ -11,8 +10,7 @@ import { useAuth } from "@/features/auth/useAuth";
 import { formatDA, formatTime } from "@/lib/format";
 import { ORDER_TYPE_LABELS } from "@/lib/orderLabels";
 import { STORE_LABELS } from "@/types/store";
-import type { ServiceStats } from "@/types/order";
-import type { OrderStatus } from "@/types/order";
+import type { ServiceStats, OrderStatus } from "@/types/order";
 
 const STATUS_ORDER: OrderStatus[] = [
   "pending",
@@ -64,17 +62,19 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {STATUS_ORDER.filter((status) => stats.byStatus[status]).map((status) => (
-          <div
-            key={status}
-            className="flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface px-2 py-1"
-          >
-            <StatusBadge status={status} />
-            <span className="pr-1 text-xs font-bold text-foreground/70">
-              {stats.byStatus[status]}
-            </span>
-          </div>
-        ))}
+        {STATUS_ORDER.filter((status) => stats.byStatus[status]).map(
+          (status) => (
+            <div
+              key={status}
+              className="flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface px-2 py-1"
+            >
+              <StatusBadge status={status} />
+              <span className="pr-1 text-xs font-bold text-foreground/70">
+                {stats.byStatus[status]}
+              </span>
+            </div>
+          ),
+        )}
       </div>
 
       {(stats.byType.length > 0 || stats.topItems.length > 0) && (
@@ -133,12 +133,14 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
   );
 }
 
-function DashboardHomeContent() {
+export default function DashboardHomePage() {
   const { user } = useAuth();
   const { activeStore } = useActiveStore();
-  const { data: stats, isLoading, isError } = useGetServiceStatsQuery({
-    store: activeStore,
-  });
+  const {
+    data: stats,
+    isLoading,
+    isError,
+  } = useGetServiceStatsQuery({ store: activeStore });
 
   return (
     <div className="flex flex-col gap-6">
@@ -174,13 +176,5 @@ function DashboardHomeContent() {
           <StoreServicePanel key={storeStats.store} stats={storeStats} />
         ))}
     </div>
-  );
-}
-
-export default function DashboardHomePage() {
-  return (
-    <DashboardShell>
-      <DashboardHomeContent />
-    </DashboardShell>
   );
 }

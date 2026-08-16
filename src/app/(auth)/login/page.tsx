@@ -2,18 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/features/auth/useAuth";
 import { ThemeToggle } from "@/components/public/themeToggle";
-
-// Type le corps d'erreur RTK Query tel que renvoyé par errorResponse() backend
-interface ApiError {
-  data?: { error?: string };
-  status?: number;
-}
+import { getApiErrorMessage } from "@/lib/apiError";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isLoginLoading } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -26,13 +22,22 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push("/dashboard");
+
+      // Renvoie là où l'employé voulait aller avant d'être intercepté par le
+      // middleware. On ne garde que les chemins internes : accepter une URL
+      // absolue ouvrirait une redirection ouverte (?from=https://…).
+      const from = searchParams.get("from");
+      const destination = from?.startsWith("/") ? from : "/dashboard";
+
+      router.replace(destination);
+      // Indispensable : le cookie vient d'être posé, mais les Server Components
+      // ont déjà été rendus sans session. Sans refresh, le layout dashboard
+      // resservirait son rendu « non connecté » et renverrait vers /login.
+      router.refresh();
     } catch (err) {
-      const apiError = err as ApiError;
-      // Le 429 (rate limit) renvoie déjà un délai précis dans err.data.error
-      // (voir middlewares/rateLimiters.ts backend) -> on l'affiche tel quel
+      // Le 429 du rate limiter renvoie déjà un délai précis dans le message.
       setErrorMessage(
-        apiError.data?.error ?? "Une erreur est survenue, réessayez.",
+        getApiErrorMessage(err, "Une erreur est survenue, réessayez."),
       );
     }
   }
@@ -56,7 +61,10 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-semibold text-foreground">
+            <label
+              htmlFor="email"
+              className="text-sm font-semibold text-foreground"
+            >
               Email
             </label>
             <input
@@ -71,7 +79,10 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-semibold text-foreground">
+            <label
+              htmlFor="password"
+              className="text-sm font-semibold text-foreground"
+            >
               Mot de passe
             </label>
             <input

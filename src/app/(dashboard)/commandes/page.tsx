@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { OrderColumn } from "@/components/orders/OrderColumn";
 import { OrderFilters } from "@/components/orders/OrderFilters";
 import { OrderDetailModal } from "@/components/orders/OrderDetailModal";
@@ -18,7 +17,7 @@ import type { Order, OrderType } from "@/types/order";
 // tags reste le mécanisme principal, ce polling n'est qu'un rattrapage discret.
 const POLL_INTERVAL_MS = 20_000;
 
-function CommandesContent() {
+export default function CommandesPage() {
   const router = useRouter();
   const { activeStore } = useActiveStore();
   const [typeFilter, setTypeFilter] = useState<OrderType | "all">("all");
@@ -69,6 +68,7 @@ function CommandesContent() {
       <EmptyState
         icon="icon-[mdi--cloud-off-outline]"
         title="Impossible de charger les commandes"
+        description="Vérifie ta connexion, puis recharge la page."
       />
     );
   }
@@ -119,13 +119,5 @@ function CommandesContent() {
         onClose={() => setOpenOrderId(null)}
       />
     </div>
-  );
-}
-
-export default function CommandesPage() {
-  return (
-    <DashboardShell>
-      <CommandesContent />
-    </DashboardShell>
   );
 }

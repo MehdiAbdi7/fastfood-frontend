@@ -1,20 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { UserFormModal } from "@/components/users/UserFormModal";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SkeletonGrid } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useGetUsersQuery, useDeleteUserMutation } from "@/features/auth/authApi";
+import {
+  useGetUsersQuery,
+  useDeleteUserMutation,
+} from "@/features/auth/authApi";
 import { useAuth } from "@/features/auth/useAuth";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { STORE_LABELS } from "@/types/store";
 import type { User } from "@/types/user";
 
-function UsersContent() {
+// La restriction admin vit désormais dans (dashboard)/utilisateurs/layout.tsx,
+// donc côté serveur : le HTML de cette page n'est jamais envoyé à un employé.
+export default function UtilisateursPage() {
   const { user: currentUser } = useAuth();
   const { data: users, isLoading, isError } = useGetUsersQuery();
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
@@ -37,14 +41,24 @@ function UsersContent() {
   }
 
   if (isLoading) return <SkeletonGrid count={6} />;
+
   if (isError) {
-    return <EmptyState icon="icon-[mdi--cloud-off-outline]" title="Impossible de charger l'équipe" />;
+    return (
+      <EmptyState
+        icon="icon-[mdi--cloud-off-outline]"
+        title="Impossible de charger l'équipe"
+        description="Vérifie ta connexion, puis recharge la page."
+      />
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        <Button icon="icon-[mdi--account-plus-outline]" onClick={() => setIsCreating(true)}>
+        <Button
+          icon="icon-[mdi--account-plus-outline]"
+          onClick={() => setIsCreating(true)}
+        >
           Nouveau compte
         </Button>
       </div>
@@ -68,9 +82,15 @@ function UsersContent() {
                   <div className="flex flex-col">
                     <span className="font-semibold text-foreground">
                       {user.firstname} {user.lastname}
-                      {isSelf && <span className="ml-1.5 text-xs text-foreground/40">(vous)</span>}
+                      {isSelf && (
+                        <span className="ml-1.5 text-xs text-foreground/40">
+                          (vous)
+                        </span>
+                      )}
                     </span>
-                    <span className="text-xs text-foreground/50">{user.email}</span>
+                    <span className="text-xs text-foreground/50">
+                      {user.email}
+                    </span>
                   </div>
                 </div>
 
@@ -113,7 +133,11 @@ function UsersContent() {
         </div>
       )}
 
-      <UserFormModal isOpen={isCreating} onClose={() => setIsCreating(false)} user={null} />
+      <UserFormModal
+        isOpen={isCreating}
+        onClose={() => setIsCreating(false)}
+        user={null}
+      />
       <UserFormModal
         isOpen={editingUser !== null}
         onClose={() => setEditingUser(null)}
@@ -130,13 +154,5 @@ function UsersContent() {
         isLoading={isDeleting}
       />
     </div>
-  );
-}
-
-export default function UtilisateursPage() {
-  return (
-    <DashboardShell adminOnly>
-      <UsersContent />
-    </DashboardShell>
   );
 }

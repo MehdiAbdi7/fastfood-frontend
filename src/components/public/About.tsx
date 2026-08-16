@@ -24,7 +24,7 @@ export function About() {
       id="a-propos"
       className="relative isolate overflow-hidden contain-paint px-6 py-16 sm:px-8 sm:py-20"
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-8 rounded-4xl bg-background dark:bg-primary/30 px-4 py-8 shadow-[0_0_15px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-2xl sm:gap-10 sm:px-8 sm:py-12 md:grid-cols-2 md:gap-16 border border-foreground">
+      <div className="mx-auto grid max-w-6xl items-center gap-8 rounded-4xl bg-background dark:bg-primary/30 px-4 py-8 shadow-[0_0_25px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-2xl sm:gap-10 sm:px-8 sm:py-12 md:grid-cols-2 md:gap-16 border border-primary">
         <div className="flex flex-col items-center gap-4 text-center sm:text-left md:items-start">
           <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground ">
             Notre histoire

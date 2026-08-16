@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { MenuItemsTab } from "@/components/menu/MenuItemsTab";
 import { MenuCategoriesTab } from "@/components/menu/MenuCategoriesTab";
 import { MenuExtrasTab } from "@/components/menu/MenuExtrasTab";
@@ -16,7 +15,11 @@ const TABS: { value: MenuTab; label: string }[] = [
   { value: "types-extras", label: "Types d'extras" },
 ];
 
-function MenuContent() {
+// Pas de restriction admin ici : un employé doit pouvoir consulter le menu et
+// les prix pour prendre une commande — seules les actions de création/édition/
+// suppression sont réservées admin (voir les Tab* qui masquent leurs boutons
+// selon isAdmin).
+export default function MenuPage() {
   const [tab, setTab] = useState<MenuTab>("produits");
 
   return (
@@ -42,16 +45,5 @@ function MenuContent() {
       {tab === "extras" && <MenuExtrasTab />}
       {tab === "types-extras" && <MenuExtraTypesTab />}
     </div>
-  );
-}
-
-// Pas de adminOnly ici : un employé doit pouvoir consulter le menu et les prix
-// pour prendre une commande — seules les actions de création/édition/suppression
-// sont réservées admin (voir les Tab* qui masquent leurs boutons selon isAdmin).
-export default function MenuPage() {
-  return (
-    <DashboardShell>
-      <MenuContent />
-    </DashboardShell>
   );
 }

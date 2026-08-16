@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { MenuBrowser } from "@/components/orders/newOrder/MenuBrowser";
 import { ProductConfigModal } from "@/components/orders/newOrder/ProductConfigModal";
+import { TicketTotals } from "@/components/orders/newOrder/TicketTotals";
 import { hasOptions } from "@/components/orders/newOrder/ProductGrid";
 import { useItemCart, getLineUnitPrice } from "@/components/orders/useItemCart";
 import { Button } from "@/components/ui/Button";
@@ -22,7 +22,7 @@ import { formatVariantLabel } from "@/lib/variantLabel";
 import { ORDER_TYPE_LABELS } from "@/lib/orderLabels";
 import type { MenuItem } from "@/types/menuItem";
 
-function AddItemsContent() {
+export default function AddItemsPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const orderId = params.id;
@@ -31,7 +31,15 @@ function AddItemsContent() {
   const { data: order, isLoading, isError } = useGetOrderByIdQuery(orderId);
   const [addItems, { isLoading: isSubmitting }] = useAddItemsToOrderMutation();
 
-  const { cart, addLine, removeFromCart, setQuantity, toPayload, total } = useItemCart();
+  const {
+    cart,
+    addLine,
+    removeFromCart,
+    setQuantity,
+    toPayload,
+    itemsCount,
+    total,
+  } = useItemCart();
   const [configuringItem, setConfiguringItem] = useState<MenuItem | null>(null);
 
   const quantityByItem = useMemo(() => {
@@ -50,6 +58,7 @@ function AddItemsContent() {
     addLine({
       menuItemId: item._id,
       name: item.name,
+      imageUrl: item.imageUrl,
       variant: item.variants[0],
       extras: [],
       excludedIngredients: [],
@@ -119,7 +128,10 @@ function AddItemsContent() {
           </div>
         </div>
 
-        <MenuBrowser quantityByItem={quantityByItem} onSelect={handleSelectProduct} />
+        <MenuBrowser
+          quantityByItem={quantityByItem}
+          onSelect={handleSelectProduct}
+        />
       </div>
 
       {/* ---------- Ticket ---------- */}
@@ -151,20 +163,28 @@ function AddItemsContent() {
             {cart.length === 0 ? (
               <div className="flex flex-col items-center gap-1.5 py-6 text-center">
                 <span className="icon-[mdi--plus-box-outline] text-2xl text-foreground/25" />
-                <p className="text-sm font-semibold text-foreground/60">Rien à ajouter</p>
+                <p className="text-sm font-semibold text-foreground/60">
+                  Rien à ajouter
+                </p>
                 <p className="text-xs text-foreground/40">
                   Touche un produit pour le sélectionner
                 </p>
               </div>
             ) : (
               cart.map((line) => {
-                const variantLabel = formatVariantLabel(line.variant.combination);
+                const variantLabel = formatVariantLabel(
+                  line.variant.combination,
+                );
                 return (
                   <div key={line.key} className="flex items-center gap-2.5">
                     <div className="flex min-w-0 flex-1 flex-col">
-                      <p className="truncate text-xs font-bold text-foreground">{line.name}</p>
+                      <p className="truncate text-xs font-bold text-foreground">
+                        {line.name}
+                      </p>
                       <p className="tabular-nums text-xs text-foreground/50">
-                        {variantLabel !== "Standard" ? `${variantLabel} · ` : ""}
+                        {variantLabel !== "Standard"
+                          ? `${variantLabel} · `
+                          : ""}
                         {formatDA(getLineUnitPrice(line))}
                       </p>
                       {line.extras.length > 0 && (
@@ -212,14 +232,7 @@ function AddItemsContent() {
             )}
           </div>
 
-          <div className="flex items-baseline justify-between border-t border-dashed border-border-subtle pt-4">
-            <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
-              Ajout
-            </span>
-            <span className="tabular-nums font-heading text-2xl font-bold text-accent-green">
-              {formatDA(total)}
-            </span>
-          </div>
+          <TicketTotals itemsTotal={total} itemsCount={itemsCount} />
 
           <p className="-mt-2 text-xs text-foreground/45">
             Nouveau total de la commande : {formatDA(order.totalPrice + total)}
@@ -244,13 +257,5 @@ function AddItemsContent() {
         onConfirm={addLine}
       />
     </div>
-  );
-}
-
-export default function AddItemsPage() {
-  return (
-    <DashboardShell>
-      <AddItemsContent />
-    </DashboardShell>
   );
 }

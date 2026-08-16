@@ -13,13 +13,6 @@ interface LoginPayload {
   password: string;
 }
 
-// login renvoie le user dans `data` ET le token dans `token`, séparément
-// (voir successResponse() côté backend) — d'où ce type de retour composite
-interface LoginResult {
-  user: User;
-  token: string;
-}
-
 interface GetUsersParams {
   store?: Store;
   role?: UserRole;
@@ -27,16 +20,19 @@ interface GetUsersParams {
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResult, LoginPayload>({
+    // Ne renvoie plus que le User : le token part désormais dans un cookie
+    // posé par le backend, que le JavaScript ne voit jamais.
+    login: builder.mutation<User, LoginPayload>({
       query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
         body: credentials,
       }),
-      transformResponse: (response: ApiEnvelope<User>) => ({
-        user: response.data,
-        token: response.token!,
-      }),
+      transformResponse: (response: ApiEnvelope<User>) => response.data,
+    }),
+
+    logout: builder.mutation<null, void>({
+      query: () => ({ url: "/auth/logout", method: "POST" }),
     }),
 
     checkUser: builder.query<User, void>({
@@ -75,13 +71,13 @@ export const authApi = api.injectEndpoints({
     }),
 
     // Self-service, disponible pour tout rôle : contact uniquement (jamais
-    // role/store — voir PATCH /auth/me côté backend). Distinct de updateUser
-    // ci-dessus qui est réservé admin et peut cibler n'importe quel compte.
+    // role/store — voir PATCH /auth/me côté backend).
     updateOwnProfile: builder.mutation<
       User,
       Pick<UpdateUserPayload, "firstname" | "lastname" | "email" | "tel">
     >({
       query: (body) => ({ url: "/auth/me", method: "PATCH", body }),
+      transformResponse: (response: ApiEnvelope<User>) => response.data,
       invalidatesTags: ["User"],
     }),
 
@@ -94,6 +90,7 @@ export const authApi = api.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useLogoutMutation,
   useCheckUserQuery,
   useLazyCheckUserQuery,
   useGetUsersQuery,

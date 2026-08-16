@@ -19,7 +19,7 @@ export function Contact() {
       id="contact"
       className="relative isolate overflow-hidden px-6 sm:px-8 py-16 sm:py-20"
     >
-      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_15px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-8 py-6 bg-background dark:bg-primary/30 border border-foreground">
+      <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_25px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md px-8 py-6 bg-background dark:bg-primary/30 border border-primary">
         <div className="mb-10 flex flex-col gap-2 text-center">
           <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
             Où nous trouver

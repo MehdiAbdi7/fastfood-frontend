@@ -3,10 +3,10 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { MenuBrowser } from "@/components/orders/newOrder/MenuBrowser";
 import { hasOptions } from "@/components/orders/newOrder/ProductGrid";
 import { ProductConfigModal } from "@/components/orders/newOrder/ProductConfigModal";
+import { TicketTotals } from "@/components/orders/newOrder/TicketTotals";
 import { useItemCart, getLineUnitPrice } from "@/components/orders/useItemCart";
 import type { NewCartLine } from "@/components/orders/useItemCart";
 import { Input } from "@/components/ui/Input";
@@ -27,7 +27,7 @@ import type { CreateOrderPayload, OrderType } from "@/types/order";
 
 const TYPE_OPTIONS: OrderType[] = ["dine_in", "takeaway", "delivery"];
 
-function NewOrderContent() {
+export default function NewOrderPage() {
   const router = useRouter();
   const { user, isAdmin } = useAuth();
   const { activeStore } = useActiveStore();
@@ -62,9 +62,7 @@ function NewOrderContent() {
 
   const { data: tables } = useGetTablesQuery(
     { store: resolvedStore },
-    {
-      skip: type !== "dine_in" || !resolvedStore,
-    },
+    { skip: type !== "dine_in" || !resolvedStore },
   );
 
   const quantityByItem = useMemo(() => {
@@ -158,11 +156,7 @@ function NewOrderContent() {
       payload = {
         type: "delivery",
         store: resolvedStore as Store,
-        client: {
-          fullName,
-          phone,
-          address,
-        },
+        client: { fullName, phone, address },
         remark: remark || undefined,
         items,
       };
@@ -419,16 +413,7 @@ function NewOrderContent() {
             )}
           </div>
 
-          {/* Total */}
-          <div className="flex items-baseline justify-between border-t border-dashed border-border-subtle pt-4">
-            <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
-              Total
-            </span>
-
-            <span className="tabular-nums font-heading text-2xl font-bold text-accent-green">
-              {formatDA(total)}
-            </span>
-          </div>
+          <TicketTotals itemsTotal={total} itemsCount={itemsCount} />
 
           {type === "delivery" && (
             <p className="-mt-2 text-xs text-foreground/45">
@@ -461,13 +446,5 @@ function NewOrderContent() {
         onConfirm={handleConfirmConfiguredLine}
       />
     </div>
-  );
-}
-
-export default function NewOrderPage() {
-  return (
-    <DashboardShell>
-      <NewOrderContent />
-    </DashboardShell>
   );
 }

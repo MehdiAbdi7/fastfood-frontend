@@ -12,6 +12,7 @@ export const menuItemApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createMenuItem: builder.mutation<MenuItem, CreateMenuItemPayload>({
       query: (body) => ({ url: "/menu-items", method: "POST", body }),
+      transformResponse: (response: ApiEnvelope<MenuItem>) => response.data,
       invalidatesTags: ["MenuItem"],
     }),
 
@@ -19,7 +20,12 @@ export const menuItemApi = api.injectEndpoints({
       MenuItem,
       { id: string; body: Partial<CreateMenuItemPayload> }
     >({
-      query: ({ id, body }) => ({ url: `/menu-items/${id}`, method: "PUT", body }),
+      query: ({ id, body }) => ({
+        url: `/menu-items/${id}`,
+        method: "PUT",
+        body,
+      }),
+      transformResponse: (response: ApiEnvelope<MenuItem>) => response.data,
       invalidatesTags: ["MenuItem"],
     }),
 
@@ -38,14 +44,22 @@ export const menuItemApi = api.injectEndpoints({
       query: ({ id, file }) => {
         const formData = new FormData();
         formData.append("image", file);
-        return { url: `/upload/menu-item-image/${id}`, method: "POST", body: formData };
+        return {
+          url: `/upload/menu-item-image/${id}`,
+          method: "POST",
+          body: formData,
+        };
       },
-      transformResponse: (response: ApiEnvelope<UploadImageResult>) => response.data,
+      transformResponse: (response: ApiEnvelope<UploadImageResult>) =>
+        response.data,
       invalidatesTags: ["MenuItem"],
     }),
 
     deleteMenuItemImage: builder.mutation<null, string>({
-      query: (id) => ({ url: `/upload/menu-item-image/${id}`, method: "DELETE" }),
+      query: (id) => ({
+        url: `/upload/menu-item-image/${id}`,
+        method: "DELETE",
+      }),
       invalidatesTags: ["MenuItem"],
     }),
   }),
