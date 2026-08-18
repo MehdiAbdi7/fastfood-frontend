@@ -3,7 +3,8 @@ import { io, type Socket } from "socket.io-client";
 import { api } from "@/server/api";
 import { sessionLoaded, sessionCleared } from "@/features/auth/authSlice";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+const SOCKET_URL =
+  process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:5000";
 
 // Une seule instance pour toute la session, ouverte/fermée sur login/logout —
 // pas de reconnexion à chaque action Redux.
@@ -31,7 +32,7 @@ export const socketMiddleware: Middleware = (store) => (next) => (action) => {
     // Plus de `auth: { token }` : le token est dans un cookie httpOnly, que le
     // JavaScript ne peut pas lire. withCredentials fait joindre ce cookie au
     // handshake, où le backend le lit (voir readCookie dans config/socket.ts).
-    socket = io(API_URL, { withCredentials: true });
+    socket = io(SOCKET_URL, { withCredentials: true });
 
     socket.on("connect", () => {
       // C'est ce message qui fait rejoindre les rooms dashboard:<store>,

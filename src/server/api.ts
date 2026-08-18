@@ -1,6 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+// URL relative, et non NEXT_PUBLIC_API_URL : les appels passent par le rewrite
+// déclaré dans next.config.ts, qui les relaie vers le backend. Le navigateur
+// ne parle donc qu'au domaine du front, ce qui rend le Set-Cookie du backend
+// first-party — seule façon pour proxy.ts et getSession() de le voir, eux qui
+// tournent sur le domaine Vercel et non sur celui de l'API.
+// Effet de bord bienvenu : tout devient same-origin, donc plus de préflight
+// CORS ni de restriction navigateur sur les cookies tiers.
+const API_URL = "/api";
 
 // Liste volontairement large : un tag déclaré mais jamais utilisé ne coûte
 // rien, alors qu'un tag utilisé sans être déclaré déclenche l'avertissement
@@ -27,9 +34,9 @@ export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: API_URL,
-    // Remplace prepareHeaders : le navigateur joint désormais le cookie
-    // httpOnly tout seul. Le token n'existe plus dans le state Redux, donc
-    // plus rien à injecter à la main — et plus rien à voler via une XSS.
+    // Le navigateur joint le cookie httpOnly tout seul. Conservé malgré le
+    // passage en same-origin : sans cette option, fetch n'enverrait pas le
+    // cookie si l'API repassait un jour sur un autre domaine.
     credentials: "include",
   }),
   tagTypes: TAG_TYPES,
