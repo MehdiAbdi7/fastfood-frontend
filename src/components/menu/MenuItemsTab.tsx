@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useGetMenuItemsQuery, useGetMenuCategoriesQuery } from "@/features/menu/menuApi";
+import {
+  useGetMenuItemsQuery,
+  useGetMenuCategoriesQuery,
+} from "@/features/menu/menuApi";
 import { useDeleteMenuItemMutation } from "@/features/menu/menuItemApi";
 import { useAuth } from "@/features/auth/useAuth";
 import { useToast } from "@/features/toast/useToast";
@@ -65,7 +68,9 @@ export function MenuItemsTab() {
       toast.success("Produit supprimé");
       setDeletingItem(null);
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Impossible de supprimer ce produit"));
+      toast.error(
+        getApiErrorMessage(err, "Impossible de supprimer ce produit"),
+      );
     }
   }
 
@@ -152,7 +157,9 @@ export function MenuItemsTab() {
 
       {filteredItems.length === 0 ? (
         <EmptyState
-          icon={search ? "icon-[mdi--magnify-close]" : "icon-[mdi--food-outline]"}
+          icon={
+            search ? "icon-[mdi--magnify-close]" : "icon-[mdi--food-outline]"
+          }
           title={search ? "Aucun résultat" : "Aucun produit"}
           description={
             search
@@ -164,14 +171,17 @@ export function MenuItemsTab() {
           action={
             !search &&
             isAdmin && (
-              <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
+              <Button
+                icon="icon-[mdi--plus]"
+                onClick={() => setIsCreating(true)}
+              >
                 Nouveau produit
               </Button>
             )
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {filteredItems.map((item) => (
             <MenuItemCard
               key={item._id}

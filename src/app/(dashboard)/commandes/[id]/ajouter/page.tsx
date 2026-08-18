@@ -135,7 +135,7 @@ export default function AddItemsPage() {
       </div>
 
       {/* ---------- Ticket ---------- */}
-      <aside className="w-full shrink-0 lg:sticky lg:top-20 lg:w-[22rem]">
+      <aside className="w-full shrink-0 lg:sticky lg:top-20 lg:w-88">
         <div className="ticket-notch surface-card relative flex flex-col gap-4 p-5 pb-7">
           {/* Déjà commandé : contexte en lecture seule, pour ne pas ressaisir
               deux fois le même article par erreur. */}
@@ -144,7 +144,10 @@ export default function AddItemsPage() {
               Déjà sur la commande
             </p>
             {order.items.map((item, i) => (
-              <div key={i} className="flex items-center justify-between text-xs">
+              <div
+                key={i}
+                className="flex items-center justify-between text-xs"
+              >
                 <span className="truncate text-foreground/55">
                   {item.quantity}x {item.name}
                 </span>

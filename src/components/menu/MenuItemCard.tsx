@@ -19,12 +19,16 @@ export function MenuItemCard({
 }: MenuItemCardProps) {
   const categoryName =
     typeof item.category === "object" ? item.category.name : null;
-  const minPrice = Math.min(...item.variants.map((v) => v.price));
   const hasVariants = item.variants.length > 1;
+  // Math.min() sur un tableau vide renvoie Infinity : on préfère ne rien
+  // afficher plutôt qu'un "dès ∞ DA" si un item arrive sans variante.
+  const minPrice = item.variants.length
+    ? Math.min(...item.variants.map((v) => v.price))
+    : null;
 
   return (
     <article
-      className={`surface-card group relative flex flex-col overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-food-sm ${
+      className={`surface-card group relative flex flex-col overflow-hidden transition-all pointer-fine:hover:-translate-y-0.5 pointer-fine:hover:shadow-food-sm ${
         item.available ? "" : "opacity-60"
       }`}
     >
@@ -37,7 +41,7 @@ export function MenuItemCard({
           <img
             src={item.imageUrl}
             alt=""
-            className="h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 motion-safe:pointer-fine:group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full items-center justify-center">
@@ -46,43 +50,50 @@ export function MenuItemCard({
         )}
 
         {categoryName && (
-          <span className="absolute left-2.5 top-2.5 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
+          <span className="absolute left-2.5 top-2.5 max-w-[60%] truncate rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
             {categoryName}
           </span>
         )}
 
-        {/* Actions en surimpression, révélées au survol : elles encombreraient
-            le corps de la carte alors qu'on ne les utilise qu'occasionnellement.
-            Toujours visibles au clavier grâce à focus-within. */}
+        {/* Actions en surimpression. Sur un appareil à pointeur fin (souris),
+            on les révèle au survol pour alléger la carte. Sur tactile, où le
+            survol n'existe pas, elles restent affichées en permanence —
+            sinon elles étaient tout simplement inatteignables. */}
         {isAdmin && (
-          <div className="absolute right-2.5 top-2.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+          <div className="absolute right-2.5 top-2.5 flex gap-1.5 transition-opacity pointer-fine:opacity-0 pointer-fine:gap-1 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100">
             <button
+              type="button"
               onClick={onEdit}
               aria-label={`Modifier ${item.name}`}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-background/90 text-foreground/70 backdrop-blur-sm transition-colors hover:text-primary"
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/90 text-foreground/70 shadow-sm backdrop-blur-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary pointer-fine:h-8 pointer-fine:w-8 pointer-fine:shadow-none"
             >
-              <span className="icon-[mdi--pencil-outline] text-base" />
+              <span className="icon-[mdi--pencil-outline] text-lg pointer-fine:text-base" />
             </button>
             <button
+              type="button"
               onClick={onDelete}
               aria-label={`Supprimer ${item.name}`}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-background/90 text-foreground/70 backdrop-blur-sm transition-colors hover:text-accent-bordeaux"
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/90 text-foreground/70 shadow-sm backdrop-blur-sm transition-colors hover:text-accent-bordeaux focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-bordeaux pointer-fine:h-8 pointer-fine:w-8 pointer-fine:shadow-none"
             >
-              <span className="icon-[mdi--trash-can-outline] text-base" />
+              <span className="icon-[mdi--trash-can-outline] text-lg pointer-fine:text-base" />
             </button>
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
+      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-3.5">
+        {/* min-w-0 sur le titre : sans lui, truncate ne se déclenche pas dans
+            un conteneur flex et le prix se fait pousser hors de la carte. */}
         <div className="flex items-baseline justify-between gap-2">
-          <h3 className="truncate font-heading text-sm font-bold text-foreground">
+          <h3 className="min-w-0 truncate font-heading text-sm font-bold text-foreground">
             {item.name}
           </h3>
-          <span className="tabular-nums shrink-0 font-heading text-sm font-bold text-accent-green">
-            {hasVariants ? "dès " : ""}
-            {formatDA(minPrice)}
-          </span>
+          {minPrice !== null && (
+            <span className="shrink-0 whitespace-nowrap font-heading text-sm font-bold tabular-nums text-accent-green">
+              {hasVariants ? "dès " : ""}
+              {formatDA(minPrice)}
+            </span>
+          )}
         </div>
 
         {/* La description existait en base sans jamais être affichée ici —
@@ -95,7 +106,7 @@ export function MenuItemCard({
 
         <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
           {hasVariants && (
-            <span className="rounded-md bg-surface-2 px-2 py-1 text-xs font-semibold text-foreground/55">
+            <span className="min-w-0 truncate rounded-md bg-surface-2 px-2 py-1 text-xs font-semibold text-foreground/55">
               {item.variants
                 .map((v) => formatVariantLabel(v.combination))
                 .join(" · ")}
@@ -103,7 +114,7 @@ export function MenuItemCard({
           )}
 
           <span
-            className={`rounded-md px-2 py-1 text-xs font-semibold ${
+            className={`shrink-0 rounded-md px-2 py-1 text-xs font-semibold ${
               item.available
                 ? "bg-accent-green/10 text-accent-green"
                 : "bg-accent-bordeaux/10 text-accent-bordeaux"
