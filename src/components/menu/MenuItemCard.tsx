@@ -32,9 +32,9 @@ export function MenuItemCard({
         item.available ? "" : "opacity-60"
       }`}
     >
-      {/* Image large plutôt que la vignette 64px d'avant : sur une page de
-          gestion, reconnaître un produit d'un coup d'œil compte plus que
-          d'en faire tenir un maximum à l'écran. */}
+      {/* Photo laissée entièrement libre : sur une carte de ~165px en grille
+          2 colonnes, le moindre bouton en surimpression masque le produit —
+          or c'est la photo qui permet de le reconnaître d'un coup d'œil. */}
       <div className="relative aspect-4/3 w-full overflow-hidden bg-surface-2">
         {item.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -50,34 +50,9 @@ export function MenuItemCard({
         )}
 
         {categoryName && (
-          <span className="absolute left-2.5 top-2.5 max-w-[60%] truncate rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
+          <span className="absolute left-2.5 top-2.5 max-w-[70%] truncate rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
             {categoryName}
           </span>
-        )}
-
-        {/* Actions en surimpression. Sur un appareil à pointeur fin (souris),
-            on les révèle au survol pour alléger la carte. Sur tactile, où le
-            survol n'existe pas, elles restent affichées en permanence —
-            sinon elles étaient tout simplement inatteignables. */}
-        {isAdmin && (
-          <div className="absolute right-2.5 top-2.5 flex gap-1.5 transition-opacity pointer-fine:opacity-0 pointer-fine:gap-1 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100">
-            <button
-              type="button"
-              onClick={onEdit}
-              aria-label={`Modifier ${item.name}`}
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/90 text-foreground/70 shadow-sm backdrop-blur-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary pointer-fine:h-8 pointer-fine:w-8 pointer-fine:shadow-none"
-            >
-              <span className="icon-[mdi--pencil-outline] text-lg pointer-fine:text-base" />
-            </button>
-            <button
-              type="button"
-              onClick={onDelete}
-              aria-label={`Supprimer ${item.name}`}
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/90 text-foreground/70 shadow-sm backdrop-blur-sm transition-colors hover:text-accent-bordeaux focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-bordeaux pointer-fine:h-8 pointer-fine:w-8 pointer-fine:shadow-none"
-            >
-              <span className="icon-[mdi--trash-can-outline] text-lg pointer-fine:text-base" />
-            </button>
-          </div>
         )}
       </div>
 
@@ -104,15 +79,18 @@ export function MenuItemCard({
           </p>
         )}
 
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
-          {hasVariants && (
-            <span className="min-w-0 truncate rounded-md bg-surface-2 px-2 py-1 text-xs font-semibold text-foreground/55">
-              {item.variants
-                .map((v) => formatVariantLabel(v.combination))
-                .join(" · ")}
-            </span>
-          )}
+        {hasVariants && (
+          <p className="truncate text-xs font-semibold text-foreground/45">
+            {item.variants
+              .map((v) => formatVariantLabel(v.combination))
+              .join(" · ")}
+          </p>
+        )}
 
+        {/* Pied de carte : état à gauche, actions à droite. Toujours visibles,
+            donc atteignables au doigt comme à la souris, et sans jamais
+            recouvrir la photo. */}
+        <div className="mt-auto flex items-center gap-2 border-t border-border-subtle pt-2.5">
           <span
             className={`shrink-0 rounded-md px-2 py-1 text-xs font-semibold ${
               item.available
@@ -122,6 +100,27 @@ export function MenuItemCard({
           >
             {item.available ? "Disponible" : "Épuisé"}
           </span>
+
+          {isAdmin && (
+            <div className="ml-auto flex shrink-0 items-center gap-0.5">
+              <button
+                type="button"
+                onClick={onEdit}
+                aria-label={`Modifier ${item.name}`}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground/45 transition-colors hover:bg-surface-2 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <span className="icon-[mdi--pencil-outline] text-base" />
+              </button>
+              <button
+                type="button"
+                onClick={onDelete}
+                aria-label={`Supprimer ${item.name}`}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground/45 transition-colors hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-bordeaux"
+              >
+                <span className="icon-[mdi--trash-can-outline] text-base" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </article>

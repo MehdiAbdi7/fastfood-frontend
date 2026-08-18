@@ -91,7 +91,7 @@ export default function CommandePage() {
   const isEmpty = sections ? sections.length === 0 : itemsInTab.length === 0;
 
   return (
-    <div className="mx-4  max-w-8xl rounded-4xl shadow-[0_0_15px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-4 sm:px-8 py-8 my-32 bg-background dark:bg-primary/30 border border-foreground">
+    <div className="mx-4  max-w-8xl rounded-4xl shadow-[0_0_15px_5px_rgba(217,169,77,0.45)] shadow-primary backdrop-blur-md px-4 sm:px-8 py-8 my-32 bg-background dark:bg-primary/30 ">
       <div className="mb-8 flex flex-col items-center gap-2 text-center">
         <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
           Notre carte
