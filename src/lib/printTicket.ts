@@ -20,6 +20,9 @@ export function printOrderTicket(order: Order): void {
     .map((item) => {
       // Défensif : voir variantLabel.ts — même raison
       const selectedExtras = item.selectedExtras ?? [];
+      const formulaLine = item.formula
+        ? `<div class="sub"><b>${item.formula.name}</b>${item.formula.includes.length ? ` : ${item.formula.includes.join(", ")}` : ""}</div>`
+        : "";
       const excludedIngredients = item.excludedIngredients ?? [];
       const extrasTotal = selectedExtras.reduce((sum, e) => sum + e.price, 0);
       const lineTotal = (item.unitPrice + extrasTotal) * item.quantity;
@@ -37,6 +40,7 @@ export function printOrderTicket(order: Order): void {
             <span>${item.quantity}x ${item.name}${variantLabel !== "Standard" ? ` (${variantLabel})` : ""}</span>
             <span>${formatDA(lineTotal)}</span>
           </div>
+          ${formulaLine}
           ${extrasLine}
           ${excludedLine}
         </div>`;

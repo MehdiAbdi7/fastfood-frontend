@@ -39,8 +39,10 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
     isError,
     refetch,
   } = useGetOrderByIdQuery(orderId ?? "", { skip: !orderId });
-  const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateOrderStatusMutation();
-  const [setDeliveryFee, { isLoading: isSavingFee }] = useSetDeliveryFeeMutation();
+  const [updateStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateOrderStatusMutation();
+  const [setDeliveryFee, { isLoading: isSavingFee }] =
+    useSetDeliveryFeeMutation();
   const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
@@ -61,9 +63,13 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
     if (!action) return;
     try {
       await updateStatus({ id: order._id, status: action.status }).unwrap();
-      toast.success(`Commande #${order.dailyNumber} — ${action.label.toLowerCase()}`);
+      toast.success(
+        `Commande #${order.dailyNumber} — ${action.label.toLowerCase()}`,
+      );
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Impossible de mettre à jour la commande"));
+      toast.error(
+        getApiErrorMessage(err, "Impossible de mettre à jour la commande"),
+      );
     }
   }
 
@@ -87,7 +93,9 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
       setIsDeleteConfirmOpen(false);
       handleClose();
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Impossible de supprimer la commande"));
+      toast.error(
+        getApiErrorMessage(err, "Impossible de supprimer la commande"),
+      );
     }
   }
 
@@ -102,7 +110,9 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
       toast.success("Prix de livraison mis à jour");
       setIsEditingFee(false);
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Impossible de mettre à jour le prix"));
+      toast.error(
+        getApiErrorMessage(err, "Impossible de mettre à jour le prix"),
+      );
     }
   }
 
@@ -173,7 +183,11 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
           title="Impossible de charger cette commande"
           description="Vérifie ta connexion, ou que la commande n'a pas été supprimée entretemps."
           action={
-            <Button variant="secondary" icon="icon-[mdi--refresh]" onClick={() => refetch()}>
+            <Button
+              variant="secondary"
+              icon="icon-[mdi--refresh]"
+              onClick={() => refetch()}
+            >
               Réessayer
             </Button>
           }
@@ -185,15 +199,21 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
           {/* En-tête */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-col gap-1">
-              <p className="font-semibold text-foreground">{order.client.fullName}</p>
+              <p className="font-semibold text-foreground">
+                {order.client.fullName}
+              </p>
               <p className="text-sm text-foreground/60">
                 {tableLabel ?? ORDER_TYPE_LABELS[order.type]}
                 {order.client.phone && ` · ${order.client.phone}`}
               </p>
               {order.client.address && (
-                <p className="text-sm text-foreground/60">{order.client.address}</p>
+                <p className="text-sm text-foreground/60">
+                  {order.client.address}
+                </p>
               )}
-              <p className="text-xs text-foreground/40">{formatDateTime(order.createdAt)}</p>
+              <p className="text-xs text-foreground/40">
+                {formatDateTime(order.createdAt)}
+              </p>
             </div>
             <div className="flex flex-col items-end gap-2">
               <StatusBadge status={order.status} />
@@ -222,15 +242,24 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               // du schéma, qui ne s'applique qu'à la création.
               const selectedExtras = item.selectedExtras ?? [];
               const excludedIngredients = item.excludedIngredients ?? [];
-              const extrasTotal = selectedExtras.reduce((s, e) => s + e.price, 0);
+              const extrasTotal = selectedExtras.reduce(
+                (s, e) => s + e.price,
+                0,
+              );
               const variantLabel = formatVariantLabel(item.variantSelected);
               return (
-                <div key={i} className="rounded-xl border border-border-subtle p-3">
+                <div
+                  key={i}
+                  className="rounded-xl border border-border-subtle p-3"
+                >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-foreground">
                       {item.quantity}x {item.name}
                       {variantLabel !== "Standard" && (
-                        <span className="text-foreground/50"> ({variantLabel})</span>
+                        <span className="text-foreground/50">
+                          {" "}
+                          ({variantLabel})
+                        </span>
                       )}
                     </span>
                     <span className="font-semibold text-foreground">
@@ -240,6 +269,13 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                   {selectedExtras.length > 0 && (
                     <p className="mt-1 text-xs text-foreground/60">
                       + {selectedExtras.map((e) => e.name).join(", ")}
+                    </p>
+                  )}
+                  {item.formula && (
+                    <p className="mt-1 text-xs font-semibold text-accent-mustard">
+                      {item.formula.name}
+                      {item.formula.includes.length > 0 &&
+                        ` : ${item.formula.includes.join(", ")}`}
                     </p>
                   )}
                   {excludedIngredients.length > 0 && (
@@ -259,7 +295,10 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                 Frais de livraison
               </span>
               {isEditingFee ? (
-                <form onSubmit={handleSaveFee} className="flex items-center gap-2">
+                <form
+                  onSubmit={handleSaveFee}
+                  className="flex items-center gap-2"
+                >
                   <Input
                     type="number"
                     min={0}
@@ -280,7 +319,9 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                   }}
                   className="text-sm font-bold text-primary hover:underline"
                 >
-                  {order.deliveryFee !== undefined ? formatDA(order.deliveryFee) : "À définir"}
+                  {order.deliveryFee !== undefined
+                    ? formatDA(order.deliveryFee)
+                    : "À définir"}
                 </button>
               )}
             </div>
@@ -288,7 +329,9 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
 
           {/* Total */}
           <div className="flex items-center justify-between border-t border-border-subtle pt-3">
-            <span className="font-heading text-base font-bold text-foreground">Total</span>
+            <span className="font-heading text-base font-bold text-foreground">
+              Total
+            </span>
             <span className="font-heading text-xl font-bold text-accent-green">
               {formatDA(order.totalPrice)}
             </span>

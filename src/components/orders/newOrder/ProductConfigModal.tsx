@@ -11,12 +11,13 @@ import {
   isExtraSelectable,
   resolveExtraPrice,
 } from "@/lib/extraPrice";
+import { getEligibleFormulas, resolveEffectiveSize } from "@/lib/formulaRules";
 import type { MenuExtra, MenuItem, MenuItemVariant } from "@/types/menuItem";
 import type { NewCartLine } from "../useItemCart";
 
 // Types d'extras où un seul choix est permis. Le backend ne l'impose pas
-// (décision produit : contrainte portée par l'interface), donc c'est ici que
-// ça se joue — un tacos ne peut recevoir qu'un seul gratinage.
+// (décision produit portée par l'interface) — un tacos ne reçoit qu'un
+// seul gratinage.
 const SINGLE_CHOICE_TYPES = ["Gratinage"];
 
 interface ProductConfigModalProps {
@@ -34,33 +35,55 @@ export function ProductConfigModal({
   const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
+  const [formulaId, setFormulaId] = useState<string | null>(null);
+  const [formulaChoices, setFormulaChoices] = useState<Record<string, string>>(
+    {},
+  );
 
-  // Remise à zéro à chaque ouverture : sans ça, les extras du produit
-  // précédent resteraient cochés sur le suivant.
+  // Remise à zéro à chaque ouverture : sans ça, la formule du produit
+  // précédent resterait active sur le suivant.
   useEffect(() => {
     if (!item) return;
     setVariantIndex(0);
     setSelectedExtraIds([]);
     setExcluded([]);
     setQuantity(1);
+    setFormulaId(null);
+    setFormulaChoices({});
   }, [item]);
+
+  const eligibleFormulas = useMemo(
+    () => (item ? getEligibleFormulas(item) : []),
+    [item],
+  );
+
+  const selectedFormula = useMemo(
+    () => eligibleFormulas.find((f) => f.id === formulaId) ?? null,
+    [eligibleFormulas, formulaId],
+  );
+
+  const isFixed = selectedFormula?.pricingMode === "fixed";
 
   const variant: MenuItemVariant | undefined = item?.variants[variantIndex];
 
-  // useMemo indispensable : `?? {}` crée un objet neuf à chaque rendu quand
-  // `combination` est absent en base. Sans mémoïsation, cette nouvelle
-  // référence invalide le useMemo des extras à chaque rendu, qui relance le
-  // useEffect de nettoyage, qui refait un setState... boucle infinie.
-  const variantSelected = useMemo(() => variant?.combination ?? {}, [variant]);
+  // Une formule "fixed" sert le produit en format unique : plus de variante.
+  // useMemo indispensable ici — `?? {}` crée un objet neuf à chaque rendu,
+  // dont la nouvelle référence relancerait le useMemo des extras en boucle.
+  const variantSelected = useMemo(
+    () => (isFixed ? {} : (variant?.combination ?? {})),
+    [isFixed, variant],
+  );
 
-  // availableExtras est peuplé par le backend (populate) — on écarte les
-  // éventuels ID bruts et les extras non applicables à cette variante.
+  // Chaîne primitive, donc stable d'un rendu à l'autre : c'est elle qui casse
+  // le risque de boucle sur les dépendances ci-dessous.
+  const effectiveSize = resolveEffectiveSize(selectedFormula, variantSelected);
+
   const extras = useMemo(() => {
     const list = (item?.availableExtras ?? []).filter(
       (extra): extra is MenuExtra => typeof extra === "object",
     );
-    return list.filter((extra) => isExtraSelectable(extra, variantSelected));
-  }, [item, variantSelected]);
+    return list.filter((extra) => isExtraSelectable(extra, effectiveSize));
+  }, [item, effectiveSize]);
 
   const extrasByType = useMemo(() => {
     const groups = new Map<string, MenuExtra[]>();
@@ -73,14 +96,11 @@ export function ProductConfigModal({
     return [...groups.entries()];
   }, [extras]);
 
-  // Un extra devenu non sélectionnable après changement de variante (ex: on
-  // passe d'une taille M à une variante sans taille) doit être décoché, sinon
-  // il partirait dans la commande sans prix affiché.
+  // Un extra devenu non sélectionnable après changement de variante ou de
+  // formule doit être décoché, sinon il partirait sans prix affiché.
   useEffect(() => {
     setSelectedExtraIds((prev) => {
-      const next = prev.filter((id) =>
-        extras.some((extra) => extra._id === id),
-      );
+      const next = prev.filter((id) => extras.some((e) => e._id === id));
       // On renvoie `prev` à l'identique quand rien n'a changé : .filter()
       // produit toujours un nouveau tableau, et une nouvelle référence
       // relancerait un rendu, donc cet effet, en boucle.
@@ -95,11 +115,27 @@ export function ProductConfigModal({
     .map((extra) => ({
       extraId: extra._id,
       name: extra.name,
-      price: resolveExtraPrice(extra, variantSelected),
+      price: resolveExtraPrice(extra, effectiveSize),
     }));
 
-  const unitPrice =
-    variant.price + selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+  const extrasTotal = selectedExtras.reduce((sum, e) => sum + e.price, 0);
+
+  const basePrice = isFixed
+    ? selectedFormula!.price
+    : variant.price + (selectedFormula?.price ?? 0);
+
+  const unitPrice = basePrice + extrasTotal;
+
+  // Le backend refuse une formule dont un choix manque : on bloque avant
+  // l'envoi plutôt que de laisser l'employé se prendre un 400.
+  const missingChoice = (selectedFormula?.choices ?? []).some(
+    (choice) => !formulaChoices[choice.label],
+  );
+
+  function selectFormula(id: string | null) {
+    setFormulaId(id);
+    setFormulaChoices({}); // les choix d'une formule n'ont pas de sens sur l'autre
+  }
 
   function toggleExtra(extra: MenuExtra) {
     const typeName = getExtraTypeName(extra);
@@ -110,7 +146,6 @@ export function ProductConfigModal({
         return prev.filter((id) => id !== extra._id);
       }
       if (isSingleChoice) {
-        // Remplace la sélection existante du même type
         const sameTypeIds = extras
           .filter((e) => getExtraTypeName(e) === typeName)
           .map((e) => e._id);
@@ -136,6 +171,23 @@ export function ProductConfigModal({
       extras: selectedExtras,
       excludedIngredients: excluded,
       quantity,
+      ...(selectedFormula
+        ? {
+            formula: {
+              formulaId: selectedFormula.id,
+              name: selectedFormula.name,
+              price: selectedFormula.price,
+              pricingMode: selectedFormula.pricingMode,
+              includes: [
+                ...selectedFormula.includedNames,
+                ...selectedFormula.choices.map(
+                  (choice) => formulaChoices[choice.label]!,
+                ),
+              ],
+              choices: formulaChoices,
+            },
+          }
+        : {}),
     });
     onClose();
   }
@@ -168,15 +220,94 @@ export function ProductConfigModal({
             </button>
           </div>
 
-          <Button icon="icon-[mdi--cart-plus]" onClick={handleConfirm}>
+          <Button
+            icon="icon-[mdi--cart-plus]"
+            onClick={handleConfirm}
+            disabled={missingChoice}
+          >
             Ajouter · {formatDA(unitPrice * quantity)}
           </Button>
         </div>
       }
     >
       <div className="flex flex-col gap-5">
-        {/* Variantes */}
-        {item.variants.length > 1 && (
+        {/* Formules */}
+        {eligibleFormulas.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-semibold text-foreground">Formule</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => selectFormula(null)}
+                className={`rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
+                  formulaId === null
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border-subtle text-foreground/60 hover:text-foreground"
+                }`}
+              >
+                Seul
+              </button>
+              {eligibleFormulas.map((formula) => (
+                <button
+                  key={formula.id}
+                  onClick={() => selectFormula(formula.id)}
+                  className={`rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
+                    formulaId === formula.id
+                      ? "border-accent-mustard bg-accent-mustard/10 text-accent-mustard"
+                      : "border-border-subtle text-foreground/60 hover:text-foreground"
+                  }`}
+                >
+                  {formula.name}
+                  <span className="tabular-nums ml-2 font-normal">
+                    {formula.pricingMode === "fixed"
+                      ? formatDA(formula.price)
+                      : `+${formatDA(formula.price)}`}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {selectedFormula && selectedFormula.includedNames.length > 0 && (
+              <p className="text-xs text-accent-green">
+                Inclus : {selectedFormula.includedNames.join(", ")}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Choix imposés par la formule (boisson...) */}
+        {(selectedFormula?.choices ?? []).map((choice) => (
+          <div key={choice.label} className="flex flex-col gap-2">
+            <p className="text-sm font-semibold text-foreground">
+              {choice.label}
+              <span className="ml-2 text-xs font-normal text-accent-bordeaux">
+                obligatoire
+              </span>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {choice.options.map((option) => (
+                <button
+                  key={option}
+                  onClick={() =>
+                    setFormulaChoices((prev) => ({
+                      ...prev,
+                      [choice.label]: option,
+                    }))
+                  }
+                  className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
+                    formulaChoices[choice.label] === option
+                      ? "border-accent-green bg-accent-green/10 text-accent-green"
+                      : "border-border-subtle text-foreground/70 hover:text-foreground"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {/* Variantes — masquées quand la formule impose un format unique */}
+        {!isFixed && item.variants.length > 1 && (
           <div className="flex flex-col gap-2">
             <p className="text-sm font-semibold text-foreground">Choix</p>
             <div className="flex flex-wrap gap-2">
@@ -200,6 +331,12 @@ export function ProductConfigModal({
           </div>
         )}
 
+        {isFixed && item.variants.length > 1 && (
+          <p className="text-xs text-foreground/50">
+            Format unique en {selectedFormula!.name} — pas de taille à choisir.
+          </p>
+        )}
+
         {/* Extras, groupés par type */}
         {extrasByType.map(([typeName, group]) => (
           <div key={typeName} className="flex flex-col gap-2">
@@ -214,7 +351,7 @@ export function ProductConfigModal({
             <div className="flex flex-wrap gap-2">
               {group.map((extra) => {
                 const isSelected = selectedExtraIds.includes(extra._id);
-                const price = resolveExtraPrice(extra, variantSelected);
+                const price = resolveExtraPrice(extra, effectiveSize);
                 return (
                   <button
                     key={extra._id}
@@ -268,15 +405,6 @@ export function ProductConfigModal({
             </div>
           </div>
         )}
-
-        {extrasByType.length === 0 &&
-          (!item.removableIngredients ||
-            item.removableIngredients.length === 0) &&
-          item.variants.length <= 1 && (
-            <p className="py-2 text-sm text-foreground/50">
-              Aucune option pour ce produit — ajuste la quantité et ajoute-le.
-            </p>
-          )}
       </div>
     </Modal>
   );

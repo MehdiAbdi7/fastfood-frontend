@@ -185,16 +185,22 @@ export default function AddItemsPage() {
                         {line.name}
                       </p>
                       <p className="tabular-nums text-xs text-foreground/50">
-                        {variantLabel !== "Standard"
-                          ? `${variantLabel} · `
-                          : ""}
+                        {line.formula?.pricingMode === "fixed"
+                          ? `${line.formula.name} · `
+                          : variantLabel !== "Standard"
+                            ? `${variantLabel} · `
+                            : ""}
                         {formatDA(getLineUnitPrice(line))}
                       </p>
-                      {line.extras.length > 0 && (
-                        <p className="truncate text-xs text-accent-green">
-                          + {line.extras.map((extra) => extra.name).join(", ")}
+
+                      {line.formula && (
+                        <p className="truncate text-xs font-semibold text-accent-mustard">
+                          {line.formula.name}
+                          {line.formula.includes.length > 0 &&
+                            ` : ${line.formula.includes.join(", ")}`}
                         </p>
                       )}
+
                       {line.excludedIngredients.length > 0 && (
                         <p className="truncate text-xs text-accent-bordeaux">
                           sans {line.excludedIngredients.join(", ")}

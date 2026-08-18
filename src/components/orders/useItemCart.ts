@@ -3,11 +3,21 @@
 import { useState } from "react";
 import type { CreateOrderItemPayload } from "@/types/order";
 import type { MenuItemVariant } from "@/types/menuItem";
+import type { FormulaPricingMode } from "@/config/formulas";
 
 export interface CartExtra {
   extraId: string;
   name: string;
   price: number; // résolu à la sélection, pour l'affichage uniquement
+}
+
+export interface CartFormula {
+  formulaId: string;
+  name: string;
+  price: number;
+  pricingMode: FormulaPricingMode;
+  includes: string[]; // affichage ticket (inclus + choix résolus)
+  choices: Record<string, string>; // renvoyé au backend pour revalidation
 }
 
 export interface CartLine {
@@ -19,14 +29,21 @@ export interface CartLine {
   extras: CartExtra[];
   excludedIngredients: string[];
   quantity: number;
+  formula?: CartFormula;
 }
 
 export type NewCartLine = Omit<CartLine, "key">;
 
+// Une formule "fixed" sert le produit en format unique : la variante choisie
+// n'a plus de sens et ne doit pas partir au backend, qui la rejetterait.
+function isFixedFormula(line: Pick<CartLine, "formula">): boolean {
+  return line.formula?.pricingMode === "fixed";
+}
+
 // Deux lignes ne fusionnent que si TOUT est identique : même produit, même
-// variante, mêmes extras, mêmes retraits. Sinon "1x burger sans oignons" et
-// "1x burger avec cheddar" deviendraient une seule ligne à 2, et la cuisine
-// recevrait une commande fausse.
+// variante, mêmes extras, mêmes retraits, même formule. Sinon "1x burger
+// simple" et "1x burger en menu" deviendraient une seule ligne à 2, et la
+// cuisine recevrait une commande fausse.
 function buildKey(line: NewCartLine): string {
   const extras = line.extras
     .map((extra) => extra.extraId)
@@ -35,18 +52,27 @@ function buildKey(line: NewCartLine): string {
 
   const excluded = [...line.excludedIngredients].sort().join(",");
 
+  const formula = line.formula
+    ? `${line.formula.formulaId}:${JSON.stringify(line.formula.choices)}`
+    : "";
+
   return `${line.menuItemId}|${JSON.stringify(
     line.variant.combination ?? {},
-  )}|${extras}|${excluded}`;
+  )}|${extras}|${excluded}|${formula}`;
 }
 
-// Prix d'une unité, extras compris — sert au total affiché pendant la saisie.
+// Prix d'une unité, formule et extras compris.
 export function getLineUnitPrice(
-  line: Pick<CartLine, "variant" | "extras">,
+  line: Pick<CartLine, "variant" | "extras" | "formula">,
 ): number {
   const extrasTotal = line.extras.reduce((sum, extra) => sum + extra.price, 0);
 
-  return line.variant.price + extrasTotal;
+  if (line.formula?.pricingMode === "fixed") {
+    return line.formula.price + extrasTotal;
+  }
+
+  const supplement = line.formula?.price ?? 0;
+  return line.variant.price + supplement + extrasTotal;
 }
 
 export function useItemCart() {
@@ -61,10 +87,7 @@ export function useItemCart() {
       if (existing) {
         return prev.map((line) =>
           line.key === key
-            ? {
-                ...line,
-                quantity: line.quantity + newLine.quantity,
-              }
+            ? { ...line, quantity: line.quantity + newLine.quantity }
             : line,
         );
       }
@@ -81,8 +104,6 @@ export function useItemCart() {
     setCart((prev) => prev.filter((line) => line.key !== key));
   }
 
-  // Ajustement direct de la quantité (+/- dans le panier) — un quantity <= 0
-  // retire la ligne, plutôt que de laisser un panier avec une ligne à 0.
   function setQuantity(key: string, quantity: number) {
     setCart((prev) => {
       if (quantity <= 0) {
@@ -103,19 +124,26 @@ export function useItemCart() {
     return cart.map((line) => ({
       menuItemId: line.menuItemId,
 
-      // Le backend attend un objet pour matcher la variante
-      // et résoudre le prix.
-      variantSelected: line.variant.combination ?? {},
+      variantSelected: isFixedFormula(line)
+        ? {}
+        : (line.variant.combination ?? {}),
 
-      // Le backend ne veut que les IDs :
-      // il résout nom et prix lui-même.
+      // Le backend ne veut que les IDs : il résout nom et prix lui-même.
       selectedExtras: line.extras.map((extra) => ({
         extraId: extra.extraId,
       })),
 
       excludedIngredients: line.excludedIngredients,
       quantity: line.quantity,
-      isKidsMenu: false,
+
+      ...(line.formula
+        ? {
+            formula: {
+              formulaId: line.formula.formulaId,
+              choices: line.formula.choices,
+            },
+          }
+        : {}),
     }));
   }
 

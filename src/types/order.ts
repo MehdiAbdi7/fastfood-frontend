@@ -15,6 +15,14 @@ export interface OrderItemExtra {
   price: number; // snapshot au moment de la commande
 }
 
+export interface OrderFormula {
+  formulaId: string;
+  name: string;
+  price: number;
+  pricingMode: "fixed" | "supplement";
+  includes: string[];
+}
+
 export interface OrderItem {
   menuItemId: string;
   name: string;
@@ -23,7 +31,7 @@ export interface OrderItem {
   selectedExtras: OrderItemExtra[];
   excludedIngredients: string[];
   quantity: number;
-  isKidsMenu?: boolean;
+  formula?: OrderFormula;
 }
 
 export interface OrderClient {
@@ -57,7 +65,7 @@ export interface CreateOrderItemPayload {
   selectedExtras: { extraId: string }[];
   excludedIngredients: string[];
   quantity: number;
-  isKidsMenu: boolean;
+  formula?: { formulaId: string; choices: Record<string, string> };
 }
 
 export type CreateOrderPayload =

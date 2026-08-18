@@ -1,33 +1,28 @@
 import type { MenuExtra } from "@/types/menuItem";
 
-// Miroir de la logique de resolveOrderItemsPricing côté backend, uniquement
-// pour AFFICHER un total juste pendant la saisie. Le backend reste seul maître
-// du prix réel : il recalcule tout à la création, en ignorant ce que le client
-// envoie (voir utils/pricing.ts).
+// Miroir de resolveOrderItemsPricing côté backend, uniquement pour AFFICHER
+// un total juste pendant la saisie. Le backend recalcule tout à la création.
+//
+// `effectiveSize` vient de resolveEffectiveSize() : c'est la taille du variant
+// choisi, ou celle imposée par la formule (un Menu Kids compte comme un M).
 export function resolveExtraPrice(
   extra: MenuExtra,
-  variantSelected: Record<string, string>,
+  effectiveSize: string | undefined,
 ): number {
   if (extra.priceType === "fixed") return extra.price ?? 0;
-
-  // bySize : le prix dépend de la taille choisie sur le produit lui-même
-  const size = variantSelected?.taille;
-  if (size === "M" || size === "L") return extra.pricesBySize?.[size] ?? 0;
-
+  if (effectiveSize === "M" || effectiveSize === "L") {
+    return extra.pricesBySize?.[effectiveSize] ?? 0;
+  }
   return 0;
 }
 
-// Un extra "bySize" n'a de prix que si le produit a une taille M ou L : sur un
-// produit sans taille, on le masque plutôt que de l'afficher à 0 DA.
 export function isExtraSelectable(
   extra: MenuExtra,
-  variantSelected: Record<string, string>,
+  effectiveSize: string | undefined,
 ): boolean {
   if (extra.available === false) return false;
   if (extra.priceType === "fixed") return true;
-
-  const size = variantSelected?.taille;
-  return size === "M" || size === "L";
+  return effectiveSize === "M" || effectiveSize === "L";
 }
 
 export function getExtraTypeName(extra: MenuExtra): string {

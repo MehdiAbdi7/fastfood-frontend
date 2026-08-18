@@ -3,6 +3,7 @@
 import { formatDA } from "@/lib/format";
 import { formatVariantLabel } from "@/lib/variantLabel";
 import type { MenuItem } from "@/types/menuItem";
+import { getEligibleFormulas } from "@/lib/formulaRules";
 
 interface ProductGridProps {
   items: MenuItem[];
@@ -11,10 +12,9 @@ interface ProductGridProps {
   quantityByItem: Record<string, number>;
   onSelect: (item: MenuItem) => void;
 }
-
-// Un produit sans options (une seule variante, ni extras ni ingrédients
-// retirables) n'a rien à configurer : la page l'ajoute directement au ticket
-// au lieu d'ouvrir une modale pour rien.
+// Un produit sans options n'a rien à configurer : la page l'ajoute directement
+// au ticket. Une formule éligible compte comme une option — sans ça, un burger
+// sans variante partirait au ticket sans jamais proposer le menu.
 export function hasOptions(item: MenuItem): boolean {
   const extras = (item.availableExtras ?? []).filter(
     (extra) => typeof extra === "object",
@@ -22,10 +22,10 @@ export function hasOptions(item: MenuItem): boolean {
   return (
     item.variants.length > 1 ||
     extras.length > 0 ||
-    (item.removableIngredients?.length ?? 0) > 0
+    (item.removableIngredients?.length ?? 0) > 0 ||
+    getEligibleFormulas(item).length > 0
   );
 }
-
 export function ProductGrid({
   items,
   quantityByItem,
