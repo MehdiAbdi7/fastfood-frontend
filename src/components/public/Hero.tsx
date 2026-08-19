@@ -8,14 +8,14 @@ const heroSlides: HeroSlide[] = [
     label: "Burger juteux, pain toasté",
   },
   {
-    src: "/hero-pizza.png",
-    alt: "Pizza Niwa Food",
-    label: "Pizza maison, pâte du jour",
-  },
-  {
     src: "/tacos-gilera.png",
     alt: "Tacos Niwa Food",
     label: "Tacos généreux, sauce signature",
+  },
+  {
+    src: "/hero-pizza.png",
+    alt: "Pizza Niwa Food",
+    label: "Pizza maison, pâte du jour",
   },
   {
     src: "/frites.png",
