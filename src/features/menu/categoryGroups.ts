@@ -54,4 +54,15 @@ export const CATEGORY_GROUPS: CategoryGroupConfig[] = [
       },
     ],
   },
+  // Deux catégories bien distinctes en base — c'est ce qui permet aux formules
+  // de désigner précisément les canettes (voir config/formulas.ts) — mais un
+  // seul onglet côté client, découpé en deux sections par le hook.
+  {
+    label: "Boissons",
+    categoryNames: ["Canettes", "Bouteilles"],
+    subLabels: [
+      { categoryName: "Canettes", displayLabel: "Canettes" },
+      { categoryName: "Bouteilles", displayLabel: "Bouteilles" },
+    ],
+  },
 ];

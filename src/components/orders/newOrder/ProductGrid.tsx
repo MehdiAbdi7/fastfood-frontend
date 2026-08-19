@@ -12,6 +12,7 @@ interface ProductGridProps {
   quantityByItem: Record<string, number>;
   onSelect: (item: MenuItem) => void;
 }
+
 // Un produit sans options n'a rien à configurer : la page l'ajoute directement
 // au ticket. Une formule éligible compte comme une option — sans ça, un burger
 // sans variante partirait au ticket sans jamais proposer le menu.
@@ -26,6 +27,7 @@ export function hasOptions(item: MenuItem): boolean {
     getEligibleFormulas(item).length > 0
   );
 }
+
 export function ProductGrid({
   items,
   quantityByItem,
@@ -46,7 +48,9 @@ export function ProductGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+    // Pas de items-start : les cartes d'une rangée s'étirent à la hauteur de la
+    // plus haute, et le flex-1 interne aligne toutes les barres de prix.
+    <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
       {items.map((item) => {
         const inCart = quantityByItem[item._id] ?? 0;
         const configurable = hasOptions(item);
@@ -79,21 +83,35 @@ export function ProductGrid({
               )}
             </div>
 
-            <div className="flex flex-1 flex-col gap-2 p-3">
+            <div className="flex flex-1 flex-col gap-1.5 p-3">
               <p className="line-clamp-2 font-heading text-sm font-bold leading-tight text-foreground">
                 {item.name}
               </p>
 
-              {/* Le libellé de variante n'a de sens que s'il y a un choix à faire */}
-              {item.variants.length > 1 && (
-                <p className="truncate text-xs text-foreground/50">
-                  {item.variants
-                    .map((v) => formatVariantLabel(v.combination))
-                    .join(" · ")}
-                </p>
-              )}
+              {/* flex-1 sur ce bloc, pas sur le parent seul : c'est lui qui
+                  encaisse la hauteur excédentaire d'une carte étirée par sa
+                  voisine. Sans ça, le vide se creuserait au-dessus du prix. */}
+              <div className="flex flex-1 flex-col gap-1.5">
+                {/* Description entière : en prise de commande, une description
+                    tronquée oblige à ouvrir la fiche pour trancher entre deux
+                    produits proches. */}
+                {item.description && (
+                  <p className="text-xs leading-relaxed text-foreground/55">
+                    {item.description}
+                  </p>
+                )}
 
-              <div className="mt-auto flex items-center justify-between gap-2 rounded-xl bg-surface-2 px-3 py-2 transition-colors group-hover:bg-primary group-hover:text-on-primary">
+                {/* Le libellé de variante n'a de sens que s'il y a un choix à faire */}
+                {item.variants.length > 1 && (
+                  <p className="truncate text-xs text-foreground/50">
+                    {item.variants
+                      .map((v) => formatVariantLabel(v.combination))
+                      .join(" · ")}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-2 rounded-xl bg-surface-2 px-3 py-2 transition-colors group-hover:bg-primary group-hover:text-on-primary">
                 <span className="tabular-nums font-heading text-sm font-bold">
                   {item.variants.length > 1 ? "dès " : ""}
                   {formatDA(minPrice)}

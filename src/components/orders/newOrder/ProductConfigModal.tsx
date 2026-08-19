@@ -12,6 +12,7 @@ import {
   resolveExtraPrice,
 } from "@/lib/extraPrice";
 import { getEligibleFormulas, resolveEffectiveSize } from "@/lib/formulaRules";
+import { useMenuOptionsByCategory } from "@/features/menu/useMenuOptionsByCategory";
 import type { MenuExtra, MenuItem, MenuItemVariant } from "@/types/menuItem";
 import type { NewCartLine } from "../useItemCart";
 
@@ -39,6 +40,11 @@ export function ProductConfigModal({
   const [formulaChoices, setFormulaChoices] = useState<Record<string, string>>(
     {},
   );
+
+  // Options de formule lues dans le menu réel (canettes disponibles) plutôt
+  // qu'une liste en dur. Aucune requête de plus : RTK Query sert le cache
+  // déjà rempli par MenuBrowser.
+  const optionsByCategory = useMenuOptionsByCategory();
 
   // Remise à zéro à chaque ouverture : sans ça, la formule du produit
   // précédent resterait active sur le suivant.
@@ -132,6 +138,12 @@ export function ProductConfigModal({
     (choice) => !formulaChoices[choice.label],
   );
 
+  // Catégorie vide ou entièrement en rupture : la formule est incommandable,
+  // le backend renverrait "Aucune option disponible". Même verdict ici.
+  const unavailableChoice = (selectedFormula?.choices ?? []).some(
+    (choice) => (optionsByCategory[choice.fromCategoryName] ?? []).length === 0,
+  );
+
   function selectFormula(id: string | null) {
     setFormulaId(id);
     setFormulaChoices({}); // les choix d'une formule n'ont pas de sens sur l'autre
@@ -223,7 +235,7 @@ export function ProductConfigModal({
           <Button
             icon="icon-[mdi--cart-plus]"
             onClick={handleConfirm}
-            disabled={missingChoice}
+            disabled={missingChoice || unavailableChoice}
           >
             Ajouter · {formatDA(unitPrice * quantity)}
           </Button>
@@ -274,37 +286,51 @@ export function ProductConfigModal({
           </div>
         )}
 
-        {/* Choix imposés par la formule (boisson...) */}
-        {(selectedFormula?.choices ?? []).map((choice) => (
-          <div key={choice.label} className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-foreground">
-              {choice.label}
-              <span className="ml-2 text-xs font-normal text-accent-bordeaux">
-                obligatoire
-              </span>
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {choice.options.map((option) => (
-                <button
-                  key={option}
-                  onClick={() =>
-                    setFormulaChoices((prev) => ({
-                      ...prev,
-                      [choice.label]: option,
-                    }))
-                  }
-                  className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
-                    formulaChoices[choice.label] === option
-                      ? "border-accent-green bg-accent-green/10 text-accent-green"
-                      : "border-border-subtle text-foreground/70 hover:text-foreground"
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
+        {/* Choix imposés par la formule (boisson...) — les options viennent
+            désormais du menu, pas d'une liste figée dans le code. */}
+        {(selectedFormula?.choices ?? []).map((choice) => {
+          const options = optionsByCategory[choice.fromCategoryName] ?? [];
+
+          return (
+            <div key={choice.label} className="flex flex-col gap-2">
+              <p className="text-sm font-semibold text-foreground">
+                {choice.label}
+                <span className="ml-2 text-xs font-normal text-accent-bordeaux">
+                  obligatoire
+                </span>
+              </p>
+
+              {options.length === 0 ? (
+                <p className="text-xs text-accent-bordeaux">
+                  Aucun produit disponible dans «&nbsp;{choice.fromCategoryName}
+                  &nbsp;» — ajoute-en depuis le Menu, ou cette formule reste
+                  incommandable.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {options.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() =>
+                        setFormulaChoices((prev) => ({
+                          ...prev,
+                          [choice.label]: option,
+                        }))
+                      }
+                      className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
+                        formulaChoices[choice.label] === option
+                          ? "border-accent-green bg-accent-green/10 text-accent-green"
+                          : "border-border-subtle text-foreground/70 hover:text-foreground"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Variantes — masquées quand la formule impose un format unique */}
         {!isFixed && item.variants.length > 1 && (
