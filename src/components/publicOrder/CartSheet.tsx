@@ -94,7 +94,7 @@ export function CartSheet() {
           <div className="flex-1 overflow-y-auto px-5 py-4">
             {lines.length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-14 text-center">
-                <span className="icon-[mdi--basket-outline] text-4xl text-foreground/20" />
+                <span className="icon-[mdi--cart] text-4xl text-foreground/20" />
                 <p className="font-heading text-base font-bold text-foreground">
                   Votre panier est vide
                 </p>
