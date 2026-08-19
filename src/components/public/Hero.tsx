@@ -3,6 +3,11 @@ import { HeroCarousel, type HeroSlide } from "./HeroCarousel";
 
 const heroSlides: HeroSlide[] = [
   {
+    src: "/hero-burger1.png",
+    alt: "Burger Niwa Food",
+    label: "Burger juteux, pain toasté",
+  },
+  {
     src: "/hero-pizza.png",
     alt: "Pizza Niwa Food",
     label: "Pizza maison, pâte du jour",
@@ -11,11 +16,6 @@ const heroSlides: HeroSlide[] = [
     src: "/tacos-gilera.png",
     alt: "Tacos Niwa Food",
     label: "Tacos généreux, sauce signature",
-  },
-  {
-    src: "/hero-burger1.png",
-    alt: "Burger Niwa Food",
-    label: "Burger juteux, pain toasté",
   },
   {
     src: "/frites.png",

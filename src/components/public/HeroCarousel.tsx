@@ -11,7 +11,7 @@ import {
 const SHARED_IMAGE_CLASSNAME =
   "absolute left-1/2 top-35 sm:top-50 w-[85%] sm:w-[85%] -translate-x-1/2 object-contain shadow-food-md transition-[transform,opacity] duration-700 ease-out ";
 
-const AUTOPLAY_INTERVAL_MS = 5000;
+const AUTOPLAY_INTERVAL_MS = 6000;
 const SLIDE_START_OFFSET = "7rem";
 const SWIPE_THRESHOLD_PX = 40;
 
