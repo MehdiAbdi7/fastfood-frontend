@@ -8,6 +8,8 @@ import testimonialsReducer from "../features/testimonials/testimonialsSlice";
 import authReducer from "../features/auth/authSlice";
 import toastReducer from "../features/toast/toastSlice";
 import storeScopeReducer from "../features/store/storeScopeSlice";
+import publicCartReducer from "../features/publicOrder/cartSlice";
+import menuBrowseReducer from "../features/publicOrder/browseSlice";
 import { api } from "@/server/api";
 import { socketMiddleware } from "@/middlewares/socketMiddleware";
 
@@ -20,6 +22,8 @@ export const store = configureStore({
     auth: authReducer,
     toast: toastReducer,
     storeScope: storeScopeReducer,
+    publicCart: publicCartReducer,
+    menuBrowse: menuBrowseReducer,
     [api.reducerPath]: api.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useNavbar } from "@/features/navbar/useNavbar";
 import { ThemeToggle } from "./themeToggle";
+import { CartButton } from "./CartButton";
 
 const NAV_LINKS = [
   { href: "/#accueil", label: "Accueil" },
@@ -59,7 +60,11 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* gap resserré sur mobile : le panier vient s'intercaler ici, et à
+            gap-4 le trio panier/thème/hamburger débordait sur les petits
+            écrans. */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          <CartButton />
           <ThemeToggle />
           <Link
             href="/commande"
