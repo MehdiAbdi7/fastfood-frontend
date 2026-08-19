@@ -291,7 +291,7 @@ export function ProductSheet({
         return (
           <>
             {/* ---------- Visuel d'en-tête ---------- */}
-            <div className="relative h-70 w-full shrink-0 overflow-hidden bg-primary/10 sm:h-48">
+            <div className="relative h-100 sm:h-85 w-full shrink-0 overflow-hidden bg-primary/10 ">
               {item.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img

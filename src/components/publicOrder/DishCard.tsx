@@ -37,7 +37,7 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
       type="button"
       onClick={() => onSelect(item)}
       aria-label={`${item.name}, ${configurable ? "choisir les options" : "ajouter au panier"}`}
-      className="group flex w-full items-start gap-4 rounded-2xl border border-primary/15 bg-background p-3 text-left transition-colors duration-200 hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:bg-primary/10 sm:p-4"
+      className="group flex w-full items-start gap-4 rounded-2xl border border-primary/50 bg-background p-3 text-left transition-colors duration-200 hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:bg-primary/10 sm:p-4"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 py-0.5">
         <h3 className="font-heading text-base font-bold leading-snug text-foreground">

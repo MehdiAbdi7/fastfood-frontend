@@ -24,7 +24,7 @@ export function CartButton() {
       aria-label={`Voir mon panier, ${count} article${count > 1 ? "s" : ""}`}
       className="relative flex h-9 items-center gap-2 rounded-full border-2 border-foreground/80 bg-primary/20 px-2.5 font-bold text-foreground/80 backdrop-blur-2xl transition-colors hover:border-accent-green hover:text-accent-green sm:pl-3 sm:pr-4"
     >
-      <span className="icon-[mdi--basket-outline] size-5" />
+      <span className="icon-[mdi--cart] size-5" />
 
       {/* Le total n'apparaît qu'à partir de sm : sur mobile la barre est déjà
           serrée entre le logo et le hamburger, et CartBar l'affiche en bas. */}

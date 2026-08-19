@@ -130,7 +130,7 @@ export function DishList({ items, nav }: DishListProps) {
       ) : (
         // Une colonne sur mobile pour laisser respirer les descriptions, deux
         // sur grand écran où la largeur devient excessive pour une seule ligne.
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {filteredItems.map((item) => (
             <DishCard
               key={item._id}

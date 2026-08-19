@@ -13,7 +13,7 @@ import { Providers } from "./providers";
 // (--font-heading / --font-body).
 export const metadata: Metadata = {
   title: "Niwa Food",
-  description: "Fast-food fait maison à Kouba et Chéraga",
+  description: "Fast-food fait maison burger, pizza, tacos à Kouba et Chéraga",
 };
 
 const themeInitScript = `

@@ -65,7 +65,7 @@ export default async function CommandePage() {
   const nav = buildMenuNav(categories, availableItems);
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 pb-40 pt-24 sm:px-6 sm:pt-28">
+    <div className="mx-auto w-full max-w-7xl px-4 pb-30 pt-28 sm:pt-28">
       <header className="mb-6 flex flex-col gap-1.5">
         <span className="font-heading text-sm font-bold uppercase tracking-wide text-accent-green">
           Notre carte

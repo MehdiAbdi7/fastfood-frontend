@@ -9,7 +9,7 @@ import { CartButton } from "./CartButton";
 
 const NAV_LINKS = [
   { href: "/#accueil", label: "Accueil" },
-  { href: "/#menu", label: "Menu" },
+  { href: "/commande", label: "Menu" },
   { href: "/#a-propos", label: "À propos" },
   { href: "/#contact", label: "Contact" },
 ];
