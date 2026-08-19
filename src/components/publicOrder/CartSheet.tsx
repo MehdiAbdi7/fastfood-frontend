@@ -15,6 +15,7 @@ import {
 } from "@/lib/cartLine";
 
 const ORDER_PATH = "/commande";
+const CHECKOUT_PATH = "/commande/finaliser";
 
 const DETAIL_CLASSES: Record<LineDetailTone, string> = {
   neutral: "text-foreground/50",
@@ -222,18 +223,9 @@ export function CartSheet() {
                 </span>
               </div>
 
-              {/* Depuis une autre page, on renvoie d'abord vers la carte :
-                  le tunnel de validation vivra là-bas. */}
-              {pathname === ORDER_PATH ? (
-                <button
-                  type="button"
-                  disabled
-                  className="flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 font-heading text-base font-bold text-on-primary transition-all hover:bg-accent-slate active:scale-[0.99] disabled:opacity-50"
-                >
-                  Finaliser ma commande
-                  <span className="icon-[line-md--arrow-right-circle-twotone] text-xl" />
-                </button>
-              ) : (
+              {/* Depuis le tunnel lui-même, le ticket ne sert qu'à relire sa
+                  commande : le seul geste utile est de repartir la modifier. */}
+              {pathname === CHECKOUT_PATH ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -242,14 +234,27 @@ export function CartSheet() {
                   }}
                   className="flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 font-heading text-base font-bold text-on-primary transition-all hover:bg-accent-slate active:scale-[0.99]"
                 >
-                  Retour à la carte
+                  Modifier ma commande
+                  <span className="icon-[mdi--pencil-outline] text-lg" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    close();
+                    router.push(CHECKOUT_PATH);
+                  }}
+                  className="flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 font-heading text-base font-bold text-on-primary transition-all hover:bg-accent-slate active:scale-[0.99]"
+                >
+                  Finaliser ma commande
                   <span className="icon-[line-md--arrow-right-circle-twotone] text-xl" />
                 </button>
               )}
 
               <div className="mt-2 flex items-center justify-between">
                 <p className="text-xs text-foreground/45">
-                  Sur place, à emporter ou livraison — étape suivante.
+                  Sur place, à emporter ou livraison — vous choisirez à
+                  l&apos;étape suivante.
                 </p>
                 <button
                   type="button"

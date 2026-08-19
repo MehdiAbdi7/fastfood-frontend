@@ -57,6 +57,25 @@ export interface Order {
   updatedAt: string;
 }
 
+// Ce que renvoie GET /orders/:id/track — route publique, sans authentification.
+// La projection du backend exclut téléphone et adresse : la room de suivi est
+// ouverte à quiconque connaît l'id. Un type distinct plutôt qu'un Order
+// partiel, pour que le compilateur interdise de lire un champ absent.
+export interface OrderTracking {
+  _id: string;
+  type: OrderType;
+  status: OrderStatus;
+  store: Store;
+  dailyNumber: number;
+  client: { fullName: string };
+  items: OrderItem[];
+  remark?: string;
+  deliveryFee?: number;
+  totalPrice: number;
+  completedAt: string | null;
+  createdAt: string;
+}
+
 // Payload de création — items simplifiés : le serveur résout prix/noms,
 // le client n'envoie que des IDs et des choix (voir utils/pricing.ts backend)
 export interface CreateOrderItemPayload {

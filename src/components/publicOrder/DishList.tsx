@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { DishCard, hasChoices } from "./DishCard";
 import { ProductSheet } from "./ProductSheet";
 import { useCart } from "@/features/publicOrder/useCart";
@@ -30,6 +30,9 @@ function getCategoryId(item: MenuItem): string {
  * La fiche vit ici et non dans un composant frère : c'est le seul endroit qui
  * détient déjà le menu complet. L'isoler ailleurs obligerait à sérialiser une
  * deuxième fois tout le catalogue dans le payload RSC.
+ *
+ * C'est aussi pour cette raison que la réconciliation du panier restauré est
+ * portée ici : le layout, qui hydrate, ne connaît pas le menu.
  */
 export function DishList({ items, nav }: DishListProps) {
   const dispatch = useAppDispatch();
@@ -38,8 +41,35 @@ export function DishList({ items, nav }: DishListProps) {
   const subCategoryId = useAppSelector(selectSubCategoryId);
   const sheet = useAppSelector(selectProductSheet);
 
-  const { quantityByItem, lines, addLine, openProduct, closeProduct } =
-    useCart();
+  const {
+    quantityByItem,
+    lines,
+    addLine,
+    openProduct,
+    closeProduct,
+    isHydrated,
+    reconcile,
+    unavailableNotice,
+    dismissNotice,
+  } = useCart();
+
+  // Chaîne primitive et non tableau : la référence d'un tableau change à
+  // chaque rendu, ce qui relancerait l'effet en boucle.
+  const availableIdsKey = useMemo(
+    () => items.map((item) => item._id).join(","),
+    [items],
+  );
+
+  useEffect(() => {
+    // Avant l'hydratation il n'y a rien à réconcilier, et le faire trop tôt
+    // reviendrait à valider un panier vide.
+    if (!isHydrated) return;
+    reconcile(availableIdsKey ? availableIdsKey.split(",") : []);
+    // reconcile est recréé à chaque rendu (useCart n'est pas mémoïsé) : le
+    // sortir des dépendances évite la boucle, et le reducer est de toute
+    // façon idempotent — il ne modifie l'état que s'il y a vraiment à retirer.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHydrated, availableIdsKey]);
 
   // Options de formule (la boisson d'un menu) lues dans le menu réel plutôt
   // qu'une liste figée : ajouter une canette suffit à la proposer en formule.
@@ -110,6 +140,33 @@ export function DishList({ items, nav }: DishListProps) {
 
   return (
     <>
+      {/* Un article disparu en silence serait pire que pas de panier persisté
+          du tout : le client doit savoir pourquoi son total a baissé. */}
+      {unavailableNotice.length > 0 && (
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-accent-mustard/40 bg-accent-mustard/10 px-4 py-3">
+          <span className="icon-[mdi--information-outline] mt-0.5 shrink-0 text-lg text-accent-mustard" />
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <p className="font-heading text-sm font-bold text-foreground">
+              {unavailableNotice.length > 1
+                ? "Des articles ne sont plus disponibles"
+                : "Un article n'est plus disponible"}
+            </p>
+            <p className="text-sm text-foreground/65">
+              {unavailableNotice.join(", ")} — retiré
+              {unavailableNotice.length > 1 ? "s" : ""} de votre panier.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={dismissNotice}
+            aria-label="Fermer"
+            className="shrink-0 text-foreground/40 transition-colors hover:text-foreground"
+          >
+            <span className="icon-[mdi--close] text-lg" />
+          </button>
+        </div>
+      )}
+
       {filteredItems.length === 0 ? (
         <div className="flex flex-col items-center gap-2 py-20 text-center">
           <span className="icon-[mdi--silverware-clean] text-4xl text-foreground/25" />

@@ -37,7 +37,10 @@ export const orderApi = api.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.orders.map((o) => ({ type: "Order" as const, id: o._id })),
+              ...result.orders.map((o) => ({
+                type: "Order" as const,
+                id: o._id,
+              })),
               { type: "Order" as const, id: "LIST" },
             ]
           : [{ type: "Order" as const, id: "LIST" }],
@@ -48,9 +51,14 @@ export const orderApi = api.injectEndpoints({
     // pour les commandes prises au comptoir ou par téléphone.
     createOrder: builder.mutation<Order, CreateOrderPayload>({
       query: (body) => ({ url: "/orders", method: "POST", body }),
+      // Le backend enveloppe tout dans { success, message, data }. Sans ce
+      // déballage, `created.dailyNumber` vaut undefined et le toast de
+      // NewOrderPage affiche « Commande #undefined créée ».
+      transformResponse: (response: ApiEnvelope<Order>) => response.data,
       invalidatesTags: [
         { type: "Order", id: "LIST" },
         { type: "Table", id: "LIST" }, // dine_in occupe la table choisie
+        { type: "Table", id: "PUBLIC" }, // le sélecteur client doit le refléter
       ],
     }),
 
@@ -69,10 +77,12 @@ export const orderApi = api.injectEndpoints({
         method: "PATCH",
         body: { status },
       }),
+      transformResponse: (response: ApiEnvelope<Order>) => response.data,
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Order", id },
         { type: "Order", id: "LIST" },
         { type: "Table", id: "LIST" }, // "completed" libère la table associée
+        { type: "Table", id: "PUBLIC" },
       ],
     }),
 
@@ -85,18 +95,23 @@ export const orderApi = api.injectEndpoints({
         method: "PATCH",
         body: { items },
       }),
+      transformResponse: (response: ApiEnvelope<Order>) => response.data,
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Order", id },
         { type: "Order", id: "LIST" },
       ],
     }),
 
-    setDeliveryFee: builder.mutation<Order, { id: string; deliveryFee: number }>({
+    setDeliveryFee: builder.mutation<
+      Order,
+      { id: string; deliveryFee: number }
+    >({
       query: ({ id, deliveryFee }) => ({
         url: `/orders/${id}/delivery-fee`,
         method: "PATCH",
         body: { deliveryFee },
       }),
+      transformResponse: (response: ApiEnvelope<Order>) => response.data,
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Order", id },
         { type: "Order", id: "LIST" },
@@ -109,12 +124,17 @@ export const orderApi = api.injectEndpoints({
         { type: "Order", id },
         { type: "Order", id: "LIST" },
         { type: "Table", id: "LIST" },
+        { type: "Table", id: "PUBLIC" },
       ],
     }),
 
     getCounters: builder.query<CounterState[], StoreScopeParams | void>({
-      query: (params) => ({ url: "/orders/counter", params: params ?? undefined }),
-      transformResponse: (response: ApiEnvelope<CounterState[]>) => response.data,
+      query: (params) => ({
+        url: "/orders/counter",
+        params: params ?? undefined,
+      }),
+      transformResponse: (response: ApiEnvelope<CounterState[]>) =>
+        response.data,
       providesTags: ["Counter"],
     }),
 
@@ -123,7 +143,8 @@ export const orderApi = api.injectEndpoints({
         url: "/orders/stats/service",
         params: params ?? undefined,
       }),
-      transformResponse: (response: ApiEnvelope<ServiceStats[]>) => response.data,
+      transformResponse: (response: ApiEnvelope<ServiceStats[]>) =>
+        response.data,
       providesTags: ["ServiceStats"],
     }),
 
@@ -132,6 +153,7 @@ export const orderApi = api.injectEndpoints({
       { store?: Store; force?: boolean }
     >({
       query: (body) => ({ url: "/orders/counter/reset", method: "POST", body }),
+      transformResponse: (response: ApiEnvelope<CounterState>) => response.data,
       invalidatesTags: [
         "Counter",
         "ServiceStats",
