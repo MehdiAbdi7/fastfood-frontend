@@ -33,7 +33,7 @@ export function Hero() {
   return (
     <section className="background relative isolate overflow-hidden px-4 sm:px-2 py-14 sm:py-16 ">
       {/* Contenu */}
-      <div className="relative z-10 mx-auto flex flex-col sm:flex-row w-full max-w-7xl justify-evenly py-20 gap-10 sm:gap-0">
+      <div className="relative z-10 mx-auto flex flex-col lg:flex-row w-full max-w-7xl items-center justify-evenly pt-20 pb-10 gap-10">
         <HeroCarousel slides={heroSlides} />
 
         <div className="flex flex-col justify-between items-center">

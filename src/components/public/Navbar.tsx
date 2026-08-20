@@ -20,7 +20,9 @@ const Navbar = () => {
   return (
     <header
       className={`fixed z-40 w-full transition-all duration-300 ease-in ${
-        isScrolled || isMenuOpen ? "bg-primary shadow-md" : "bg-transparent"
+        isScrolled || isMenuOpen
+          ? "bg-primary border-b-2 border-background shadow-md"
+          : "bg-transparent"
       }`}
     >
       <nav
