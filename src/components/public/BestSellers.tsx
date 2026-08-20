@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useGetMenuItemsQuery } from "@/features/menu/menuApi";
 import { useInfiniteCarousel } from "@/features/carousel/useInfiniteCarousel";
@@ -20,9 +20,6 @@ const BEST_SELLER_NAMES = [
   "Frites Niwa",
   "Salade César",
 ];
-
-// ---------- TEMPORAIRE : passer à false, puis supprimer le bloc plus bas ----------
-const SHOW_DEBUG = true;
 
 export function BestSellers() {
   const { data: menuItems, isLoading, isError } = useGetMenuItemsQuery();
@@ -51,30 +48,6 @@ export function BestSellers() {
 
   const { scrollerRef, handleScroll, scrollByCard, scrollerHandlers } =
     useInfiniteCarousel(bestSellers.length);
-
-  // ---------- TEMPORAIRE : diagnostic autoplay ----------
-  const [debug, setDebug] = useState("…");
-
-  useEffect(() => {
-    if (!SHOW_DEBUG) return;
-
-    const id = setInterval(() => {
-      const el = scrollerRef.current;
-      if (!el) {
-        setDebug("pas de ref");
-        return;
-      }
-      const reduced = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      setDebug(
-        `reduceMotion:${reduced} · largeur:${el.scrollWidth}/${el.clientWidth} · x:${Math.round(el.scrollLeft)}`,
-      );
-    }, 500);
-
-    return () => clearInterval(id);
-  }, [scrollerRef]);
-  // ---------- FIN TEMPORAIRE ----------
 
   return (
     <section
@@ -167,14 +140,6 @@ export function BestSellers() {
             </div>
           </div>
         )}
-
-        {/* ---------- TEMPORAIRE : à supprimer une fois validé ---------- */}
-        {SHOW_DEBUG && (
-          <p className="mt-4 text-center text-xs tabular-nums text-accent-bordeaux">
-            {debug}
-          </p>
-        )}
-        {/* ---------- FIN TEMPORAIRE ---------- */}
 
         <div className="mt-8 flex justify-center">
           <Link
