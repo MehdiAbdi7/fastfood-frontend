@@ -1,16 +1,26 @@
 import type { Metadata } from "next";
 
+// Polices servies depuis notre propre domaine via Fontsource, et non par un
+// <link> vers Google Fonts. Une feuille externe bloque le premier rendu, et
+// celle de Google impose deux allers-retours réseau avant le premier pixel :
+// résolution DNS + TLS pour googleapis.com, téléchargement du CSS, puis
+// découverte des fichiers sur gstatic.com et nouvelle connexion.
+//
+// next/font/google ferait la même chose à la compilation, mais Turbopack ne
+// résout pas ses URLs en dev ("@vercel/turbopack-next/internal/font/google").
+// Fontsource contourne le problème : ce sont de simples imports npm, donc les
+// fichiers sont traités comme n'importe quel asset du projet.
+//
+// Les familles correspondantes sont déclarées dans globals.css
+// (--font-heading / --font-body).
+import "@fontsource-variable/dm-sans";
+import "@fontsource/baloo-2/400.css";
+import "@fontsource/baloo-2/600.css";
+import "@fontsource/baloo-2/700.css";
+
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Polices chargées par <link> plutôt que par next/font/google : Turbopack
-// n'arrive pas à résoudre les URLs gstatic générées par next/font en dev
-// (erreur "@vercel/turbopack-next/internal/font/google/font"). Le <link> est
-// la méthode standard du web, sans dépendance ni résolution de module — le
-// navigateur télécharge la feuille de style, et `display=swap` affiche
-// immédiatement une police système en attendant.
-// Les familles correspondantes sont déclarées dans globals.css
-// (--font-heading / --font-body).
 export const metadata: Metadata = {
   title: "Niwa Food",
   description: "Fast-food fait maison burger, pizza, tacos à Kouba et Chéraga",
