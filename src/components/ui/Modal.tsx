@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
 interface ModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export function Modal({
   size = "md",
   footer,
 }: ModalProps) {
-  // Echap pour fermer + on bloque le scroll du body pendant que la modale est ouverte
+  // Echap pour fermer + verrou de défilement pendant que la modale est ouverte.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -35,11 +36,15 @@ export function Modal({
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
+
+    // Voir lib/scrollLock.ts : l'ancien `body.style.overflow = "hidden"` était
+    // neutralisé par l'overflow-x-clip du <html>, qui coupe la propagation de
+    // l'overflow du body vers le viewport.
+    lockScroll();
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
+      unlockScroll();
     };
   }, [isOpen, onClose]);
 
@@ -62,7 +67,10 @@ export function Modal({
         className={`relative flex max-h-[85vh] w-full flex-col rounded-2xl border border-border-subtle bg-surface shadow-food-md ${SIZE_CLASSES[size]}`}
       >
         <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
-          <h2 id="modal-title" className="font-heading text-lg font-bold text-foreground">
+          <h2
+            id="modal-title"
+            className="font-heading text-lg font-bold text-foreground"
+          >
             {title}
           </h2>
           <button

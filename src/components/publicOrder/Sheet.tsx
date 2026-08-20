@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
 const EXIT_MS = 220;
 
@@ -55,14 +56,14 @@ export function Sheet({
 
     document.addEventListener("keydown", handleKeyDown);
 
-    // On mémorise la valeur précédente : deux feuilles enchaînées ne doivent
-    // pas se voler le verrou de scroll.
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // Verrou centralisé : un simple `body.style.overflow = "hidden"` est sans
+    // effet ici, l'overflow-x-clip du <html> coupant la propagation au
+    // viewport. Voir lib/scrollLock.ts.
+    lockScroll();
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflow;
+      unlockScroll();
     };
   }, [close]);
 
