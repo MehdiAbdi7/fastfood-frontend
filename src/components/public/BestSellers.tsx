@@ -11,8 +11,11 @@ import { BestSellerCard } from "./BestSellerCard";
 // renommé côté dashboard fait disparaître la carte en silence, d'où le contrôle
 // de développement plus bas.
 const BEST_SELLER_NAMES = [
-  "GIVI",
+  "POLINI",
   "MALOSSI",
+  "GIVI",
+  "ARAI",
+  "GILERA",
   "SAMOURAI",
   "Frites Niwa",
   "Salade César",
@@ -52,7 +55,7 @@ export function BestSellers() {
   return (
     <section
       id="menu"
-      className="relative isolate overflow-hidden px-2 py-16 sm:px-8 sm:py-24"
+      className="relative isolate overflow-hidden px-2 py-16 sm:px-8"
     >
       <div className="relative z-10 mx-auto max-w-6xl rounded-4xl border border-primary bg-background px-1 sm:px-4 py-8 shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md dark:bg-primary/30 ">
         <div className="mb-10 flex flex-col items-center gap-2 text-center sm:mb-14">
@@ -128,7 +131,7 @@ export function BestSellers() {
                   <div
                     key={`${copy}-${item._id}`}
                     aria-hidden={copy !== 1}
-                    className="shrink-0 basis-[42%] sm:basis-[28%] lg:basis-[21%]"
+                    className="shrink-0 basis-[38%] sm:basis-[28%] lg:basis-[18%]"
                   >
                     <BestSellerCard item={item} isDuplicate={copy !== 1} />
                   </div>
