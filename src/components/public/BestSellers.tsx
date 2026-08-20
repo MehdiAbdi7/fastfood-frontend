@@ -12,13 +12,13 @@ import { BestSellerCard } from "./BestSellerCard";
 // de développement plus bas.
 const BEST_SELLER_NAMES = [
   "PIRELLI",
-  "GIVI",
   "HARLEY",
-  "MALOSSI",
   "GILERA",
-  "SAMOURAI",
   "Frites Niwa",
   "Salade César",
+  "À REMPLACER 1",
+  "À REMPLACER 2",
+  "À REMPLACER 3",
 ];
 
 export function BestSellers() {
@@ -32,6 +32,9 @@ export function BestSellers() {
       menuItems?.find((item) => item.name === name && item.available),
     ).filter((item): item is NonNullable<typeof item> => item !== undefined);
 
+    // Le filtrage par nom échoue silencieusement : sans ce signal, un produit
+    // renommé ou épuisé se traduit juste par une carte manquante que personne
+    // ne remarque avant une capture d'écran client.
     if (process.env.NODE_ENV !== "production" && menuItems) {
       const missing = BEST_SELLER_NAMES.filter(
         (name) => !menuItems.some((item) => item.name === name),
@@ -63,7 +66,7 @@ export function BestSellers() {
             Les best-sellers Niwa
           </h2>
           <p className="mx-auto max-w-md text-sm text-foreground">
-            Les plats que nos clients recommandent le plus souvent.
+            Touchez un plat pour le composer.
           </p>
         </div>
 
@@ -110,22 +113,19 @@ export function BestSellers() {
 
                 py-6 -my-6 : overflow-x-auto force implicitement overflow-y à
                 "auto", ce qui rognerait le -translate-y-1.5 et le glow de 30px
-                des cartes au survol. On rend l'espace sans décaler la page.
-
-                tabIndex : sans enfant focusable, un conteneur scrollable est
-                inatteignable au clavier. */}
+                des cartes au survol. On rend l'espace sans décaler la page. */}
             <div
               ref={scrollerRef}
               onScroll={handleScroll}
               {...scrollerHandlers}
-              tabIndex={0}
               role="region"
               aria-label="Carrousel des best-sellers"
-              className="scrollbar-hide -my-6 flex gap-4 overflow-x-auto overscroll-x-contain px-1 py-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+              className="scrollbar-hide -my-6 flex gap-4 overflow-x-auto overscroll-x-contain px-1 py-6"
             >
               {/* Trois copies : c'est ce qui donne la boucle. Les deux
-                  latérales sont aria-hidden — un lecteur d'écran ne doit
-                  entendre la liste qu'une seule fois. */}
+                  latérales sont aria-hidden ET hors parcours clavier — un
+                  lecteur d'écran ne doit entendre la liste qu'une seule fois,
+                  et la tabulation ne doit pas traverser 24 liens. */}
               {[0, 1, 2].map((copy) =>
                 bestSellers.map((item) => (
                   <div
@@ -133,7 +133,7 @@ export function BestSellers() {
                     aria-hidden={copy !== 1}
                     className="shrink-0 basis-[42%] sm:basis-[28%] lg:basis-[21%]"
                   >
-                    <BestSellerCard item={item} />
+                    <BestSellerCard item={item} isDuplicate={copy !== 1} />
                   </div>
                 )),
               )}
