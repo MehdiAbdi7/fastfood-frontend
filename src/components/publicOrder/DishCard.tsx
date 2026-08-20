@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { formatDA } from "@/lib/format";
 import { summarizeVariants } from "@/lib/variantLabel";
+import { hasExtras } from "@/lib/extraGroups";
 import { getEligibleFormulas } from "@/lib/formulaRules";
 import type { MenuItem } from "@/types/menuItem";
 
@@ -20,13 +21,12 @@ const THUMB_SIZES = "(max-width: 640px) 112px, 128px";
 
 // Un produit sans variante, sans extra, sans retrait possible et sans formule
 // éligible n'a rien à configurer : il part au panier en un seul geste.
+// hasExtras() couvre les deux modèles — extraGroups, et availableExtras pour
+// les produits pas encore migrés.
 export function hasChoices(item: MenuItem): boolean {
-  const extras = (item.availableExtras ?? []).filter(
-    (extra) => typeof extra === "object",
-  );
   return (
     item.variants.length > 1 ||
-    extras.length > 0 ||
+    hasExtras(item) ||
     (item.removableIngredients?.length ?? 0) > 0 ||
     getEligibleFormulas(item).length > 0
   );
@@ -95,9 +95,6 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
               {formatDA(minPrice)}
             </span>
           )}
-          {/* La pastille « à composer » a été retirée : l'icône tune-variant
-              sur la photo dit déjà qu'une fiche va s'ouvrir. Deux signaux pour
-              la même information encombraient la ligne de prix. */}
         </div>
       </div>
 
