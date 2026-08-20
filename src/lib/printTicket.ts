@@ -4,13 +4,8 @@ import { ORDER_TYPE_LABELS } from "./orderLabels";
 import { formatVariantLabel } from "./variantLabel";
 
 // Ticket papier volontairement minimal (police monospace, largeur ticket de
-// caisse ~72mm) : ouvre une fenêtre dédiée plutôt que d'ajouter une dépendance
-// react-to-print pour un besoin aussi simple. À remplacer si un jour le ticket
-// doit intégrer un logo ou un QR de suivi.
+// caisse ~72mm). L'iframe évite le blocage des fenêtres pop-up par Chrome.
 export function printOrderTicket(order: Order): void {
-  const printWindow = window.open("", "_blank", "width=380,height=600");
-  if (!printWindow) return;
-
   const tableLine =
     order.type === "dine_in" && order.table && typeof order.table === "object"
       ? `Table ${order.table.tableN}`
@@ -51,12 +46,13 @@ export function printOrderTicket(order: Order): void {
     ? `<div class="remark">Remarque : ${order.remark}</div>`
     : "";
 
-  printWindow.document.write(`
+  const ticketHtml = `
     <html>
       <head>
         <title>Commande #${order.dailyNumber}</title>
         <style>
-          body { font-family: 'Courier New', monospace; font-size: 13px; width: 300px; margin: 0 auto; padding: 16px 0; }
+          @page { size: 80mm auto; margin: 0; }
+          body { font-family: 'Courier New', monospace; font-size: 13px; width: 72mm; margin: 0 auto; padding: 16px 0; }
           h1 { font-size: 22px; text-align: center; margin: 0 0 4px; }
           .meta { text-align: center; font-size: 12px; margin-bottom: 12px; }
           hr { border: none; border-top: 1px dashed #000; margin: 8px 0; }
@@ -81,9 +77,35 @@ export function printOrderTicket(order: Order): void {
         <div class="total-row"><span>TOTAL</span><span>${formatDA(order.totalPrice)}</span></div>
       </body>
     </html>
-  `);
+  `;
 
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
+  const printFrame = document.createElement("iframe");
+  printFrame.setAttribute("aria-hidden", "true");
+  printFrame.style.position = "fixed";
+  printFrame.style.right = "0";
+  printFrame.style.bottom = "0";
+  printFrame.style.width = "0";
+  printFrame.style.height = "0";
+  printFrame.style.border = "0";
+
+  printFrame.onload = () => {
+    const printWindow = printFrame.contentWindow;
+    if (!printWindow) {
+      printFrame.remove();
+      return;
+    }
+
+    printWindow.focus();
+    printWindow.print();
+    printWindow.addEventListener("afterprint", () => printFrame.remove(), {
+      once: true,
+    });
+    // Chrome peut ne pas émettre afterprint si la boîte est annulée.
+    window.setTimeout(() => printFrame.remove(), 60_000);
+  };
+
+  document.body.appendChild(printFrame);
+  printFrame.contentDocument?.open();
+  printFrame.contentDocument?.write(ticketHtml);
+  printFrame.contentDocument?.close();
 }
