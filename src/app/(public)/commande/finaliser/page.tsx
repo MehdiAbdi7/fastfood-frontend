@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { publicFetch } from "@/lib/publicFetch";
+import { FixedBackground } from "@/components/public/FixedBackground";
 import { CheckoutForm } from "@/components/publicOrder/CheckoutForm";
 import type { MenuItem } from "@/types/menuItem";
 
@@ -34,14 +35,24 @@ export default async function FinaliserPage() {
     .map((item) => item._id);
 
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <span className="icon-[mdi--loading] animate-spin text-4xl text-primary" />
-        </div>
-      }
-    >
-      <CheckoutForm availableItemIds={availableItemIds} />
-    </Suspense>
+    <>
+      {/* Même fond que la carte : le tunnel de commande doit se lire comme la
+          suite du même écran, pas comme une page d'un autre site. Le fallback
+          le porte aussi, sinon le fond apparaîtrait après coup. */}
+      <FixedBackground />
+
+      <Suspense
+        fallback={
+          <div className="relative z-10 flex min-h-[60vh] items-center justify-center">
+            <span
+              aria-hidden="true"
+              className="icon-[mdi--loading] animate-spin text-4xl text-primary"
+            />
+          </div>
+        }
+      >
+        <CheckoutForm availableItemIds={availableItemIds} />
+      </Suspense>
+    </>
   );
 }

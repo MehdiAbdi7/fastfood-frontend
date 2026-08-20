@@ -59,8 +59,22 @@ function Label({
   );
 }
 
+// bg-background/85 et non bg-background : le fond fixe doit rester perceptible
+// derrière les champs, sinon la page ressemble à un formulaire posé sur une
+// image plutôt qu'à un écran unifié.
 const FIELD_CLASSES =
-  "h-12 w-full rounded-xl border border-primary/25 bg-background px-4 text-foreground outline-none transition-colors placeholder:text-foreground/40 focus:border-primary";
+  "h-12 w-full rounded-xl border border-primary/25 bg-background/85 px-4 text-foreground outline-none transition-colors placeholder:text-foreground/40 focus:border-primary";
+
+function LoadingScreen() {
+  return (
+    <div className="relative z-10 flex min-h-[60vh] items-center justify-center">
+      <span
+        aria-hidden="true"
+        className="icon-[mdi--loading] animate-spin text-4xl text-primary"
+      />
+    </div>
+  );
+}
 
 export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
   const router = useRouter();
@@ -70,6 +84,28 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
 
   const [createOrder, { isLoading: isSubmitting }] =
     useCreatePublicOrderMutation();
+
+  /**
+   * Faux pendant le rendu serveur ET pendant l'hydratation.
+   *
+   * Sans ce garde, le branchement sur `isHydrated` casse l'hydratation :
+   * CartHydrator est monté par le layout public, donc AU-DESSUS de cette page,
+   * et son effet dispatche `cartRestored` avant que React n'hydrate ce
+   * composant. Le serveur a rendu le spinner (store vide), le client rendrait
+   * déjà le formulaire (store rempli) — les deux arbres divergent.
+   *
+   * Avec ce drapeau, le premier rendu client reproduit le HTML serveur à
+   * l'identique, et le formulaire n'apparaît qu'au rendu suivant.
+   */
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Le rendu supplémentaire est précisément l'objectif : il sépare le rendu
+  // d'hydratation (identique au HTML serveur) du rendu suivant, où le panier
+  // restauré peut enfin être pris en compte.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
 
   // Le QR ne porte rien aujourd'hui (generateQRCode.ts produit un /commande
   // nu), mais si un jour tu passes à un QR par table, le contexte pré-remplit
@@ -200,23 +236,27 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
 
   // Écran d'attente le temps que le panier soit relu du disque : afficher le
   // formulaire puis le faire disparaître serait plus déroutant.
-  if (!isHydrated || lines.length === 0) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <span className="icon-[mdi--loading] animate-spin text-4xl text-primary" />
-      </div>
-    );
+  // isMounted en premier : voir plus haut, c'est ce qui garantit que le
+  // premier rendu client est identique au HTML serveur.
+  if (!isMounted || !isHydrated || lines.length === 0) {
+    return <LoadingScreen />;
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 pb-32 pt-28">
+    // relative z-10 obligatoire : FixedBackground est en z-0, donc positionné,
+    // donc peint APRÈS les fonds des éléments non positionnés. Sans cette
+    // remontée, tout le formulaire passerait derrière le motif.
+    //
+    // pb-16 et non pb-32 : le bouton n'est plus flottant, il n'y a plus de
+    // hauteur à réserver sous le contenu.
+    <div className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-28">
       <header className="mb-6 flex items-center gap-3">
         <Link
           href="/commande"
           aria-label="Retour à la carte"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/25 text-foreground/60 transition-colors hover:border-primary hover:text-foreground"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-background/60 text-foreground/60 backdrop-blur-sm transition-colors hover:border-primary hover:text-foreground"
         >
-          <span className="icon-[mdi--arrow-left] text-xl" />
+          <span aria-hidden="true" className="icon-[mdi--arrow-left] text-xl" />
         </Link>
 
         <div>
@@ -248,13 +288,16 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                 type="button"
                 onClick={() => selectStore(option)}
                 aria-pressed={store === option}
-                className={`flex min-h-14 items-center justify-center gap-2 rounded-xl border font-heading text-sm font-bold transition-colors ${
+                className={`flex min-h-14 items-center justify-center gap-2 rounded-xl border font-heading text-sm font-bold backdrop-blur-sm transition-colors ${
                   store === option
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-primary/25 text-foreground/70 hover:border-primary/50"
+                    : "border-primary/25 bg-background/60 text-foreground/70 hover:border-primary/50"
                 }`}
               >
-                <span className="icon-[mdi--map-marker] text-lg" />
+                <span
+                  aria-hidden="true"
+                  className="icon-[mdi--map-marker] text-lg"
+                />
                 {STORE_LABELS[option]}
               </button>
             ))}
@@ -274,13 +317,16 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                 type="button"
                 onClick={() => setType(option)}
                 aria-pressed={type === option}
-                className={`flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-xl border px-2 text-xs font-bold transition-colors ${
+                className={`flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-xl border px-2 text-xs font-bold backdrop-blur-sm transition-colors ${
                   type === option
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-primary/25 text-foreground/70 hover:border-primary/50"
+                    : "border-primary/25 bg-background/60 text-foreground/70 hover:border-primary/50"
                 }`}
               >
-                <span className={`${ORDER_TYPE_ICONS[option]} text-2xl`} />
+                <span
+                  aria-hidden="true"
+                  className={`${ORDER_TYPE_ICONS[option]} text-2xl`}
+                />
                 {ORDER_TYPE_LABELS[option]}
               </button>
             ))}
@@ -316,15 +362,15 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
               <Label htmlFor="table">Votre table</Label>
 
               {!store ? (
-                <p className="rounded-xl bg-surface-2 px-4 py-3 text-sm text-foreground/55">
+                <p className="rounded-xl bg-background/70 px-4 py-3 text-sm text-foreground/55 backdrop-blur-sm">
                   Choisissez d&apos;abord un restaurant.
                 </p>
               ) : isLoadingTables ? (
-                <p className="rounded-xl bg-surface-2 px-4 py-3 text-sm text-foreground/55">
+                <p className="rounded-xl bg-background/70 px-4 py-3 text-sm text-foreground/55 backdrop-blur-sm">
                   Chargement des tables…
                 </p>
               ) : !tables || tables.length === 0 ? (
-                <p className="rounded-xl bg-accent-bordeaux/10 px-4 py-3 text-sm text-accent-bordeaux">
+                <p className="rounded-xl bg-accent-bordeaux/10 px-4 py-3 text-sm text-accent-bordeaux backdrop-blur-sm">
                   Aucune table disponible ici. Choisissez « à emporter », ou
                   demandez à un membre de l&apos;équipe.
                 </p>
@@ -357,8 +403,11 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                   {tableId &&
                     tables.find((table) => table._id === tableId)?.status ===
                       "occupied" && (
-                      <p className="flex items-start gap-2 rounded-xl bg-accent-mustard/10 px-3 py-2 text-xs text-foreground/75">
-                        <span className="icon-[mdi--information-outline] mt-0.5 shrink-0 text-sm text-accent-mustard" />
+                      <p className="flex items-start gap-2 rounded-xl bg-accent-mustard/10 px-3 py-2 text-xs text-foreground/75 backdrop-blur-sm">
+                        <span
+                          aria-hidden="true"
+                          className="icon-[mdi--information-outline] mt-0.5 shrink-0 text-sm text-accent-mustard"
+                        />
                         Une commande est déjà en cours sur cette table : vos
                         articles y seront ajoutés.
                       </p>
@@ -396,7 +445,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
                 placeholder="Rue, immeuble, étage, repère…"
-                className="w-full rounded-xl border border-primary/25 bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-foreground/40 focus:border-primary"
+                className="w-full rounded-xl border border-primary/25 bg-background/85 px-4 py-3 text-foreground outline-none transition-colors placeholder:text-foreground/40 focus:border-primary"
               />
             </div>
           )}
@@ -417,49 +466,58 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
         </section>
 
         {type === "delivery" && (
-          <p className="flex items-start gap-2 rounded-xl bg-surface-2 px-4 py-3 text-xs text-foreground/65">
-            <span className="icon-[mdi--moped-outline] mt-0.5 shrink-0 text-base text-primary" />
+          <p className="flex items-start gap-2 rounded-xl bg-background/70 px-4 py-3 text-xs text-foreground/65 backdrop-blur-sm">
+            <span
+              aria-hidden="true"
+              className="icon-[mdi--moped-outline] mt-0.5 shrink-0 text-base text-primary"
+            />
             Les frais de livraison dépendent de votre adresse : ils seront
             ajoutés par l&apos;équipe et visibles sur votre suivi.
           </p>
         )}
 
-        {error && (
-          <p
-            role="alert"
-            className="rounded-xl bg-accent-bordeaux/10 px-4 py-3 text-sm font-semibold text-accent-bordeaux"
-          >
-            {error}
-          </p>
-        )}
-      </div>
-
-      {/* Bouton d'envoi flottant : sur un formulaire de cette longueur, un
-          bouton en fin de page oblige à scroller pour valider. */}
-      <div
-        className="fixed inset-x-0 z-30 px-4 sm:px-6"
-        style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
-      >
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="mx-auto flex h-14 w-full max-w-md items-center justify-center gap-2 rounded-full bg-primary px-4 font-heading text-base font-bold text-on-primary shadow-[0_10px_30px_-8px_rgba(0,0,0,0.5)] transition-all hover:bg-accent-slate active:scale-[0.99] disabled:opacity-60 disabled:active:scale-100"
-        >
-          {isSubmitting ? (
-            <>
-              <span className="icon-[mdi--loading] animate-spin text-xl" />
-              Envoi en cours…
-            </>
-          ) : (
-            <>
-              Envoyer ma commande
-              <span className="tabular-nums">
-                · {total.toLocaleString("fr-FR")} DA
-              </span>
-            </>
+        {/* ---------- Envoi ---------- */}
+        {/* En flux normal, en fin de formulaire. Le message d'erreur est
+            remonté ICI, juste au-dessus du bouton : un client qui clique en bas
+            de page doit voir immédiatement ce qui bloque. */}
+        <section className="flex flex-col gap-3 border-t border-dashed border-primary/25 pt-6">
+          {error && (
+            <p
+              role="alert"
+              className="rounded-xl bg-accent-bordeaux/10 px-4 py-3 text-sm font-semibold text-accent-bordeaux backdrop-blur-sm"
+            >
+              {error}
+            </p>
           )}
-        </button>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 font-heading text-base font-bold text-on-primary transition-all hover:bg-accent-slate active:scale-[0.99] disabled:opacity-60 disabled:active:scale-100"
+          >
+            {isSubmitting ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="icon-[mdi--loading] animate-spin text-xl"
+                />
+                Envoi en cours…
+              </>
+            ) : (
+              <>
+                Envoyer ma commande
+                <span className="tabular-nums">
+                  · {total.toLocaleString("fr-FR")} DA
+                </span>
+              </>
+            )}
+          </button>
+
+          <p className="text-center text-xs text-foreground/45">
+            En envoyant, votre commande part directement en cuisine.
+          </p>
+        </section>
       </div>
     </div>
   );

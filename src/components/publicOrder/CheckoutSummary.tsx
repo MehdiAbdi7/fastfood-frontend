@@ -30,12 +30,16 @@ interface CheckoutSummaryProps {
  * l'invite à repartir en arrière au lieu de terminer. Le lien « Modifier »
  * renvoie à la carte, qui est l'endroit prévu pour ça.
  *
- * Même vocabulaire visuel que le ticket (chasse fixe, pointillés, découpe
- * dentelée) pour qu'on reconnaisse le même objet d'un écran à l'autre.
+ * PAS de .ticket-notch ici, contrairement à CartSheet : la découpe dentelée
+ * peint ses demi-cercles dans var(--background), ce qui ne simule une découpe
+ * que sur un fond uni. Sur cette page, FixedBackground affiche un motif —
+ * les demi-cercles s'y lisent comme des pastilles opaques collées sous la
+ * carte, pas comme un ticket déchiré. Le vocabulaire ticket est porté par les
+ * pointillés et la chasse fixe, qui suffisent.
  */
 export function CheckoutSummary({ lines, total, count }: CheckoutSummaryProps) {
   return (
-    <section className="ticket-notch relative flex flex-col rounded-3xl border border-primary/25 bg-background pb-6 dark:bg-primary/10">
+    <section className="relative flex flex-col rounded-3xl border border-primary/25 bg-background/70 pb-6 backdrop-blur-sm dark:bg-primary/10">
       <header className="flex items-center justify-between border-b border-dashed border-primary/25 px-5 py-4">
         <div className="flex flex-col">
           <h2 className="font-heading text-base font-bold text-foreground">
@@ -50,7 +54,10 @@ export function CheckoutSummary({ lines, total, count }: CheckoutSummaryProps) {
           href="/commande"
           className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-foreground/55 transition-colors hover:bg-primary/10 hover:text-primary"
         >
-          <span className="icon-[mdi--pencil-outline] text-sm" />
+          <span
+            aria-hidden="true"
+            className="icon-[mdi--pencil-outline] text-sm"
+          />
           Modifier
         </Link>
       </header>
