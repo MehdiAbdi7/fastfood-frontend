@@ -11,11 +11,8 @@ import { BestSellerCard } from "./BestSellerCard";
 // renommé côté dashboard fait disparaître la carte en silence, d'où le contrôle
 // de développement plus bas.
 const BEST_SELLER_NAMES = [
-  "PIRELLI",
   "GIVI",
-  "HARLEY",
   "MALOSSI",
-  "GILERA",
   "SAMOURAI",
   "Frites Niwa",
   "Salade César",
