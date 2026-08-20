@@ -37,7 +37,11 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
       type="button"
       onClick={() => onSelect(item)}
       aria-label={`${item.name}, ${configurable ? "choisir les options" : "ajouter au panier"}`}
-      className="group flex w-full items-start gap-4 rounded-2xl border border-primary/50 bg-background p-3 text-left transition-colors duration-200 hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:bg-primary/10 sm:p-4"
+      // items-stretch et non items-start : la colonne de texte doit occuper
+      // toute la hauteur de la carte pour que le `mt-auto` du bloc prix ait
+      // quelque chose à repousser. Sinon le prix reste collé sous la
+      // description et flotte à une hauteur différente d'une carte à l'autre.
+      className="group flex w-full items-stretch gap-4 rounded-2xl border border-primary/40 bg-background/70 p-3 text-left backdrop-blur-md transition-colors duration-200 hover:border-primary hover:bg-background/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:bg-primary/10 sm:p-4"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 py-0.5">
         <h3 className="font-heading text-base font-bold leading-snug text-foreground">
@@ -60,9 +64,13 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
           </p>
         )}
 
-        <div className="mt-1 flex items-center gap-2">
+        {/* mt-auto : ancre la ligne de prix en bas, donc alignée avec celle des
+            cartes voisines quelle que soit la longueur des descriptions. */}
+        <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 pt-1.5">
           {minPrice !== null && (
-            <span className="tabular-nums font-heading text-base font-bold text-accent-green">
+            // whitespace-nowrap : sans lui, « dès 250 DA » se coupait entre le
+            // montant et la devise dès que la colonne se resserrait.
+            <span className="tabular-nums whitespace-nowrap font-heading text-base font-bold text-accent-green">
               {item.variants.length > 1 && (
                 <span className="text-xs font-semibold text-foreground/50">
                   dès{" "}
@@ -72,17 +80,19 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
             </span>
           )}
 
-          {/* Annonce le geste à venir : une modale s'ouvrira, ce n'est pas un
+          {/* Annonce le geste à venir : une fiche s'ouvrira, ce n'est pas un
               ajout direct. Évite la surprise d'un écran qui apparaît. */}
           {configurable && (
-            <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold text-foreground/50">
+            <span className="whitespace-nowrap rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold text-foreground/50">
               à composer
             </span>
           )}
         </div>
       </div>
 
-      <div className="relative shrink-0">
+      {/* self-start : la photo reste en haut même quand la carte est étirée
+          par une voisine plus haute. */}
+      <div className="relative shrink-0 self-start">
         <div className="h-24 w-24 overflow-hidden rounded-xl bg-primary/10 sm:h-28 sm:w-28">
           {item.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element

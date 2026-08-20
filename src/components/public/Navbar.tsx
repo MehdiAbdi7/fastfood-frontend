@@ -39,6 +39,7 @@ const Navbar = () => {
             width={55}
             height={55}
             priority
+            className="h-auto w-auto shrink-0"
           />
           <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
             <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
@@ -118,7 +119,7 @@ const Navbar = () => {
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        className={`fixed top-0 right-0 z-40 h-dvh w-full  bg-primary-dark text-white shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-40 h-dvh w-full  bg-background text-white shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -133,9 +134,9 @@ const Navbar = () => {
               <Image
                 src="/logo-niwa.png"
                 alt="Niwa Food"
-                width={55}
-                height={55}
-                priority
+                width={48}
+                height={48}
+                className="h-auto w-auto shrink-0"
               />
               <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
                 <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
@@ -145,7 +146,7 @@ const Navbar = () => {
             <button
               onClick={closeMenu}
               aria-label="Fermer le menu"
-              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-on-primary/10"
+              className="flex h-9 w-9 text-primary cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-on-primary/10"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +174,7 @@ const Navbar = () => {
                 style={{
                   transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
                 }}
-                className={`rounded-full px-3 py-1 font-heading text-lg font-semibold border-b border-foreground transition-all duration-300 ease-out ${
+                className={`rounded-2xl px-4 py-3 font-heading text-lg text-foreground font-semibold border border-primary transition-all duration-300 ease-out ${
                   isMenuOpen
                     ? "translate-x-0 opacity-100"
                     : "translate-x-4 opacity-0"

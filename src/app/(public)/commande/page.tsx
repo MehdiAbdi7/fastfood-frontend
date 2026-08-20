@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { publicFetch } from "@/lib/publicFetch";
 import { buildMenuNav } from "@/features/menu/menuNav";
+import { FixedBackground } from "@/components/public/FixedBackground";
 import { MenuFilters } from "@/components/publicOrder/MenuFilters";
 import { DishList } from "@/components/publicOrder/DishList";
 import { CartBar } from "@/components/publicOrder/CartBar";
@@ -34,28 +35,32 @@ export default async function CommandePage() {
 
   if (!items || !categories) {
     return (
-      <div className="mx-auto flex min-h-[60vh] w-full max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
-        <span className="icon-[mdi--wifi-off] text-5xl text-foreground/25" />
-        <h1 className="font-heading text-xl font-bold text-foreground">
-          Le menu est momentanément indisponible
-        </h1>
-        <p className="text-sm text-foreground/60">
-          Rechargez la page dans un instant, ou appelez-nous directement.
-        </p>
-        {/* <a> natif : cette page peut s'afficher avant même le chargement du JS */}
-        <a
-          href="/commande"
-          className="mt-2 rounded-full bg-primary px-6 py-3 font-bold text-on-primary"
-        >
-          Réessayer
-        </a>
-        <Link
-          href="/#contact"
-          className="text-sm font-semibold text-accent-green"
-        >
-          Voir nos numéros
-        </Link>
-      </div>
+      <>
+        <FixedBackground />
+
+        <div className="relative z-10 mx-auto flex min-h-[60vh] w-full max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
+          <span className="icon-[mdi--wifi-off] text-5xl text-foreground/25" />
+          <h1 className="font-heading text-xl font-bold text-foreground">
+            Le menu est momentanément indisponible
+          </h1>
+          <p className="text-sm text-foreground/60">
+            Rechargez la page dans un instant, ou appelez-nous directement.
+          </p>
+          {/* <a> natif : cette page peut s'afficher avant même le chargement du JS */}
+          <a
+            href="/commande"
+            className="mt-2 rounded-full bg-primary px-6 py-3 font-bold text-on-primary"
+          >
+            Réessayer
+          </a>
+          <Link
+            href="/#contact"
+            className="text-sm font-semibold text-accent-green"
+          >
+            Voir nos numéros
+          </Link>
+        </div>
+      </>
     );
   }
 
@@ -65,23 +70,41 @@ export default async function CommandePage() {
   const nav = buildMenuNav(categories, availableItems);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 pb-30 pt-28 sm:pt-28">
-      <header className="mb-6 flex flex-col gap-1.5">
-        <span className="font-heading text-sm font-bold uppercase tracking-wide text-accent-green">
-          Notre carte
-        </span>
-        <h1 className="font-heading text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-          Composez votre commande
-        </h1>
-        <p className="text-sm text-foreground/60">
-          Sur place, à emporter ou en livraison. Vous choisirez à la fin.
-        </p>
-      </header>
+    <>
+      <FixedBackground />
 
-      <MenuFilters nav={nav} />
-      <DishList items={availableItems} nav={nav} />
+      {/* relative z-10 obligatoire : sans lui, tout le contenu passerait sous
+          le fond fixe (voir le commentaire dans FixedBackground). */}
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-30 pt-28 sm:pt-28">
+        <header className="mb-6 flex flex-col gap-1.5">
+          <span className="font-heading text-sm font-bold uppercase tracking-wide text-accent-green">
+            Notre carte
+          </span>
+          <h1 className="font-heading text-3xl font-bold leading-tight text-foreground sm:text-4xl">
+            Composez votre commande
+          </h1>
+          <p className="text-sm text-foreground/60">
+            Sur place, à emporter ou en livraison. Vous choisirez à la fin.
+          </p>
+        </header>
 
-      <CartBar />
-    </div>
+        {/* items-start est ce qui rend le sticky de la colonne opérant : sans
+            lui, align-items:stretch étire l'aside sur toute la hauteur de la
+            rangée, et un élément déjà aussi haut que son conteneur n'a plus
+            aucune marge pour coller. */}
+        <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
+          <MenuFilters nav={nav} />
+
+          {/* min-w-0 : sans lui, un enfant de flex refuse de passer sous la
+              largeur de son contenu, et une longue description de plat
+              élargirait la grille au-delà de la colonne. */}
+          <div className="min-w-0 flex-1">
+            <DishList items={availableItems} nav={nav} />
+          </div>
+        </div>
+
+        <CartBar />
+      </div>
+    </>
   );
 }

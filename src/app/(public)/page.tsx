@@ -8,6 +8,12 @@ import { HowItWorks } from "@/components/public/HowItWorks";
 import { Testimonials } from "@/components/public/Testimonials";
 import Image from "next/image";
 
+// Toutes les décorations ci-dessous vivent dans un conteneur `w-56` visible à
+// partir de xl uniquement : leur largeur d'affichage est donc constante, d'où
+// un `sizes` fixe. Sans lui, Next suppose 100vw et sert la variante la plus
+// large du srcset pour un rendu de 224 px.
+const DECO_SIZES = "224px";
+
 export default function Home() {
   return (
     <>
@@ -22,28 +28,34 @@ export default function Home() {
             src="/sauces.png"
             alt=""
             fill
-            priority
-            className="object-cover object-center rounded-2xl"
+            sizes={DECO_SIZES}
+            className="rounded-2xl object-cover object-center"
           />
         </div>
       </div>
 
       <HowItWorks />
+
       <div className="relative">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-4 top-0 z-20 hidden -translate-y-1/2 sm:h-240 sm:w-56 xl:block"
         >
+          {/* Pas de `priority` : ces images sont purement ornementales et
+              masquées sous xl. Les précharger volait la priorité de la photo
+              du hero, qui est le vrai contenu de la page. */}
           <Image
             src="/deco.png"
             alt=""
             fill
-            priority
+            sizes={DECO_SIZES}
             className="object-contain object-center"
           />
         </div>
       </div>
+
       <BestSellers />
+
       <div className="relative">
         <div
           aria-hidden="true"
@@ -53,12 +65,14 @@ export default function Home() {
             src="/deco.png"
             alt=""
             fill
-            priority
+            sizes={DECO_SIZES}
             className="object-contain object-center"
           />
         </div>
       </div>
+
       <About />
+
       <div className="relative">
         <div
           aria-hidden="true"
@@ -68,7 +82,7 @@ export default function Home() {
             src="/deco.png"
             alt=""
             fill
-            priority
+            sizes={DECO_SIZES}
             className="object-contain object-center"
           />
         </div>
@@ -79,17 +93,18 @@ export default function Home() {
       <div className="relative">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-7 top-125 z-20 -scale-x-100 hidden -translate-y-1/2 sm:h-112 sm:w-56 xl:block"
+          className="pointer-events-none absolute -right-7 top-125 z-20 hidden -translate-y-1/2 -scale-x-100 sm:h-112 sm:w-56 xl:block"
         >
           <Image
             src="/sauces2.png"
             alt=""
             fill
-            priority
-            className="object-cover object-center rounded-2xl"
+            sizes={DECO_SIZES}
+            className="rounded-2xl object-cover object-center"
           />
         </div>
       </div>
+
       <Contact />
     </>
   );

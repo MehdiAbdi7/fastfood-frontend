@@ -5,6 +5,13 @@ interface BestSellerCardProps {
   item: MenuItem;
 }
 
+// Décrit la largeur d'AFFICHAGE de la vignette, pas le poids du fichier : le
+// navigateur choisit la variante du srcset avec cette seule information, avant
+// même d'avoir appliqué le CSS. Elle suit la grille du parent (2 colonnes sur
+// mobile, 3 en sm, 5 en lg dans un conteneur max-w-6xl, soit ~230 px).
+const CARD_IMAGE_SIZES =
+  "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 230px";
+
 export function BestSellerCard({ item }: BestSellerCardProps) {
   return (
     <div className="group relative flex flex-col overflow-hidden border-2 border-primary rounded-2xl bg-background ring-1 ring-primary/10 backdrop-blur-2xl hover:shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] hover:shadow-primary transition-all duration-300 motion-safe:hover:-translate-y-1.5 cursor-pointer ">
@@ -15,6 +22,7 @@ export function BestSellerCard({ item }: BestSellerCardProps) {
             src={item.imageUrl}
             alt={item.name}
             fill
+            sizes={CARD_IMAGE_SIZES}
             className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-105 "
           />
         ) : (

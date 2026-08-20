@@ -44,11 +44,16 @@ const Footer = () => {
         {/* Bloc marque */}
         <div className="flex flex-col items-center gap-3 text-center md:items-start md:text-left md:max-w-xs">
           <Link href="/" className="flex items-center gap-1">
+            {/* Hauteur fixée en CSS, largeur en auto : le rapport d'aspect
+                réel du fichier est respecté quel qu'il soit, et Next n'a plus
+                de divergence à signaler entre les dimensions déclarées et le
+                rendu. shrink-0 empêche le parent flex de comprimer le logo. */}
             <Image
               src="/logo-niwa.png"
               alt="Niwa Food"
               width={48}
               height={48}
+              className="h-12 w-auto shrink-0"
             />
             <span className="font-heading text-lg font-semibold text-accent-mustard sm:text-xl">
               <span className="text-foreground">Niwa</span> Food
