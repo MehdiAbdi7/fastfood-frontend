@@ -42,8 +42,8 @@ const Navbar = () => {
             className="h-auto w-auto shrink-0"
           />
           <span className="font-heading text-sm text-accent-green font-semibold  sm:text-xl hover:scale-110">
-            <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
-            Food
+            <span className="text-lg text-foreground sm:text-xl">NIWA</span>{" "}
+            FOOD
           </span>
         </Link>
 
@@ -139,8 +139,8 @@ const Navbar = () => {
                 className="h-auto w-auto shrink-0"
               />
               <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
-                <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
-                Food
+                <span className="text-lg text-foreground sm:text-xl">NIWA</span>{" "}
+                FOOD
               </span>
             </Link>
             <button
