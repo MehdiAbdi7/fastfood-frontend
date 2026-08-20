@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useGetMenuItemsQuery } from "@/features/menu/menuApi";
 import { useInfiniteCarousel } from "@/features/carousel/useInfiniteCarousel";
@@ -21,6 +21,9 @@ const BEST_SELLER_NAMES = [
   "Salade César",
 ];
 
+// ---------- TEMPORAIRE : passer à false, puis supprimer le bloc plus bas ----------
+const SHOW_DEBUG = true;
+
 export function BestSellers() {
   const { data: menuItems, isLoading, isError } = useGetMenuItemsQuery();
 
@@ -32,9 +35,6 @@ export function BestSellers() {
       menuItems?.find((item) => item.name === name && item.available),
     ).filter((item): item is NonNullable<typeof item> => item !== undefined);
 
-    // Le filtrage par nom échoue silencieusement : sans ce signal, un produit
-    // renommé ou épuisé se traduit juste par une carte manquante que personne
-    // ne remarque avant une capture d'écran client.
     if (process.env.NODE_ENV !== "production" && menuItems) {
       const missing = BEST_SELLER_NAMES.filter(
         (name) => !menuItems.some((item) => item.name === name),
@@ -52,10 +52,34 @@ export function BestSellers() {
   const { scrollerRef, handleScroll, scrollByCard, scrollerHandlers } =
     useInfiniteCarousel(bestSellers.length);
 
+  // ---------- TEMPORAIRE : diagnostic autoplay ----------
+  const [debug, setDebug] = useState("…");
+
+  useEffect(() => {
+    if (!SHOW_DEBUG) return;
+
+    const id = setInterval(() => {
+      const el = scrollerRef.current;
+      if (!el) {
+        setDebug("pas de ref");
+        return;
+      }
+      const reduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      setDebug(
+        `reduceMotion:${reduced} · largeur:${el.scrollWidth}/${el.clientWidth} · x:${Math.round(el.scrollLeft)}`,
+      );
+    }, 500);
+
+    return () => clearInterval(id);
+  }, [scrollerRef]);
+  // ---------- FIN TEMPORAIRE ----------
+
   return (
     <section
       id="menu"
-      className="relative isolate overflow-hidden px-2 py-16 sm:px-8 sm:py-24"
+      className="relative isolate overflow-hidden px-6 py-16 sm:px-8 sm:py-24"
     >
       <div className="relative z-10 mx-auto max-w-6xl rounded-4xl border border-primary bg-background px-2 py-8 shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md dark:bg-primary/30 sm:px-8">
         <div className="mb-10 flex flex-col items-center gap-2 text-center sm:mb-14">
@@ -105,9 +129,11 @@ export function BestSellers() {
               <span className="icon-[mdi--chevron-right] text-2xl" />
             </button>
 
-            {/* Pas de scroll-snap ici : `snap-mandatory` ramènerait le scroll à
-                l'ancre la plus proche à chaque frame, transformant la dérive
-                automatique en vibration.
+            {/* NI scroll-snap NI scroll-smooth ici — voir l'avertissement en
+                tête de useInfiniteCarousel : le setter scrollLeft respecte
+                scroll-behavior, donc `scroll-smooth` en CSS fige totalement la
+                dérive sur Safari iOS. La fluidité des flèches est demandée
+                explicitement dans scrollByCard.
 
                 py-6 -my-6 : overflow-x-auto force implicitement overflow-y à
                 "auto", ce qui rognerait le -translate-y-1.5 et le glow de 30px
@@ -122,7 +148,7 @@ export function BestSellers() {
               tabIndex={0}
               role="region"
               aria-label="Carrousel des best-sellers"
-              className="scrollbar-hide -my-6 flex gap-4 overflow-x-auto overscroll-x-contain px-1 py-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-safe:scroll-smooth"
+              className="scrollbar-hide -my-6 flex gap-4 overflow-x-auto overscroll-x-contain px-1 py-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
             >
               {/* Trois copies : c'est ce qui donne la boucle. Les deux
                   latérales sont aria-hidden — un lecteur d'écran ne doit
@@ -141,6 +167,14 @@ export function BestSellers() {
             </div>
           </div>
         )}
+
+        {/* ---------- TEMPORAIRE : à supprimer une fois validé ---------- */}
+        {SHOW_DEBUG && (
+          <p className="mt-4 text-center text-xs tabular-nums text-accent-bordeaux">
+            {debug}
+          </p>
+        )}
+        {/* ---------- FIN TEMPORAIRE ---------- */}
 
         <div className="mt-8 flex justify-center">
           <Link

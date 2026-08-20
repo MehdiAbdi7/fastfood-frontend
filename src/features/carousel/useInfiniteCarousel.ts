@@ -2,13 +2,8 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-// Délai sans événement de scroll au-delà duquel on considère un geste terminé.
 const SETTLE_DELAY_MS = 140;
-
-// Vitesse de dérive, en pixels par seconde.
 const AUTOPLAY_SPEED_PX_S = 38;
-
-// Après une interaction (survol, swipe, molette), délai avant reprise.
 const RESUME_DELAY_MS = 2500;
 
 interface Options {
@@ -22,9 +17,12 @@ interface Options {
  * dans la copie centrale. Aucun index stocké : le navigateur reste seul maître
  * du `scrollLeft`, on ne fait que le recentrer et l'avancer.
  *
- * IMPORTANT : le conteneur ne doit PAS porter de scroll-snap. Un
- * `snap-mandatory` ramènerait le scroll à l'ancre la plus proche à chaque
- * frame, transformant la dérive en vibration.
+ * DEUX CONTRAINTES sur le conteneur, sous peine d'immobilité :
+ *  - pas de scroll-snap (`snap-mandatory` ramènerait à l'ancre à chaque frame)
+ *  - pas de `scroll-behavior: smooth` en CSS. Le setter scrollLeft respecte
+ *    cette propriété : chaque frame lancerait une animation fluide annulant la
+ *    précédente. Safari applique la règle strictement — le carrousel reste
+ *    alors totalement figé sur iOS, alors qu'il avance sur Chrome.
  */
 export function useInfiniteCarousel(
   itemCount: number,
@@ -44,19 +42,23 @@ export function useInfiniteCarousel(
   // arrondie à 0 et le carrousel ne bougerait jamais.
   const remainder = useRef(0);
 
-  const jumpTo = useCallback((left: number) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-
-    // Instantané obligatoire : `scroll-smooth` étant posé en CSS, une
-    // affectation de scrollLeft s'animerait, et le saut d'une copie
-    // deviendrait un défilement visible de plusieurs écrans.
+  /** Écrit scrollLeft en forçant un déplacement INSTANTANÉ. */
+  const setScrollLeft = useCallback((el: HTMLDivElement, left: number) => {
     const previous = el.style.scrollBehavior;
     el.style.scrollBehavior = "auto";
     el.scrollLeft = left;
     el.style.scrollBehavior = previous;
-    remainder.current = 0;
   }, []);
+
+  const jumpTo = useCallback(
+    (left: number) => {
+      const el = scrollerRef.current;
+      if (!el) return;
+      setScrollLeft(el, left);
+      remainder.current = 0;
+    },
+    [setScrollLeft],
+  );
 
   /** Ramène le scroll dans la copie centrale s'il s'en est trop éloigné. */
   const normalize = useCallback(() => {
@@ -100,11 +102,10 @@ export function useInfiniteCarousel(
   /**
    * Suspend, puis reprend seule après RESUME_DELAY_MS.
    *
-   * TOUTE pause passe par ici, y compris celles déclenchées par un geste
-   * tactile. C'est délibéré : sur mobile, un `touchend` peut ne jamais être
-   * délivré au conteneur — le doigt quitte l'écran ailleurs, ou le geste se
-   * transforme en scroll vertical de la page. Une pause sans échéance propre
-   * laisserait alors l'autoplay figé pour de bon.
+   * TOUTE pause tactile passe par ici : sur mobile, un `touchend` peut ne
+   * jamais être délivré au conteneur — le doigt quitte l'écran ailleurs, ou le
+   * geste devient un scroll vertical de la page. Une pause sans échéance
+   * propre laisserait l'autoplay figé pour de bon.
    */
   const pauseTemporarily = useCallback(() => {
     isPaused.current = true;
@@ -128,15 +129,13 @@ export function useInfiniteCarousel(
     const el = scrollerRef.current;
     if (!el) return;
 
-    // Respecter la préférence système : une animation permanente en périphérie
-    // du regard est exactement ce que ce réglage vise à supprimer.
     // Écouté en continu et non testé une fois : sur iOS, « Réduire les
     // animations » peut être basculé pendant que la page est ouverte.
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    // Ne pas animer hors écran : c'est du calcul perdu, et de la batterie sur
-    // mobile. requestAnimationFrame se met déjà en veille quand l'onglet est
-    // masqué, mais pas quand la section est simplement plus bas dans la page.
+    // Ne pas animer hors écran : calcul perdu, et batterie sur mobile.
+    // isVisible démarre à true — si l'observer n'émettait jamais, le carrousel
+    // tournerait quand même plutôt que de rester bloqué.
     const observer = new IntersectionObserver(
       ([entry]) => {
         isVisible.current = entry.isIntersecting;
@@ -170,7 +169,9 @@ export function useInfiniteCarousel(
       remainder.current = advance - whole;
 
       if (whole > 0) {
-        el.scrollLeft += whole;
+        // setScrollLeft et non `el.scrollLeft +=` : voir l'avertissement en
+        // tête de fichier. C'est ce qui bloquait totalement Safari iOS.
+        setScrollLeft(el, el.scrollLeft + whole);
         // Recentrage à chaque frame, sans attendre : le debounce du geste
         // manuel ne se déclencherait jamais ici, les événements de scroll ne
         // s'arrêtant pas.
@@ -184,7 +185,7 @@ export function useInfiniteCarousel(
       cancelAnimationFrame(frameId);
       observer.disconnect();
     };
-  }, [autoplay, itemCount, normalize]);
+  }, [autoplay, itemCount, normalize, setScrollLeft]);
 
   useEffect(() => {
     return () => {
@@ -219,6 +220,8 @@ export function useInfiniteCarousel(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
+      // La fluidité est demandée ICI, explicitement — c'est pourquoi le CSS
+      // n'a plus besoin (et ne doit plus avoir) de scroll-smooth.
       el.scrollBy({
         left: direction * step,
         behavior: prefersReducedMotion ? "auto" : "smooth",
@@ -227,12 +230,10 @@ export function useInfiniteCarousel(
     [pauseTemporarily],
   );
 
-  // À étaler sur le conteneur.
-  //
-  // onPointerEnter/Leave et non onMouseEnter : sur mobile, un tap émet un
-  // `pointerenter` SANS `pointerleave` correspondant — le pointeur tactile
-  // cesse d'exister au lieu de sortir. Le survol est donc filtré sur le type
-  // de pointeur, et le tactile passe exclusivement par les pauses à échéance.
+  // onPointerEnter/Leave filtré sur le type de pointeur : sur mobile, un tap
+  // émet un `pointerenter` SANS `pointerleave` correspondant — le pointeur
+  // tactile cesse d'exister au lieu de sortir. Le tactile passe donc
+  // exclusivement par les pauses à échéance.
   const scrollerHandlers = {
     onPointerEnter: (event: React.PointerEvent) => {
       if (event.pointerType === "mouse") pauseWhileHovering();
