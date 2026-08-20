@@ -2,6 +2,7 @@
 
 import { formatDA } from "@/lib/format";
 import { formatVariantLabel } from "@/lib/variantLabel";
+import { hasExtras } from "@/lib/extraGroups";
 import type { MenuItem } from "@/types/menuItem";
 import { getEligibleFormulas } from "@/lib/formulaRules";
 
@@ -17,12 +18,9 @@ interface ProductGridProps {
 // au ticket. Une formule éligible compte comme une option — sans ça, un burger
 // sans variante partirait au ticket sans jamais proposer le menu.
 export function hasOptions(item: MenuItem): boolean {
-  const extras = (item.availableExtras ?? []).filter(
-    (extra) => typeof extra === "object",
-  );
   return (
     item.variants.length > 1 ||
-    extras.length > 0 ||
+    hasExtras(item) ||
     (item.removableIngredients?.length ?? 0) > 0 ||
     getEligibleFormulas(item).length > 0
   );

@@ -7,19 +7,14 @@ import { Button } from "@/components/ui/Button";
 import { formatDA } from "@/lib/format";
 import { formatVariantLabel } from "@/lib/variantLabel";
 import {
-  getExtraTypeName,
-  isExtraSelectable,
-  resolveExtraPrice,
-} from "@/lib/extraPrice";
+  indexOptionsById,
+  resolveExtraGroups,
+  resolveOptionPrice,
+} from "@/lib/extraGroups";
 import { getEligibleFormulas, resolveEffectiveSize } from "@/lib/formulaRules";
 import { useMenuOptionsByCategory } from "@/features/menu/useMenuOptionsByCategory";
-import type { MenuExtra, MenuItem, MenuItemVariant } from "@/types/menuItem";
+import type { MenuItem, MenuItemVariant } from "@/types/menuItem";
 import type { NewCartLine } from "../useItemCart";
-
-// Types d'extras où un seul choix est permis. Le backend ne l'impose pas
-// (décision produit portée par l'interface) — un tacos ne reçoit qu'un
-// seul gratinage.
-const SINGLE_CHOICE_TYPES = ["Gratinage"];
 
 interface ProductConfigModalProps {
   item: MenuItem | null;
@@ -84,44 +79,37 @@ export function ProductConfigModal({
   // le risque de boucle sur les dépendances ci-dessous.
   const effectiveSize = resolveEffectiveSize(selectedFormula, variantSelected);
 
-  const extras = useMemo(() => {
-    const list = (item?.availableExtras ?? []).filter(
-      (extra): extra is MenuExtra => typeof extra === "object",
-    );
-    return list.filter((extra) => isExtraSelectable(extra, effectiveSize));
-  }, [item, effectiveSize]);
+  const extraGroups = useMemo(
+    () => (item ? resolveExtraGroups(item, effectiveSize) : []),
+    [item, effectiveSize],
+  );
 
-  const extrasByType = useMemo(() => {
-    const groups = new Map<string, MenuExtra[]>();
-    for (const extra of extras) {
-      const typeName = getExtraTypeName(extra);
-      const group = groups.get(typeName) ?? [];
-      group.push(extra);
-      groups.set(typeName, group);
-    }
-    return [...groups.entries()];
-  }, [extras]);
+  const optionById = useMemo(
+    () => indexOptionsById(extraGroups),
+    [extraGroups],
+  );
 
-  // Un extra devenu non sélectionnable après changement de variante ou de
-  // formule doit être décoché, sinon il partirait sans prix affiché.
+  // Une option devenue non sélectionnable après changement de variante ou de
+  // formule doit être décochée, sinon elle partirait sans prix affiché.
   useEffect(() => {
     setSelectedExtraIds((prev) => {
-      const next = prev.filter((id) => extras.some((e) => e._id === id));
+      const next = prev.filter((id) => optionById.has(id));
       // On renvoie `prev` à l'identique quand rien n'a changé : .filter()
       // produit toujours un nouveau tableau, et une nouvelle référence
       // relancerait un rendu, donc cet effet, en boucle.
       return next.length === prev.length ? prev : next;
     });
-  }, [extras]);
+  }, [optionById]);
 
   if (!item || !variant) return null;
 
-  const selectedExtras = extras
-    .filter((extra) => selectedExtraIds.includes(extra._id))
-    .map((extra) => ({
-      extraId: extra._id,
-      name: extra.name,
-      price: resolveExtraPrice(extra, effectiveSize),
+  const selectedExtras = selectedExtraIds
+    .map((id) => optionById.get(id))
+    .filter((option): option is NonNullable<typeof option> => Boolean(option))
+    .map((option) => ({
+      extraId: option.extra._id,
+      name: option.extra.name,
+      price: resolveOptionPrice(option, effectiveSize),
     }));
 
   const extrasTotal = selectedExtras.reduce((sum, e) => sum + e.price, 0);
@@ -149,21 +137,19 @@ export function ProductConfigModal({
     setFormulaChoices({}); // les choix d'une formule n'ont pas de sens sur l'autre
   }
 
-  function toggleExtra(extra: MenuExtra) {
-    const typeName = getExtraTypeName(extra);
-    const isSingleChoice = SINGLE_CHOICE_TYPES.includes(typeName);
+  function toggleExtra(groupIndex: number, extraId: string) {
+    const group = extraGroups[groupIndex];
+    if (!group) return;
 
     setSelectedExtraIds((prev) => {
-      if (prev.includes(extra._id)) {
-        return prev.filter((id) => id !== extra._id);
+      if (prev.includes(extraId)) {
+        return prev.filter((id) => id !== extraId);
       }
-      if (isSingleChoice) {
-        const sameTypeIds = extras
-          .filter((e) => getExtraTypeName(e) === typeName)
-          .map((e) => e._id);
-        return [...prev.filter((id) => !sameTypeIds.includes(id)), extra._id];
+      if (group.singleChoice) {
+        const sameGroupIds = group.options.map((option) => option.extra._id);
+        return [...prev.filter((id) => !sameGroupIds.includes(id)), extraId];
       }
-      return [...prev, extra._id];
+      return [...prev, extraId];
     });
   }
 
@@ -363,25 +349,25 @@ export function ProductConfigModal({
           </p>
         )}
 
-        {/* Extras, groupés par type */}
-        {extrasByType.map(([typeName, group]) => (
-          <div key={typeName} className="flex flex-col gap-2">
+        {/* Extras, groupés selon la configuration du produit */}
+        {extraGroups.map((group, groupIndex) => (
+          <div key={group.label} className="flex flex-col gap-2">
             <p className="text-sm font-semibold text-foreground">
-              {typeName}
-              {SINGLE_CHOICE_TYPES.includes(typeName) && (
+              {group.label}
+              {group.singleChoice && (
                 <span className="ml-2 text-xs font-normal text-foreground/50">
                   un seul choix
                 </span>
               )}
             </p>
             <div className="flex flex-wrap gap-2">
-              {group.map((extra) => {
-                const isSelected = selectedExtraIds.includes(extra._id);
-                const price = resolveExtraPrice(extra, effectiveSize);
+              {group.options.map((option) => {
+                const isSelected = selectedExtraIds.includes(option.extra._id);
+                const price = resolveOptionPrice(option, effectiveSize);
                 return (
                   <button
-                    key={extra._id}
-                    onClick={() => toggleExtra(extra)}
+                    key={option.extra._id}
+                    onClick={() => toggleExtra(groupIndex, option.extra._id)}
                     className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
                       isSelected
                         ? "border-accent-green bg-accent-green/10 text-accent-green"
@@ -391,7 +377,7 @@ export function ProductConfigModal({
                     <span
                       className={`${isSelected ? "icon-[mdi--check-circle]" : "icon-[mdi--plus-circle-outline]"} text-base`}
                     />
-                    {extra.name}
+                    {option.extra.name}
                     {price > 0 && (
                       <span className="tabular-nums text-xs font-normal">
                         +{formatDA(price)}
