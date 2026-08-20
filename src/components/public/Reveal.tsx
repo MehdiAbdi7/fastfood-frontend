@@ -22,32 +22,37 @@ interface RevealProps {
 }
 
 // État d'arrivée. Pas de constante symétrique pour l'état masqué : celui-ci
-// porte des préfixes motion-safe: sur le déplacement et le flou, mais pas sur
-// l'opacité — un visiteur qui a demandé la réduction des animations doit
-// recevoir un fondu simple, jamais un contenu figé décalé de 14px. Les deux
-// états ne sont donc pas de même forme, et les écrire en parallèle donnerait
-// une fausse symétrie.
-const SHOWN = "translate-y-0 opacity-100 blur-0";
+// porte un préfixe motion-safe: sur le déplacement mais pas sur l'opacité —
+// un visiteur qui a demandé la réduction des animations doit recevoir un
+// fondu simple, jamais un contenu figé décalé.
+const SHOWN = "translate-y-0 opacity-100";
 
 // Déplacement vertical court plutôt qu'un glissement latéral : sur un bloc
 // pleine largeur, 40px horizontaux se lisent comme un saut de mise en page.
-// 14px verticaux accompagnés d'un flou se lisent comme une mise au point.
-const HIDDEN_MOTION_SAFE =
-  "opacity-0 motion-safe:translate-y-3.5 motion-safe:blur-[3px]";
+//
+// PAS de blur ici, malgré l'effet de mise au point qu'il donnait : animer
+// `filter: blur()` force une re-rastérisation de toute la surface à chaque
+// frame. Sur nos sections — 600px de haut, ombres portées, backdrop-blur-md
+// sur la carte et backdrop-blur-2xl sur chaque produit — le coût dépasse le
+// budget d'une frame et l'animation saccade. Seuls opacity et transform sont
+// composités par le GPU sans repeindre.
+const HIDDEN_MOTION_SAFE = "opacity-0 motion-safe:translate-y-3.5";
 
 // Courbe légèrement débordante : le contenu dépasse d'un cheveu sa position
 // finale avant de se poser. C'est ce qui distingue une apparition d'un fondu.
 const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
 
-const TRANSITION =
-  "transition-[opacity,transform,filter] will-change-[opacity,transform]";
+// La liste des propriétés est explicite, jamais `transition-all` : celui-ci
+// surveillerait aussi les ombres et les couleurs, que le survol des cartes
+// modifie — deux animations se marcheraient dessus.
+const TRANSITION = "transition-[opacity,transform]";
 
 /**
  * Révèle son contenu à l'entrée dans le viewport.
  *
- * Transition CSS sur opacity/transform/filter plutôt qu'une @keyframes :
- * l'état de départ doit rester appliqué tant que l'élément n'est pas visible,
- * ce qu'une animation déclenchée au montage ne permet pas.
+ * Transition CSS sur opacity + transform plutôt qu'une @keyframes : l'état de
+ * départ doit rester appliqué tant que l'élément n'est pas visible, ce qu'une
+ * animation déclenchée au montage ne permet pas.
  *
  * duration et delay passent par le style inline : les classes Tailwind sont
  * générées à la compilation, donc une valeur arbitraire passée en prop ne
@@ -65,6 +70,12 @@ export function Reveal({
 
   const stateClasses = isRevealed ? SHOWN : HIDDEN_MOTION_SAFE;
 
+  // will-change n'est posé que PENDANT l'animation. Le laisser en permanence
+  // maintiendrait chaque section sur sa propre couche de composition pour
+  // toute la vie de la page — coûteux en mémoire, et contre-productif : le
+  // navigateur a moins de couches à gérer une fois l'animation finie.
+  const layerStyle = isRevealed ? undefined : ("opacity, transform" as const);
+
   if (!stagger) {
     return (
       <div
@@ -74,6 +85,7 @@ export function Reveal({
           transitionDuration: `${duration}ms`,
           transitionDelay: `${delay}ms`,
           transitionTimingFunction: EASING,
+          willChange: layerStyle,
         }}
       >
         {children}
@@ -96,6 +108,7 @@ export function Reveal({
             transitionDuration: `${duration}ms`,
             transitionDelay: `${delay + index * staggerStep}ms`,
             transitionTimingFunction: EASING,
+            willChange: layerStyle,
           }}
         >
           {child}

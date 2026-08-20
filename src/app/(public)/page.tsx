@@ -15,6 +15,11 @@ import Image from "next/image";
 // large du srcset pour un rendu de 224 px.
 const DECO_SIZES = "224px";
 
+// Retard commun à toutes les sections : laisse le temps d'arriver sur la
+// section avant qu'elle ne se révèle, plutôt que de la voir apparaître au
+// moment précis où elle entre dans le champ.
+const REVEAL_DELAY_MS = 450;
+
 export default function Home() {
   return (
     <>
@@ -37,9 +42,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Un Reveal par section, sans stagger ici : la cascade se joue à
-          l'intérieur des sections (voir HowItWorks), pas entre elles. */}
-      <Reveal>
+      <Reveal delay={REVEAL_DELAY_MS}>
         <BestSellers />
       </Reveal>
 
@@ -61,11 +64,14 @@ export default function Home() {
         </div>
       </div>
 
-      <Reveal>
+      <Reveal delay={REVEAL_DELAY_MS}>
         <HowItWorks />
       </Reveal>
 
-      <Reveal>
+      {/* About suit HowItWorks sans décoration entre les deux : sur grand
+          écran les deux entrent quasi ensemble dans le champ. Le retard
+          supplémentaire les fait lire comme une séquence, pas un sursaut. */}
+      <Reveal delay={REVEAL_DELAY_MS + 150}>
         <About />
       </Reveal>
 
@@ -84,7 +90,7 @@ export default function Home() {
         </div>
       </div>
 
-      <Reveal>
+      <Reveal delay={REVEAL_DELAY_MS}>
         <Testimonials />
       </Reveal>
 
@@ -103,7 +109,7 @@ export default function Home() {
         </div>
       </div>
 
-      <Reveal>
+      <Reveal delay={REVEAL_DELAY_MS}>
         <Contact />
       </Reveal>
     </>
