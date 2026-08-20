@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+
 import type { MenuItemVariant } from "@/types/menuItem";
 
 interface VariantEditorProps {
@@ -15,32 +17,24 @@ interface VariantDraft {
   value: string;
 }
 
-// Défensif comme formatVariantLabel : des produits créés avant le dashboard
-// (Postman, imports) peuvent avoir `combination` absent en base — le default
-// {} de Mongoose ne s'applique qu'à la création.
+// Défensif : certains anciens produits peuvent ne pas avoir
+// de `combination` en base.
 function readCombination(variant: MenuItemVariant): VariantDraft {
   const combination = variant.combination ?? {};
+
   return {
     attribute: Object.keys(combination)[0] ?? "",
     value: Object.values(combination)[0] ?? "",
   };
 }
 
-// Chaque variante = un attribut optionnel (ex: "taille") + sa valeur (ex: "M")
-// + un prix. Les deux champs vides = variante "Standard" (combination: {}),
-// ce qui est le cas normal d'une boisson ou d'un produit à format unique.
-//
-// La saisie est conservée dans un état local séparé : `combination` ne peut
-// représenter qu'une paire complète, donc s'y fier pendant la frappe reviendrait
-// à effacer l'attribut à chaque caractère tant que la valeur reste vide.
 export function VariantEditor({ variants, onChange }: VariantEditorProps) {
   const [drafts, setDrafts] = useState<VariantDraft[]>(() =>
     variants.map(readCombination),
   );
 
-  // Filet si le parent remplace la liste (ouverture sur un autre produit) :
-  // on retombe sur ce que dit la base plutôt que d'afficher un brouillon
-  // appartenant au produit précédent.
+  // Si le parent remplace complètement la liste de variantes,
+  // on récupère les données correspondantes.
   const rows =
     drafts.length === variants.length ? drafts : variants.map(readCombination);
 
@@ -56,10 +50,10 @@ export function VariantEditor({ variants, onChange }: VariantEditorProps) {
 
     const nextVariants = variants.map((variant, i) => {
       if (i !== index) return variant;
+
       const { attribute, value } = nextDrafts[index]!;
+
       return {
-        // Une paire incomplète n'est pas une variante valide : on la garde en
-        // "Standard" côté données, l'utilisateur voit sa saisie dans les inputs.
         combination: attribute && value ? { [attribute]: value } : {},
         price: variant.price,
       };
@@ -78,8 +72,20 @@ export function VariantEditor({ variants, onChange }: VariantEditorProps) {
 
   function addVariant() {
     commit(
-      [...rows, { attribute: "", value: "" }],
-      [...variants, { combination: {}, price: 0 }],
+      [
+        ...rows,
+        {
+          attribute: "",
+          value: "",
+        },
+      ],
+      [
+        ...variants,
+        {
+          combination: {},
+          price: 0,
+        },
+      ],
     );
   }
 
@@ -91,7 +97,7 @@ export function VariantEditor({ variants, onChange }: VariantEditorProps) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="mx-auto flex w-full min-w-0 flex-col gap-2 overflow-x-hidden">
       <label className="text-sm font-semibold text-foreground">
         Variantes / prix
       </label>
@@ -102,43 +108,63 @@ export function VariantEditor({ variants, onChange }: VariantEditorProps) {
       </p>
 
       {rows.map((draft, index) => (
-        <div key={index} className="flex flex-col gap-1">
-          <div className="flex items-end gap-2">
-            <Input
-              placeholder="Attribut (ex: taille)"
-              value={draft.attribute}
-              onChange={(e) =>
-                updateDraft(index, { attribute: e.target.value })
-              }
-              className="flex-1"
-            />
-            <Input
-              placeholder="Valeur (ex: M)"
-              value={draft.value}
-              onChange={(e) => updateDraft(index, { value: e.target.value })}
-              className="flex-1"
-            />
-            <Input
-              type="number"
-              min={0}
-              placeholder="Prix"
-              value={variants[index]?.price || ""}
-              onChange={(e) => updatePrice(index, Number(e.target.value))}
-              className="w-28"
-            />
+        <div key={index} className="flex min-w-0 flex-col gap-1">
+          {/* 
+            Mobile :
+            - Les champs passent automatiquement à la ligne.
+            
+            Desktop :
+            - Tous les champs restent sur la même ligne.
+          */}
+          <div className="flex w-full min-w-0 flex-wrap items-end gap-2 md:flex-nowrap">
+            <div className="min-w-0 flex-1 basis-full sm:basis-[calc(50%-0.25rem)] md:basis-auto">
+              <Input
+                placeholder="Attribut (ex: taille)"
+                value={draft.attribute}
+                onChange={(e) =>
+                  updateDraft(index, {
+                    attribute: e.target.value,
+                  })
+                }
+                className="w-full"
+              />
+            </div>
+
+            <div className="min-w-0 flex-1 basis-full sm:basis-[calc(50%-0.25rem)] md:basis-auto">
+              <Input
+                placeholder="Valeur (ex: M)"
+                value={draft.value}
+                onChange={(e) =>
+                  updateDraft(index, {
+                    value: e.target.value,
+                  })
+                }
+                className="w-full"
+              />
+            </div>
+
+            <div className="min-w-0 flex-1 basis-[calc(100%-3.5rem)] sm:basis-auto md:flex-none">
+              <Input
+                type="number"
+                min={0}
+                placeholder="Prix"
+                value={variants[index]?.price || ""}
+                onChange={(e) => updatePrice(index, Number(e.target.value))}
+                className="w-full md:w-28"
+              />
+            </div>
+
             <button
               type="button"
               onClick={() => removeVariant(index)}
               aria-label="Retirer cette variante"
               disabled={variants.length <= 1}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-foreground/40 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux disabled:cursor-not-allowed disabled:opacity-30"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-foreground/40 transition-colors hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux disabled:cursor-not-allowed disabled:opacity-30"
             >
               <span className="icon-[mdi--trash-can-outline] text-lg" />
             </button>
           </div>
 
-          {/* Signale la paire incomplète, qui serait sinon silencieusement
-              enregistrée comme "Standard" sans que l'utilisateur comprenne. */}
           {Boolean(draft.attribute) !== Boolean(draft.value) && (
             <p className="text-xs text-accent-mustard">
               Remplis l&apos;attribut ET la valeur, ou laisse les deux vides.
