@@ -41,7 +41,7 @@ const Navbar = () => {
             priority
             className="h-auto w-auto shrink-0"
           />
-          <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
+          <span className="font-heading text-sm text-accent-green font-semibold  sm:text-xl hover:scale-110">
             <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
             Food
           </span>
@@ -52,11 +52,11 @@ const Navbar = () => {
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              className="group relative text-foreground dark:text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-mustard"
+              className="group relative text-foreground dark:text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-green"
               href={link.href}
             >
               {link.label}
-              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-mustard transition-transform duration-500 ease-out group-hover:scale-x-100" />
+              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-green transition-transform duration-500 ease-out group-hover:scale-x-100" />
             </Link>
           ))}
         </div>

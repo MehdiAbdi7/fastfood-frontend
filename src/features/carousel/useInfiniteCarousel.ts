@@ -1,0 +1,231 @@
+"use client";
+
+import { useCallback, useEffect, useRef } from "react";
+
+// Délai sans événement de scroll au-delà duquel on considère un geste terminé.
+const SETTLE_DELAY_MS = 140;
+
+// Vitesse de dérive, en pixels par seconde. Assez lent pour qu'on puisse lire
+// un nom de produit sans le suivre des yeux.
+const AUTOPLAY_SPEED_PX_S = 28;
+
+// Après une interaction (survol, swipe, molette), délai avant reprise.
+const RESUME_DELAY_MS = 2500;
+
+interface Options {
+  autoplay?: boolean;
+}
+
+/**
+ * Défilement horizontal en boucle, avec dérive automatique.
+ *
+ * La liste est rendue trois fois par l'appelant ; le hook maintient le scroll
+ * dans la copie centrale. Aucun index stocké : le navigateur reste seul maître
+ * du `scrollLeft`, on ne fait que le recentrer et l'avancer.
+ *
+ * IMPORTANT : le conteneur ne doit PAS porter de scroll-snap. Un `snap-mandatory`
+ * ramènerait le scroll à l'ancre la plus proche à chaque frame, transformant la
+ * dérive en vibration.
+ */
+export function useInfiniteCarousel(
+  itemCount: number,
+  { autoplay = true }: Options = {},
+) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Refs et non state : ces valeurs changent à chaque frame ou à chaque geste,
+  // les passer par useState provoquerait un rendu par mouvement de souris.
+  const isPaused = useRef(false);
+  const isVisible = useRef(true);
+
+  // Reste fractionnaire de la dérive. scrollLeft arrondit sur certains
+  // navigateurs : sans accumulateur, une avancée de 0,4 px par frame serait
+  // arrondie à 0 et le carrousel ne bougerait jamais.
+  const remainder = useRef(0);
+
+  const jumpTo = useCallback((left: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // Instantané obligatoire : `scroll-smooth` étant posé en CSS, une
+    // affectation de scrollLeft s'animerait, et le saut d'une copie
+    // deviendrait un défilement visible de plusieurs écrans.
+    const previous = el.style.scrollBehavior;
+    el.style.scrollBehavior = "auto";
+    el.scrollLeft = left;
+    el.style.scrollBehavior = previous;
+    remainder.current = 0;
+  }, []);
+
+  /** Ramène le scroll dans la copie centrale s'il s'en est trop éloigné. */
+  const normalize = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const copyWidth = el.scrollWidth / 3;
+
+    // Pas encore mesurable, ou pas assez de contenu pour déborder : le
+    // carrousel se comporte alors comme une simple rangée, sans boucle.
+    if (copyWidth === 0 || el.scrollWidth <= el.clientWidth) return;
+
+    if (el.scrollLeft < copyWidth * 0.5) {
+      jumpTo(el.scrollLeft + copyWidth);
+    } else if (el.scrollLeft > copyWidth * 1.5) {
+      jumpTo(el.scrollLeft - copyWidth);
+    }
+  }, [jumpTo]);
+
+  // Centrage initial. itemCount en dépendance : les produits arrivent après le
+  // fetch RTK Query, la largeur n'existe pas encore au premier montage.
+  useEffect(() => {
+    if (itemCount === 0) return;
+
+    const frame = requestAnimationFrame(() => {
+      const el = scrollerRef.current;
+      if (!el) return;
+      jumpTo(el.scrollWidth / 3);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [itemCount, jumpTo]);
+
+  /* ---------- Pause / reprise ---------- */
+
+  const pause = useCallback(() => {
+    isPaused.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+  }, []);
+
+  const resume = useCallback(() => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    isPaused.current = false;
+  }, []);
+
+  /** Suspend puis reprend seule — pour un geste ponctuel (swipe, molette). */
+  const pauseTemporarily = useCallback(() => {
+    pause();
+    resumeTimer.current = setTimeout(() => {
+      isPaused.current = false;
+    }, RESUME_DELAY_MS);
+  }, [pause]);
+
+  /* ---------- Boucle de dérive ---------- */
+
+  useEffect(() => {
+    if (!autoplay || itemCount === 0) return;
+
+    // Respecter la préférence système : une animation permanente en
+    // périphérie du regard est exactement ce que ce réglage vise à supprimer.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // Ne pas animer hors écran : c'est du calcul pur perdu, et sur mobile
+    // c'est de la batterie. requestAnimationFrame se met déjà en veille quand
+    // l'onglet est masqué, mais pas quand la section est simplement plus bas.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible.current = entry.isIntersecting;
+      },
+      { threshold: 0 },
+    );
+    observer.observe(el);
+
+    let frameId = 0;
+    let lastTime = 0;
+
+    const tick = (time: number) => {
+      frameId = requestAnimationFrame(tick);
+
+      // Premier passage, ou retour d'onglet après une longue absence : on
+      // repart de zéro plutôt que d'appliquer un delta de plusieurs secondes.
+      if (!lastTime || time - lastTime > 250) {
+        lastTime = time;
+        return;
+      }
+
+      const deltaSeconds = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (isPaused.current || !isVisible.current) return;
+      if (el.scrollWidth <= el.clientWidth) return;
+
+      const advance = AUTOPLAY_SPEED_PX_S * deltaSeconds + remainder.current;
+      const whole = Math.floor(advance);
+      remainder.current = advance - whole;
+
+      if (whole > 0) {
+        el.scrollLeft += whole;
+        // Recentrage à chaque frame, sans attendre : le debounce du geste
+        // manuel ne se déclencherait jamais ici, les événements de scroll ne
+        // s'arrêtant pas.
+        normalize();
+      }
+    };
+
+    frameId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      observer.disconnect();
+    };
+  }, [autoplay, itemCount, normalize]);
+
+  useEffect(() => {
+    return () => {
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    };
+  }, []);
+
+  /* ---------- Gestes manuels ---------- */
+
+  const handleScroll = useCallback(() => {
+    // Utile uniquement quand l'autoplay est en pause : sinon la boucle
+    // ci-dessus a déjà recentré.
+    if (settleTimer.current) clearTimeout(settleTimer.current);
+    settleTimer.current = setTimeout(normalize, SETTLE_DELAY_MS);
+  }, [normalize]);
+
+  const scrollByCard = useCallback(
+    (direction: 1 | -1) => {
+      const el = scrollerRef.current;
+      if (!el) return;
+
+      pauseTemporarily();
+
+      // Le pas est mesuré sur la première carte plutôt que codé en dur : il
+      // suit automatiquement les `basis-[...]` du breakpoint courant.
+      const card = el.firstElementChild as HTMLElement | null;
+      const gap = parseFloat(getComputedStyle(el).columnGap || "0") || 0;
+      const step = card ? card.offsetWidth + gap : el.clientWidth * 0.8;
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      el.scrollBy({
+        left: direction * step,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
+    },
+    [pauseTemporarily],
+  );
+
+  // À étaler sur le conteneur : regroupe pause au survol, au focus clavier,
+  // et pendant un geste tactile ou molette.
+  const scrollerHandlers = {
+    onPointerEnter: pause,
+    onPointerLeave: resume,
+    onFocus: pause,
+    onBlur: resume,
+    onTouchStart: pause,
+    onTouchEnd: pauseTemporarily,
+    onWheel: pauseTemporarily,
+  };
+
+  return { scrollerRef, handleScroll, scrollByCard, scrollerHandlers };
+}

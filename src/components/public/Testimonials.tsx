@@ -117,7 +117,7 @@ export function Testimonials() {
   return (
     <section
       id="avis"
-      className="relative isolate overflow-hidden px-6 py-16 sm:px-8 sm:py-20"
+      className="relative isolate overflow-hidden px-2 py-16 sm:px-8 sm:py-20"
     >
       <div className="mx-auto max-w-4xl rounded-4xl bg-background dark:bg-primary/30 px-4 py-8 shadow-[0_0_25px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md sm:px-8 sm:py-12 border border-primary">
         <div className="mb-10 flex flex-col items-center gap-2 text-center">
