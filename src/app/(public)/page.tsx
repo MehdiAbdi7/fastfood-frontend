@@ -33,8 +33,7 @@ export default function Home() {
           />
         </div>
       </div>
-
-      <HowItWorks />
+      <BestSellers />
 
       <div className="relative">
         <div
@@ -54,7 +53,7 @@ export default function Home() {
         </div>
       </div>
 
-      <BestSellers />
+      <HowItWorks />
 
       <About />
 
