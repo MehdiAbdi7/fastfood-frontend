@@ -60,13 +60,20 @@ const TESTIMONIALS: Testimonial[] = [
 
 function StarRating({ rating }: { rating: number }) {
   return (
+    // role="img" indispensable : aria-label n'est autorisé que sur un élément
+    // dont le rôle accepte un nom accessible. Un <div> nu a le rôle implicite
+    // "generic", qui ne le permet pas — le label était donc purement ignoré,
+    // et la note jamais annoncée. Le rôle "img" traite les cinq étoiles comme
+    // une image unique, décrite par son label.
     <div
-      className="flex items-center gap-0.5"
+      role="img"
       aria-label={`${rating} sur 5 étoiles`}
+      className="flex items-center gap-0.5"
     >
       {Array.from({ length: 5 }).map((_, index) => (
         <span
           key={index}
+          aria-hidden="true"
           className={`icon-[mdi--star] text-lg ${
             index < rating ? "text-accent-mustard" : "text-foreground/20"
           }`}
@@ -129,44 +136,60 @@ export function Testimonials() {
           </h2>
         </div>
 
+        {/* aria-live="polite" : le contenu change tout seul toutes les cinq
+            secondes. Sans ça, un lecteur d'écran annonce le premier avis puis
+            plus jamais rien, alors que le texte sous le curseur a changé. */}
         <div
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
+          aria-live="polite"
+          aria-atomic="true"
           className="relative mx-auto min-h-64 w-full max-w-2xl sm:min-h-56"
         >
-          {TESTIMONIALS.map((testimonial, index) => (
-            <div
-              key={testimonial.name}
-              className={`absolute inset-0 flex flex-col items-center gap-4 rounded-3xl border border-primary bg-background p-6 text-center shadow-food-sm transition-[transform,opacity] duration-700 ease-out sm:p-8 ${
-                index === currentIndex ? "opacity-100" : "opacity-0"
-              }`}
-              style={{
-                transform:
-                  index === currentIndex
-                    ? "translateY(0)"
-                    : "translateY(1.5rem)",
-              }}
-              aria-hidden={index !== currentIndex}
-            >
-              <span className="icon-[mdi--format-quote-open] text-3xl text-accent-green/60" />
+          {TESTIMONIALS.map((testimonial, index) => {
+            const isCurrent = index === currentIndex;
 
-              <p className="text-sm font-medium leading-relaxed text-foreground sm:text-base">
-                {testimonial.text}
-              </p>
+            return (
+              <div
+                key={testimonial.name}
+                className={`absolute inset-0 flex flex-col items-center gap-4 rounded-3xl border border-primary bg-background p-6 text-center shadow-food-sm transition-[transform,opacity] duration-700 ease-out sm:p-8 ${
+                  isCurrent ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  transform: isCurrent ? "translateY(0)" : "translateY(1.5rem)",
+                }}
+                aria-hidden={!isCurrent}
+                // Les avis masqués restent dans le DOM, superposés en absolu :
+                // sans inert, leur texte reste sélectionnable à la souris et
+                // interceptable au clavier alors qu'il est invisible.
+                inert={!isCurrent}
+              >
+                <span
+                  aria-hidden="true"
+                  className="icon-[mdi--format-quote-open] text-3xl text-accent-green/60"
+                />
 
-              <StarRating rating={testimonial.rating} />
+                <p className="text-sm font-medium leading-relaxed text-foreground sm:text-base">
+                  {testimonial.text}
+                </p>
 
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="font-heading text-sm font-bold text-foreground">
-                  {testimonial.name}
-                </span>
-                <span className="flex items-center gap-1 text-xs text-accent-green">
-                  <span className="icon-[mdi--map-marker] text-sm" />
-                  {testimonial.location}
-                </span>
+                <StarRating rating={testimonial.rating} />
+
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="font-heading text-sm font-bold text-foreground">
+                    {testimonial.name}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-accent-green">
+                    <span
+                      aria-hidden="true"
+                      className="icon-[mdi--map-marker] text-sm"
+                    />
+                    {testimonial.location}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Flèches */}
@@ -177,15 +200,21 @@ export function Testimonials() {
             aria-label="Avis précédent"
             className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-primary/10 text-primary shadow-food-sm transition-transform hover:scale-110"
           >
-            <span className="icon-[mdi--chevron-left] text-2xl" />
+            <span
+              aria-hidden="true"
+              className="icon-[mdi--chevron-left] text-2xl"
+            />
           </button>
 
-          {/* Dots */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Dots — purement indicatifs, non cliquables, donc masqués en bloc
+              plutôt que un par un. */}
+          <div
+            aria-hidden="true"
+            className="flex items-center gap-1.5 sm:gap-2"
+          >
             {TESTIMONIALS.map((testimonial, index) => (
               <span
                 key={testimonial.name}
-                aria-hidden="true"
                 className={`rounded-full transition-opacity duration-300 ${
                   index === currentIndex
                     ? "bg-accent-green opacity-100 h-2.5 w-2.5"
@@ -201,7 +230,10 @@ export function Testimonials() {
             aria-label="Avis suivant"
             className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-primary/10 text-primary shadow-food-sm transition-transform hover:scale-110"
           >
-            <span className="icon-[mdi--chevron-right] text-2xl" />
+            <span
+              aria-hidden="true"
+              className="icon-[mdi--chevron-right] text-2xl"
+            />
           </button>
         </div>
       </div>

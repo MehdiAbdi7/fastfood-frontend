@@ -20,9 +20,7 @@ const Navbar = () => {
   return (
     <header
       className={`fixed z-40 w-full transition-all duration-300 ease-in ${
-        isScrolled || isMenuOpen
-          ? "bg-primary border-b-2 border-background shadow-md"
-          : "bg-transparent"
+        isScrolled || isMenuOpen ? "bg-primary shadow-md" : "bg-transparent"
       }`}
     >
       <nav
@@ -35,17 +33,21 @@ const Navbar = () => {
           className="flex items-center justify-center gap-0.5 sm:gap-1 "
           onClick={closeMenu}
         >
+          {/* Hauteur fixée en CSS, largeur en auto : le rapport d'aspect réel
+              du fichier est respecté, et Next n'a plus de divergence à
+              signaler entre les dimensions déclarées et le rendu. Même
+              traitement que dans le Footer. */}
           <Image
             src="/logo-niwa.png"
             alt="Niwa Food"
             width={55}
             height={55}
             priority
-            className="h-auto w-auto shrink-0"
+            className="h-14 w-auto shrink-0"
           />
-          <span className="font-heading text-sm text-accent-green font-semibold  sm:text-xl hover:scale-110">
-            <span className="text-lg text-foreground sm:text-xl">NIWA</span>{" "}
-            FOOD
+          <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
+            <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
+            Food
           </span>
         </Link>
 
@@ -54,11 +56,11 @@ const Navbar = () => {
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              className="group relative text-foreground dark:text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-green"
+              className="group relative text-foreground dark:text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-mustard"
               href={link.href}
             >
               {link.label}
-              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-green transition-transform duration-500 ease-out group-hover:scale-x-100" />
+              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-mustard transition-transform duration-500 ease-out group-hover:scale-x-100" />
             </Link>
           ))}
         </div>
@@ -116,11 +118,16 @@ const Navbar = () => {
         aria-hidden="true"
       />
 
-      {/* Panneau mobile — slide depuis la droite */}
+      {/* Panneau mobile — slide depuis la droite.
+          aria-labelledby et non aria-label : un rôle "dialog" sans nom
+          accessible est annoncé « dialogue » tout court, sans dire lequel.
+          On pointe vers le titre visible du panneau plutôt que de dupliquer
+          un libellé qui pourrait diverger. */}
       <div
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="mobile-menu-title"
         className={`fixed top-0 right-0 z-40 h-dvh w-full  bg-background text-white shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
@@ -130,6 +137,7 @@ const Navbar = () => {
           <div className="flex items-center justify-between border-b border-on-primary/10 px-4 py-4">
             <Link
               href="/"
+              id="mobile-menu-title"
               className="flex items-center justify-center gap-0.5 sm:gap-1 shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 rounded-4xl px-4 "
               onClick={closeMenu}
             >
@@ -138,11 +146,11 @@ const Navbar = () => {
                 alt="Niwa Food"
                 width={48}
                 height={48}
-                className="h-auto w-auto shrink-0"
+                className="h-12 w-auto shrink-0"
               />
               <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
-                <span className="text-lg text-foreground sm:text-xl">NIWA</span>{" "}
-                FOOD
+                <span className="text-lg text-foreground sm:text-xl">Niwa</span>{" "}
+                Food
               </span>
             </Link>
             <button
@@ -159,6 +167,7 @@ const Navbar = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="h-7 w-7"
+                aria-hidden="true"
               >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
@@ -173,10 +182,14 @@ const Navbar = () => {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
+                // Hors du parcours clavier quand le panneau est refermé : il
+                // reste dans le DOM, translaté hors écran, donc ses liens
+                // seraient encore focalisables sans ce garde.
+                tabIndex={isMenuOpen ? undefined : -1}
                 style={{
                   transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
                 }}
-                className={`rounded-2xl px-4 py-3 font-heading text-lg text-foreground font-semibold border-b border-primary transition-all duration-300 ease-out ${
+                className={`rounded-2xl px-4 py-3 font-heading text-lg text-foreground font-semibold border border-primary transition-all duration-300 ease-out ${
                   isMenuOpen
                     ? "translate-x-0 opacity-100"
                     : "translate-x-4 opacity-0"
@@ -192,7 +205,8 @@ const Navbar = () => {
             <Link
               href="/commande"
               onClick={closeMenu}
-              className="block border border-primary/80 rounded-full bg-on-primary px-5 py-3 text-center font-bold text-primary transition-colors duration-200 hover:bg-background hover:text-accent-slate"
+              tabIndex={isMenuOpen ? undefined : -1}
+              className="block rounded-full bg-on-primary px-5 py-3 text-center font-bold text-primary transition-colors duration-200 hover:bg-background hover:text-accent-slate"
             >
               Commander
             </Link>
