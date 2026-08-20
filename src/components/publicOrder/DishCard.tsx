@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { formatDA } from "@/lib/format";
-import { formatVariantLabel } from "@/lib/variantLabel";
+import { summarizeVariants } from "@/lib/variantLabel";
 import { getEligibleFormulas } from "@/lib/formulaRules";
 import type { MenuItem } from "@/types/menuItem";
 
@@ -11,6 +12,11 @@ interface DishCardProps {
   inCart: number;
   onSelect: (item: MenuItem) => void;
 }
+
+// Largeur d'AFFICHAGE de la vignette, pas le poids du fichier : le navigateur
+// choisit la variante du srcset avec cette seule information, avant même
+// d'avoir appliqué le CSS. Elle suit les tailles fixes ci-dessous.
+const THUMB_SIZES = "(max-width: 640px) 112px, 128px";
 
 // Un produit sans variante, sans extra, sans retrait possible et sans formule
 // éligible n'a rien à configurer : il part au panier en un seul geste.
@@ -31,6 +37,9 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
   const minPrice = item.variants.length
     ? Math.min(...item.variants.map((v) => v.price))
     : null;
+
+  // Les axes de choix, pas les combinaisons — voir summarizeVariants.
+  const variantChoices = summarizeVariants(item.variants);
 
   return (
     <button
@@ -56,12 +65,19 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
           </p>
         )}
 
-        {item.variants.length > 1 && (
-          <p className="text-xs font-semibold text-foreground/45">
-            {item.variants
-              .map((v) => formatVariantLabel(v.combination))
-              .join(" · ")}
-          </p>
+        {/* Une ligne par décision à prendre (viande, taille), et non une
+            énumération des six combinaisons possibles. */}
+        {variantChoices.length > 0 && (
+          <div className="flex flex-col gap-0.5">
+            {variantChoices.map(({ attribute, values }) => (
+              <p key={attribute} className="text-xs text-foreground/50">
+                <span className="font-semibold capitalize text-foreground/65">
+                  {attribute}
+                </span>{" "}
+                : {values.join(", ")}
+              </p>
+            ))}
+          </div>
         )}
 
         {/* mt-auto : ancre la ligne de prix en bas, donc alignée avec celle des
@@ -79,28 +95,27 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
               {formatDA(minPrice)}
             </span>
           )}
-
-          {/* Annonce le geste à venir : une fiche s'ouvrira, ce n'est pas un
-              ajout direct. Évite la surprise d'un écran qui apparaît. */}
-          {configurable && (
-            <span className="whitespace-nowrap rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold text-foreground/50">
-              à composer
-            </span>
-          )}
+          {/* La pastille « à composer » a été retirée : l'icône tune-variant
+              sur la photo dit déjà qu'une fiche va s'ouvrir. Deux signaux pour
+              la même information encombraient la ligne de prix. */}
         </div>
       </div>
 
       {/* self-start : la photo reste en haut même quand la carte est étirée
           par une voisine plus haute. */}
       <div className="relative shrink-0 self-start">
-        <div className="h-24 w-24 overflow-hidden rounded-xl bg-primary/10 sm:h-28 sm:w-28">
+        {/* next/image plutôt qu'un <img> brut : Cloudinary est déclaré dans
+            remotePatterns, donc Next sert une vignette au bon format et à la
+            bonne taille. Sur une page qui charge 33 produits d'un coup, c'est
+            le principal gain sur le LCP. */}
+        <div className="relative h-28 w-28 overflow-hidden rounded-xl bg-primary/10 sm:h-32 sm:w-32">
           {item.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={item.imageUrl}
               alt=""
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
+              fill
+              sizes={THUMB_SIZES}
+              className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full items-center justify-center">

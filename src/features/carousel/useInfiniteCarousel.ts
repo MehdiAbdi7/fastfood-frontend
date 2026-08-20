@@ -5,9 +5,8 @@ import { useCallback, useEffect, useRef } from "react";
 // Délai sans événement de scroll au-delà duquel on considère un geste terminé.
 const SETTLE_DELAY_MS = 140;
 
-// Vitesse de dérive, en pixels par seconde. Assez lent pour qu'on puisse lire
-// un nom de produit sans le suivre des yeux.
-const AUTOPLAY_SPEED_PX_S = 28;
+// Vitesse de dérive, en pixels par seconde.
+const AUTOPLAY_SPEED_PX_S = 38;
 
 // Après une interaction (survol, swipe, molette), délai avant reprise.
 const RESUME_DELAY_MS = 2500;
@@ -23,9 +22,9 @@ interface Options {
  * dans la copie centrale. Aucun index stocké : le navigateur reste seul maître
  * du `scrollLeft`, on ne fait que le recentrer et l'avancer.
  *
- * IMPORTANT : le conteneur ne doit PAS porter de scroll-snap. Un `snap-mandatory`
- * ramènerait le scroll à l'ancre la plus proche à chaque frame, transformant la
- * dérive en vibration.
+ * IMPORTANT : le conteneur ne doit PAS porter de scroll-snap. Un
+ * `snap-mandatory` ramènerait le scroll à l'ancre la plus proche à chaque
+ * frame, transformant la dérive en vibration.
  */
 export function useInfiniteCarousel(
   itemCount: number,
@@ -93,39 +92,51 @@ export function useInfiniteCarousel(
 
   /* ---------- Pause / reprise ---------- */
 
-  const pause = useCallback(() => {
-    isPaused.current = true;
-    if (resumeTimer.current) clearTimeout(resumeTimer.current);
-  }, []);
-
   const resume = useCallback(() => {
     if (resumeTimer.current) clearTimeout(resumeTimer.current);
     isPaused.current = false;
   }, []);
 
-  /** Suspend puis reprend seule — pour un geste ponctuel (swipe, molette). */
+  /**
+   * Suspend, puis reprend seule après RESUME_DELAY_MS.
+   *
+   * TOUTE pause passe par ici, y compris celles déclenchées par un geste
+   * tactile. C'est délibéré : sur mobile, un `touchend` peut ne jamais être
+   * délivré au conteneur — le doigt quitte l'écran ailleurs, ou le geste se
+   * transforme en scroll vertical de la page. Une pause sans échéance propre
+   * laisserait alors l'autoplay figé pour de bon.
+   */
   const pauseTemporarily = useCallback(() => {
-    pause();
+    isPaused.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
     resumeTimer.current = setTimeout(() => {
       isPaused.current = false;
     }, RESUME_DELAY_MS);
-  }, [pause]);
+  }, []);
+
+  /** Pause franche, sans reprise programmée — réservée au survol souris. */
+  const pauseWhileHovering = useCallback(() => {
+    isPaused.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+  }, []);
 
   /* ---------- Boucle de dérive ---------- */
 
   useEffect(() => {
     if (!autoplay || itemCount === 0) return;
 
-    // Respecter la préférence système : une animation permanente en
-    // périphérie du regard est exactement ce que ce réglage vise à supprimer.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     const el = scrollerRef.current;
     if (!el) return;
 
-    // Ne pas animer hors écran : c'est du calcul pur perdu, et sur mobile
-    // c'est de la batterie. requestAnimationFrame se met déjà en veille quand
-    // l'onglet est masqué, mais pas quand la section est simplement plus bas.
+    // Respecter la préférence système : une animation permanente en périphérie
+    // du regard est exactement ce que ce réglage vise à supprimer.
+    // Écouté en continu et non testé une fois : sur iOS, « Réduire les
+    // animations » peut être basculé pendant que la page est ouverte.
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Ne pas animer hors écran : c'est du calcul perdu, et de la batterie sur
+    // mobile. requestAnimationFrame se met déjà en veille quand l'onglet est
+    // masqué, mais pas quand la section est simplement plus bas dans la page.
     const observer = new IntersectionObserver(
       ([entry]) => {
         isVisible.current = entry.isIntersecting;
@@ -150,6 +161,7 @@ export function useInfiniteCarousel(
       const deltaSeconds = (time - lastTime) / 1000;
       lastTime = time;
 
+      if (motionQuery.matches) return;
       if (isPaused.current || !isVisible.current) return;
       if (el.scrollWidth <= el.clientWidth) return;
 
@@ -215,14 +227,22 @@ export function useInfiniteCarousel(
     [pauseTemporarily],
   );
 
-  // À étaler sur le conteneur : regroupe pause au survol, au focus clavier,
-  // et pendant un geste tactile ou molette.
+  // À étaler sur le conteneur.
+  //
+  // onPointerEnter/Leave et non onMouseEnter : sur mobile, un tap émet un
+  // `pointerenter` SANS `pointerleave` correspondant — le pointeur tactile
+  // cesse d'exister au lieu de sortir. Le survol est donc filtré sur le type
+  // de pointeur, et le tactile passe exclusivement par les pauses à échéance.
   const scrollerHandlers = {
-    onPointerEnter: pause,
-    onPointerLeave: resume,
-    onFocus: pause,
+    onPointerEnter: (event: React.PointerEvent) => {
+      if (event.pointerType === "mouse") pauseWhileHovering();
+    },
+    onPointerLeave: (event: React.PointerEvent) => {
+      if (event.pointerType === "mouse") resume();
+    },
+    onFocus: pauseWhileHovering,
     onBlur: resume,
-    onTouchStart: pause,
+    onTouchStart: pauseTemporarily,
     onTouchEnd: pauseTemporarily,
     onWheel: pauseTemporarily,
   };

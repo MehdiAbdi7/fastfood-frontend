@@ -185,9 +185,11 @@ export function DishList({ items, nav }: DishListProps) {
           </button>
         </div>
       ) : (
-        // Une colonne sur mobile pour laisser respirer les descriptions, deux
-        // sur grand écran où la largeur devient excessive pour une seule ligne.
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        // Deux colonnes maximum, et seulement à partir de xl. En trois
+        // colonnes, la colonne de texte tombe à ~230 px : une description de
+        // tacos s'y étale sur quatre lignes à côté d'une photo minuscule.
+        // Une carte horizontale a besoin de largeur, pas de densité.
+        <div className="grid gap-3 xl:grid-cols-2">
           {filteredItems.map((item) => (
             <DishCard
               key={item._id}
