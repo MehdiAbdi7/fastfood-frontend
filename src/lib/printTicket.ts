@@ -87,6 +87,9 @@ export function printOrderTicket(order: Order): void {
   printFrame.style.width = "0";
   printFrame.style.height = "0";
   printFrame.style.border = "0";
+  // Définir srcdoc avant l'insertion évite qu'Opera ne déclenche onload sur
+  // about:blank avant que le contenu du ticket soit écrit.
+  printFrame.srcdoc = ticketHtml;
 
   printFrame.onload = () => {
     const printWindow = printFrame.contentWindow;
@@ -105,7 +108,4 @@ export function printOrderTicket(order: Order): void {
   };
 
   document.body.appendChild(printFrame);
-  printFrame.contentDocument?.open();
-  printFrame.contentDocument?.write(ticketHtml);
-  printFrame.contentDocument?.close();
 }
