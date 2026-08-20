@@ -5,6 +5,7 @@ import { BestSellers } from "@/components/public/BestSellers";
 import { Contact } from "@/components/public/Contact";
 import { Hero } from "@/components/public/Hero";
 import { HowItWorks } from "@/components/public/HowItWorks";
+import { Reveal } from "@/components/public/Reveal";
 import { Testimonials } from "@/components/public/Testimonials";
 import Image from "next/image";
 
@@ -17,6 +18,8 @@ const DECO_SIZES = "224px";
 export default function Home() {
   return (
     <>
+      {/* Le Hero garde ses propres animations au chargement (slideInLeft en
+          cascade) : il est visible d'emblée, il n'a rien à révéler au scroll. */}
       <Hero />
 
       <div className="relative">
@@ -33,7 +36,12 @@ export default function Home() {
           />
         </div>
       </div>
-      <BestSellers />
+
+      {/* Un Reveal par section, sans stagger ici : la cascade se joue à
+          l'intérieur des sections (voir HowItWorks), pas entre elles. */}
+      <Reveal>
+        <BestSellers />
+      </Reveal>
 
       <div className="relative">
         <div
@@ -53,9 +61,13 @@ export default function Home() {
         </div>
       </div>
 
-      <HowItWorks />
+      <Reveal>
+        <HowItWorks />
+      </Reveal>
 
-      <About />
+      <Reveal>
+        <About />
+      </Reveal>
 
       <div className="relative">
         <div
@@ -72,7 +84,9 @@ export default function Home() {
         </div>
       </div>
 
-      <Testimonials />
+      <Reveal>
+        <Testimonials />
+      </Reveal>
 
       <div className="relative">
         <div
@@ -89,7 +103,9 @@ export default function Home() {
         </div>
       </div>
 
-      <Contact />
+      <Reveal>
+        <Contact />
+      </Reveal>
     </>
   );
 }
