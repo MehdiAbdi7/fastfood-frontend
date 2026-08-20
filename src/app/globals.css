@@ -95,18 +95,6 @@ body {
     auto;
 }
 
-/* Le dashboard garde le curseur système : précision requise pour cliquer vite
-   sur des cartes de commande en heure de pointe. */
-.dashboard-shell,
-.dashboard-shell * {
-  cursor: auto;
-}
-.dashboard-shell a,
-.dashboard-shell button,
-.dashboard-shell [role="button"] {
-  cursor: pointer;
-}
-
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
