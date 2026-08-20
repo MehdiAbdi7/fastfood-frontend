@@ -38,7 +38,7 @@ export default function Home() {
       <div className="relative">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-4 top-100 z-20 hidden -translate-y-1/2 sm:h-240 sm:w-56 xl:block"
+          className="pointer-events-none absolute -right-4 top-70 z-20 hidden -translate-y-1/2 sm:h-240 sm:w-56 xl:block"
         >
           {/* Pas de `priority` : ces images sont purement ornementales et
               masquées sous xl. Les précharger volait la priorité de la photo
