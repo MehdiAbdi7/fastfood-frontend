@@ -190,7 +190,7 @@ const Navbar = () => {
             <Link
               href="/commande"
               onClick={closeMenu}
-              className="block rounded-full bg-on-primary px-5 py-3 text-center font-bold text-primary transition-colors duration-200 hover:bg-background hover:text-accent-slate"
+              className="block border border-primary/80 rounded-full bg-on-primary px-5 py-3 text-center font-bold text-primary transition-colors duration-200 hover:bg-background hover:text-accent-slate"
             >
               Commander
             </Link>
