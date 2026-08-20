@@ -12,13 +12,13 @@ import { BestSellerCard } from "./BestSellerCard";
 // de développement plus bas.
 const BEST_SELLER_NAMES = [
   "PIRELLI",
+  "GIVI",
   "HARLEY",
+  "MALOSSI",
   "GILERA",
+  "SAMOURAI",
   "Frites Niwa",
   "Salade César",
-  "À REMPLACER 1",
-  "À REMPLACER 2",
-  "À REMPLACER 3",
 ];
 
 export function BestSellers() {
@@ -55,7 +55,7 @@ export function BestSellers() {
   return (
     <section
       id="menu"
-      className="relative isolate overflow-hidden px-6 py-16 sm:px-8 sm:py-24"
+      className="relative isolate overflow-hidden px-2 py-16 sm:px-8 sm:py-24"
     >
       <div className="relative z-10 mx-auto max-w-6xl rounded-4xl border border-primary bg-background px-2 py-8 shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md dark:bg-primary/30 sm:px-8">
         <div className="mb-10 flex flex-col items-center gap-2 text-center sm:mb-14">
