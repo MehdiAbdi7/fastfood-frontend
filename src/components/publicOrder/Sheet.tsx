@@ -14,11 +14,12 @@ interface SheetProps {
   labelledBy?: string;
   width?: "md" | "sm";
   /**
-   * "center" — boîte centrée à toutes les tailles. Le défaut : une fiche
-   *   produit est un objet qu'on examine, on le pose au milieu du champ.
-   * "bottom" — collée en bas sur mobile, centrée au-dessus de sm. Réservé au
-   *   ticket et à la fiche produit, où le geste de tirer depuis le bas fait
-   *   partie de la métaphore et où chaque pixel compte au téléphone.
+   * "center" — boîte centrée à toutes les tailles. Pour une surface courte,
+   *   qu'on pose au milieu du champ.
+   * "bottom" — collée en bas sur mobile, centrée au-dessus de sm. Utilisé par
+   *   le ticket et la fiche produit : le geste de tirer depuis le bas fait
+   *   partie de la métaphore, et ça libère les ~50px que coûtaient les marges
+   *   d'un centrage sur un écran de téléphone.
    */
   placement?: "center" | "bottom";
 }
@@ -102,17 +103,18 @@ export function Sheet({
         }`}
       />
 
-      {/* Toutes les valeurs élargies sont préfixées sm: — le rendu mobile
-          (bord à bord, 92dvh) reste intact, seul le desktop s'élargit. La
-          taille "md" passe à 2xl (672px) : à 512px, la rangée de formules d'un
-          burger tenait tout juste et les ingrédients à retirer débordaient
-          sous le pied de page, alors que l'écran offrait la place. "sm" reste
-          étroit, c'est la largeur d'un ticket de caisse et c'est voulu. */}
+      {/* 94dvh sur mobile : dvh suit la barre d'URL de Safari qui se rétracte
+          au scroll, donc on ne passe jamais sous la barre d'outils du bas.
+          La taille "md" monte à 2xl (672px) — à 512px, la rangée de formules
+          d'un burger tenait tout juste et les ingrédients à retirer
+          débordaient sous le pied de page alors que l'écran offrait la place.
+          "sm" reste étroit : c'est la largeur d'un ticket de caisse, et c'est
+          voulu. */}
       <div
         className={`relative flex w-full flex-col overflow-hidden border border-primary/15 bg-background shadow-2xl transition-all duration-200 ease-out ${
           isCentered
             ? "max-h-[88dvh] rounded-3xl sm:max-h-[90dvh]"
-            : "max-h-[92dvh] rounded-t-3xl sm:max-h-[90vh] sm:rounded-3xl"
+            : "max-h-[94dvh] rounded-t-3xl sm:max-h-[92dvh] sm:rounded-3xl"
         } ${width === "sm" ? "sm:max-w-md" : "sm:max-w-2xl"} ${motionClasses}`}
       >
         {children(close)}

@@ -14,9 +14,9 @@ import { getEligibleFormulas, resolveEffectiveSize } from "@/lib/formulaRules";
 import type { CartLine, NewCartLine } from "@/lib/cartLine";
 import type { MenuItem } from "@/types/menuItem";
 
-// Hauteur de photo dépassée avant que la barre de titre ne devienne opaque.
-// Volontairement inférieure à la photo elle-même : la bascule doit se faire
-// pendant que la photo sort du champ, pas après.
+// Distance parcourue avant que la barre de titre ne devienne opaque.
+// Volontairement inférieure à la hauteur de la photo : la bascule doit se
+// faire pendant que celle-ci sort du champ, pas une fois qu'elle est partie.
 const TITLE_BAR_OFFSET_PX = 110;
 
 interface ProductSheetProps {
@@ -269,7 +269,7 @@ export function ProductSheet({
 
   return (
     // placement="bottom" comme le ticket : sur mobile la fiche colle en bas et
-    // monte à 92dvh, au lieu d'être centrée avec 16px de marge tout autour.
+    // monte à 94dvh, au lieu d'être centrée avec 16px de marge tout autour.
     // Une cinquantaine de pixels de gagnés, et le pouce atteint le pied de
     // page sans changer de prise. Au-dessus de sm, elle reste centrée.
     <Sheet
@@ -332,33 +332,37 @@ export function ProductSheet({
               onScroll={handleScroll}
               className="flex-1 overflow-y-auto overscroll-contain"
             >
-              {/* 176px sur mobile au lieu de 400px. Assez pour reconnaître le
-                  produit et donner envie, pas assez pour repousser les options
-                  hors de vue. */}
-              <div className="relative h-44 w-full overflow-hidden bg-primary/10 sm:h-56">
+              {/* object-contain et non object-cover : ces visuels sont des
+                  produits détourés, presque carrés. "cover" remplissait la
+                  boîte en rognant le pain du haut et la salade du bas — donc
+                  en montrant un burger tronqué quelle que soit la hauteur
+                  qu'on lui donnait. "contain" fait entrer la photo entière ;
+                  le vide latéral se confond avec le fond crème de la fiche.
+                  Corollaire : réduire cette hauteur ne coupe plus rien, ça
+                  affiche seulement le produit plus petit. */}
+              <div className="relative h-52 w-full overflow-hidden bg-primary/5 sm:h-72">
                 {item.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={item.imageUrl}
                     alt=""
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center">
                     <span className="icon-[mdi--food] text-5xl text-primary/30" />
                   </div>
                 )}
-
-                {/* Fondu vers le fond de la fiche : le titre placé juste
-                    dessous se pose sur la photo sans coupure nette. */}
-                <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-black/25" />
               </div>
 
               {/* Titre et description SOUS la photo, en texte normal — plus en
                   surimpression. Une description de tacos sur trois lignes
                   masquait la garniture, et le texte blanc sur photo claire
-                  était par endroits illisible. */}
-              <div className="relative -mt-5 flex flex-col gap-1 px-4">
+                  était par endroits illisible.
+                  Pas de marge négative : object-contain laisse déjà une marge
+                  naturelle sous le produit, remonter le titre le collerait à
+                  la salade. */}
+              <div className="flex flex-col gap-1 px-4 pt-1">
                 <h2
                   id="product-sheet-title"
                   className="font-heading text-2xl font-bold leading-tight text-foreground"
