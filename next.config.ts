@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 
+if (process.env.NODE_ENV === "production" && !process.env.NEXT_PUBLIC_API_URL) {
+  throw new Error(
+    "NEXT_PUBLIC_API_URL doit etre configuree dans les variables Vercel.",
+  );
+}
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [

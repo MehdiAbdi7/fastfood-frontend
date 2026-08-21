@@ -4,7 +4,9 @@ import { api } from "@/server/api";
 import { sessionLoaded, sessionCleared } from "@/features/auth/authSlice";
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:5000";
+  process.env.NEXT_PUBLIC_SOCKET_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://localhost:5000";
 
 // Une seule instance pour toute la session, ouverte/fermée sur login/logout —
 // pas de reconnexion à chaque action Redux.

@@ -7,7 +7,9 @@ import { api } from "@/server/api";
 import { useGetOrderTrackingQuery } from "./publicOrderApi";
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:5000";
+  process.env.NEXT_PUBLIC_SOCKET_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://localhost:5000";
 
 // Filet si le socket ne s'établit pas (proxy d'entreprise, réseau mobile
 // capricieux, fallback polling qui traîne). Un client qui attend son burger
