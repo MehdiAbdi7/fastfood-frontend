@@ -189,7 +189,7 @@ const Navbar = () => {
                 style={{
                   transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
                 }}
-                className={`rounded-2xl px-4 py-3 font-heading text-lg text-foreground font-semibold border border-primary transition-all duration-300 ease-out ${
+                className={`rounded-2xl px-4 py-3 font-heading text-lg text-foreground font-semibold border-b border-primary transition-all duration-300 ease-out ${
                   isMenuOpen
                     ? "translate-x-0 opacity-100"
                     : "translate-x-4 opacity-0"
@@ -206,7 +206,7 @@ const Navbar = () => {
               href="/commande"
               onClick={closeMenu}
               tabIndex={isMenuOpen ? undefined : -1}
-              className="block rounded-full bg-on-primary px-5 py-3 text-center font-bold text-primary transition-colors duration-200 hover:bg-background hover:text-accent-slate"
+              className="block rounded-full border-b border-primary bg-on-primary px-5 py-3 text-center font-bold text-primary transition-colors duration-200 hover:bg-background hover:text-accent-slate"
             >
               Commander
             </Link>
