@@ -203,240 +203,261 @@ export default function NewOrderPage() {
         />
       </div>
 
-      {/* ---------- Ticket ---------- */}
-      <aside className="w-full shrink-0 lg:sticky lg:top-20 lg:w-88">
-        <div className="ticket-notch surface-card relative flex flex-col gap-4 p-5 pb-7">
-          <div className="flex items-baseline justify-between">
-            <h2 className="font-heading text-base font-bold text-foreground">
-              Ticket
-            </h2>
+      {/* ---------- Ticket ----------
+          max-h + colonne à trois zones : un élément sticky PLUS HAUT que le
+          viewport se comporte comme un élément normal et défile avec la page —
+          il fallait donc descendre jusqu'au bout de la grille produits pour
+          atteindre « Envoyer en cuisine ». On plafonne la hauteur, seule la
+          zone centrale défile, et le bouton reste toujours à l'écran.
+          calc : 5rem = topbar sticky (top-20) + 1.5rem de respiration en bas. */}
+      <aside className="w-full shrink-0 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5.5rem)] lg:w-88">
+        <div className="ticket-notch surface-card relative flex flex-col p-5 pb-7 lg:max-h-[calc(100vh-5.5rem)]">
+          {/* Zone défilante : entête, formulaire et lignes du ticket. */}
+          <div className="flex min-h-0 flex-1 flex-col gap-4 lg:overflow-y-auto lg:pr-1">
+            <div className="flex items-baseline justify-between">
+              <h2 className="font-heading text-base font-bold text-foreground">
+                Ticket
+              </h2>
 
-            <span className="tabular-nums text-xs font-semibold text-foreground/50">
-              {itemsCount} article
-              {itemsCount > 1 ? "s" : ""}
-            </span>
-          </div>
+              <span className="tabular-nums text-xs font-semibold text-foreground/50">
+                {itemsCount} article
+                {itemsCount > 1 ? "s" : ""}
+              </span>
+            </div>
 
-          {/* Type de commande */}
-          <div className="grid grid-cols-3 gap-1.5">
-            {TYPE_OPTIONS.map((t) => (
-              <button
-                key={t}
-                onClick={() => setType(t)}
-                className={`flex flex-col items-center gap-1 rounded-xl border py-2.5 text-[11px] font-bold transition-colors ${
-                  type === t
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border-subtle text-foreground/55 hover:text-foreground"
-                }`}
-              >
-                <span className={`${ORDER_TYPE_ICONS[t]} text-lg`} />
+            {/* Type de commande */}
+            <div className="grid grid-cols-3 gap-1.5">
+              {TYPE_OPTIONS.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setType(t)}
+                  className={`flex flex-col items-center gap-1 rounded-xl border py-2.5 text-[11px] font-bold transition-colors ${
+                    type === t
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border-subtle text-foreground/55 hover:text-foreground"
+                  }`}
+                >
+                  <span className={`${ORDER_TYPE_ICONS[t]} text-lg`} />
 
-                {ORDER_TYPE_LABELS[t]}
-              </button>
-            ))}
-          </div>
+                  {ORDER_TYPE_LABELS[t]}
+                </button>
+              ))}
+            </div>
 
-          <div className="flex flex-col gap-3">
-            {needsStoreSelector && (
-              <Select
-                id="store"
-                label="Magasin"
-                value={manualStore}
-                onChange={(e) => {
-                  setManualStore(e.target.value as Store);
-                  setTableId("");
-                }}
-                placeholder="Choisir un magasin"
-                options={Object.entries(STORE_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
-            )}
+            <div className="flex flex-col gap-3">
+              {needsStoreSelector && (
+                <Select
+                  id="store"
+                  label="Magasin"
+                  value={manualStore}
+                  onChange={(e) => {
+                    setManualStore(e.target.value as Store);
+                    setTableId("");
+                  }}
+                  placeholder="Choisir un magasin"
+                  options={Object.entries(STORE_LABELS).map(
+                    ([value, label]) => ({
+                      value,
+                      label,
+                    }),
+                  )}
+                />
+              )}
 
-            {type === "dine_in" && (
-              <Select
-                id="table"
-                label="Table"
-                value={tableId}
-                onChange={(e) => setTableId(e.target.value)}
-                placeholder={
-                  resolvedStore
-                    ? "Choisir une table"
-                    : "Choisis d'abord un magasin"
-                }
-                disabled={!resolvedStore}
-                options={(tables ?? [])
-                  .slice()
-                  .sort((a, b) => a.tableN - b.tableN)
-                  .map((t) => ({
-                    value: t._id,
-                    label: `Table ${t.tableN} — ${
-                      t.status === "occupied" ? "occupée" : "libre"
-                    }`,
-                  }))}
-              />
-            )}
+              {type === "dine_in" && (
+                <Select
+                  id="table"
+                  label="Table"
+                  value={tableId}
+                  onChange={(e) => setTableId(e.target.value)}
+                  placeholder={
+                    resolvedStore
+                      ? "Choisir une table"
+                      : "Choisis d'abord un magasin"
+                  }
+                  disabled={!resolvedStore}
+                  options={(tables ?? [])
+                    .slice()
+                    .sort((a, b) => a.tableN - b.tableN)
+                    .map((t) => ({
+                      value: t._id,
+                      label: `Table ${t.tableN} — ${
+                        t.status === "occupied" ? "occupée" : "libre"
+                      }`,
+                    }))}
+                />
+              )}
 
-            <Input
-              id="fullName"
-              label="Nom du client"
-              placeholder="Ex : Yacine"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-
-            {type !== "dine_in" && (
               <Input
-                id="phone"
-                label="Téléphone"
-                placeholder="05 00 00 00 00"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                id="fullName"
+                label="Nom du client"
+                placeholder="Ex : Yacine"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
               />
-            )}
+
+              {type !== "dine_in" && (
+                <Input
+                  id="phone"
+                  label="Téléphone"
+                  placeholder="05 00 00 00 00"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              )}
+
+              {type === "delivery" && (
+                <Input
+                  id="address"
+                  label="Adresse"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+              )}
+
+              <Input
+                id="remark"
+                label="Remarque"
+                placeholder="Sans oignons, bien cuit..."
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+              />
+            </div>
+
+            {/* Lignes du ticket */}
+            <div className="flex flex-col gap-2.5 border-t border-dashed border-border-subtle pt-4">
+              {cart.length === 0 ? (
+                <div className="flex flex-col items-center gap-1.5 py-6 text-center">
+                  <span className="icon-[mdi--receipt-text-plus-outline] text-2xl text-foreground/25" />
+
+                  <p className="text-sm font-semibold text-foreground/60">
+                    Ticket vide
+                  </p>
+
+                  <p className="text-xs text-foreground/40">
+                    Touche un produit pour l&apos;ajouter
+                  </p>
+                </div>
+              ) : (
+                cart.map((line) => {
+                  const variantLabel = formatVariantLabel(
+                    line.variant.combination,
+                  );
+
+                  return (
+                    <div key={line.key} className="flex items-center gap-2.5">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-surface-2">
+                        {line.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={line.imageUrl}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center">
+                            <span className="icon-[mdi--food] text-base text-foreground/30" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <p className="truncate text-xs font-bold text-foreground">
+                          {line.name}
+                        </p>
+
+                        <p className="tabular-nums text-xs text-foreground/50">
+                          {variantLabel !== "Standard"
+                            ? `${variantLabel} · `
+                            : ""}
+                          {formatDA(getLineUnitPrice(line))}
+                        </p>
+
+                        {/* La cuisine doit voir les options sur le ticket,
+                            pas seulement leur effet sur le prix. */}
+                        {line.extras.length > 0 && (
+                          <p className="truncate text-xs text-accent-green">
+                            +{" "}
+                            {line.extras.map((extra) => extra.name).join(", ")}
+                          </p>
+                        )}
+
+                        {line.excludedIngredients.length > 0 && (
+                          <p className="truncate text-xs text-accent-bordeaux">
+                            sans {line.excludedIngredients.join(", ")}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-1 rounded-lg bg-surface-2 p-0.5">
+                        <button
+                          onClick={() =>
+                            setQuantity(line.key, line.quantity - 1)
+                          }
+                          aria-label={`Retirer un ${line.name}`}
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-bordeaux"
+                        >
+                          <span className="icon-[mdi--minus] text-sm" />
+                        </button>
+
+                        <span className="tabular-nums w-5 text-center text-xs font-bold text-foreground">
+                          {line.quantity}
+                        </span>
+
+                        <button
+                          onClick={() =>
+                            setQuantity(line.key, line.quantity + 1)
+                          }
+                          aria-label={`Ajouter un ${line.name}`}
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-green"
+                        >
+                          <span className="icon-[mdi--plus] text-sm" />
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => removeFromCart(line.key)}
+                        aria-label={`Supprimer ${line.name} du ticket`}
+                        className="shrink-0 text-foreground/25 hover:text-accent-bordeaux"
+                      >
+                        <span className="icon-[mdi--close] text-base" />
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Zone figée : totaux et action. shrink-0 empêche le flex parent de
+              la comprimer quand le ticket se remplit — sans lui, le bouton
+              s'écraserait progressivement à mesure qu'on ajoute des articles. */}
+          <div className="flex shrink-0 flex-col gap-4 pt-4">
+            <TicketTotals itemsTotal={total} itemsCount={itemsCount} />
 
             {type === "delivery" && (
-              <Input
-                id="address"
-                label="Adresse"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
+              <p className="-mt-2 text-xs text-foreground/45">
+                Les frais de livraison seront ajoutés depuis la fiche commande.
+              </p>
             )}
 
-            <Input
-              id="remark"
-              label="Remarque"
-              placeholder="Sans oignons, bien cuit..."
-              value={remark}
-              onChange={(e) => setRemark(e.target.value)}
-            />
-          </div>
-
-          {/* Lignes du ticket */}
-          <div className="flex flex-col gap-2.5 border-t border-dashed border-border-subtle pt-4">
-            {cart.length === 0 ? (
-              <div className="flex flex-col items-center gap-1.5 py-6 text-center">
-                <span className="icon-[mdi--receipt-text-plus-outline] text-2xl text-foreground/25" />
-
-                <p className="text-sm font-semibold text-foreground/60">
-                  Ticket vide
-                </p>
-
-                <p className="text-xs text-foreground/40">
-                  Touche un produit pour l&apos;ajouter
-                </p>
-              </div>
-            ) : (
-              cart.map((line) => {
-                const variantLabel = formatVariantLabel(
-                  line.variant.combination,
-                );
-
-                return (
-                  <div key={line.key} className="flex items-center gap-2.5">
-                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-surface-2">
-                      {line.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={line.imageUrl}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center">
-                          <span className="icon-[mdi--food] text-base text-foreground/30" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <p className="truncate text-xs font-bold text-foreground">
-                        {line.name}
-                      </p>
-
-                      <p className="tabular-nums text-xs text-foreground/50">
-                        {variantLabel !== "Standard"
-                          ? `${variantLabel} · `
-                          : ""}
-                        {formatDA(getLineUnitPrice(line))}
-                      </p>
-
-                      {/* La cuisine doit voir les options sur le ticket,
-                          pas seulement leur effet sur le prix. */}
-                      {line.extras.length > 0 && (
-                        <p className="truncate text-xs text-accent-green">
-                          + {line.extras.map((extra) => extra.name).join(", ")}
-                        </p>
-                      )}
-
-                      {line.excludedIngredients.length > 0 && (
-                        <p className="truncate text-xs text-accent-bordeaux">
-                          sans {line.excludedIngredients.join(", ")}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-1 rounded-lg bg-surface-2 p-0.5">
-                      <button
-                        onClick={() => setQuantity(line.key, line.quantity - 1)}
-                        aria-label={`Retirer un ${line.name}`}
-                        className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-bordeaux"
-                      >
-                        <span className="icon-[mdi--minus] text-sm" />
-                      </button>
-
-                      <span className="tabular-nums w-5 text-center text-xs font-bold text-foreground">
-                        {line.quantity}
-                      </span>
-
-                      <button
-                        onClick={() => setQuantity(line.key, line.quantity + 1)}
-                        aria-label={`Ajouter un ${line.name}`}
-                        className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-green"
-                      >
-                        <span className="icon-[mdi--plus] text-sm" />
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={() => removeFromCart(line.key)}
-                      aria-label={`Supprimer ${line.name} du ticket`}
-                      className="shrink-0 text-foreground/25 hover:text-accent-bordeaux"
-                    >
-                      <span className="icon-[mdi--close] text-base" />
-                    </button>
-                  </div>
-                );
-              })
+            {error && (
+              <p className="rounded-lg bg-accent-bordeaux/10 px-3 py-2 text-sm text-accent-bordeaux">
+                {error}
+              </p>
             )}
+
+            <Button
+              size="lg"
+              icon="icon-[mdi--check-circle-outline]"
+              onClick={handleSubmit}
+              isLoading={isSubmitting}
+              disabled={cart.length === 0}
+              className="w-full"
+            >
+              Envoyer en cuisine
+            </Button>
           </div>
-
-          <TicketTotals itemsTotal={total} itemsCount={itemsCount} />
-
-          {type === "delivery" && (
-            <p className="-mt-2 text-xs text-foreground/45">
-              Les frais de livraison seront ajoutés depuis la fiche commande.
-            </p>
-          )}
-
-          {error && (
-            <p className="rounded-lg bg-accent-bordeaux/10 px-3 py-2 text-sm text-accent-bordeaux">
-              {error}
-            </p>
-          )}
-
-          <Button
-            size="lg"
-            icon="icon-[mdi--check-circle-outline]"
-            onClick={handleSubmit}
-            isLoading={isSubmitting}
-            disabled={cart.length === 0}
-            className="w-full"
-          >
-            Envoyer en cuisine
-          </Button>
         </div>
       </aside>
 
