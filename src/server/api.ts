@@ -28,6 +28,10 @@ const TAG_TYPES = [
   "MenuCategory",
   "MenuExtra",
   "MenuExtraType",
+  // Ouverture/fermeture des commandes en ligne. Invalidé par la mutation du
+  // dashboard ET par l'événement socket "store_status_changed", pour que tous
+  // les postes voient l'interrupteur basculer.
+  "StoreStatus",
 ] as const;
 
 export const api = createApi({

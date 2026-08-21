@@ -9,6 +9,7 @@ import {
   useGetPublicTablesQuery,
   useCreatePublicOrderMutation,
 } from "@/features/publicOrder/publicOrderApi";
+import { useStoreStatuses } from "@/features/storeSettings/useStoreStatuses";
 import { useOrderContext } from "@/features/orders/useOrderContext";
 import { toOrderItemsPayload } from "@/lib/cartLine";
 import { writeLastOrder } from "@/lib/lastOrder";
@@ -82,6 +83,8 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
 
   const { lines, total, count, isHydrated, reconcile, clear } = useCart();
 
+  const { isAccepting, getClosedMessage, allClosed } = useStoreStatuses();
+
   const [createOrder, { isLoading: isSubmitting }] =
     useCreatePublicOrderMutation();
 
@@ -148,15 +151,24 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
     if (lines.length === 0) router.replace("/commande");
   }, [isHydrated, lines.length, router]);
 
+  // Le magasin choisi ne prend plus de commandes. Le backend renverrait un 503
+  // de toute façon (c'est lui qui fait foi), mais le client doit le voir avant
+  // d'avoir rempli son adresse, pas après avoir appuyé sur « Envoyer ».
+  const isSelectedStoreClosed = store !== null && !isAccepting(store);
+
   function selectStore(next: Store) {
     setStore(next);
     // La liste des tables dépend du magasin : garder l'ancienne sélection
     // enverrait un ObjectId appartenant à l'autre restaurant.
     setTableId("");
+    setError(null);
   }
 
   function validate(): string | null {
     if (!store) return "Choisissez d'abord un restaurant";
+    // En premier après le magasin : inutile de reprocher un téléphone manquant
+    // à quelqu'un dont la commande sera refusée quoi qu'il arrive.
+    if (!isAccepting(store)) return getClosedMessage(store);
     if (!fullName.trim()) return "Votre nom est requis";
     if (type === "dine_in" && !tableId) return "Choisissez votre table";
     if (type !== "dine_in" && phone.trim().length < 10) {
@@ -225,6 +237,9 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
 
       router.replace(`/commande/suivi/${created._id}`);
     } catch (err) {
+      // Couvre aussi le 503 d'un magasin fermé entre l'affichage et l'envoi :
+      // errorResponse renvoie { error }, donc le message du restaurant remonte
+      // tel quel, sans traitement particulier à ajouter ici.
       setError(
         getApiErrorMessage(
           err,
@@ -272,6 +287,34 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
       <div className="flex flex-col gap-6">
         <CheckoutSummary lines={lines} total={total} count={count} />
 
+        {/* Tout est fermé : on le dit une bonne fois en haut du formulaire,
+            plutôt que de laisser le client buter sur deux boutons grisés sans
+            comprendre lequel des deux est en cause. */}
+        {allClosed && (
+          <div
+            role="status"
+            className="flex flex-col gap-2 rounded-2xl border border-accent-bordeaux/40 bg-accent-bordeaux/10 px-4 py-4 backdrop-blur-sm"
+          >
+            <p className="flex items-center gap-2 font-heading text-sm font-bold text-foreground">
+              <span
+                aria-hidden="true"
+                className="icon-[mdi--store-clock-outline] text-lg text-accent-bordeaux"
+              />
+              Commandes en ligne fermées
+            </p>
+            <p className="text-sm text-foreground/70">
+              Votre panier est conservé : vous pourrez l&apos;envoyer dès la
+              réouverture.
+            </p>
+            <Link
+              href="/#contact"
+              className="text-sm font-bold text-accent-bordeaux underline"
+            >
+              Voir nos numéros
+            </Link>
+          </div>
+        )}
+
         {/* ---------- Restaurant ---------- */}
         {/* En premier, et pas par hasard : la liste des tables en dépend, et
             les commandes à emporter comme en livraison exigent un magasin
@@ -282,26 +325,56 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
           </h2>
 
           <div className="grid grid-cols-2 gap-2">
-            {STORES.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => selectStore(option)}
-                aria-pressed={store === option}
-                className={`flex min-h-14 items-center justify-center gap-2 rounded-xl border font-heading text-sm font-bold backdrop-blur-sm transition-colors ${
-                  store === option
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-primary/25 bg-background/60 text-foreground/70 hover:border-primary/50"
-                }`}
-              >
-                <span
-                  aria-hidden="true"
-                  className="icon-[mdi--map-marker] text-lg"
-                />
-                {STORE_LABELS[option]}
-              </button>
-            ))}
+            {STORES.map((option) => {
+              const isClosed = !isAccepting(option);
+
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => selectStore(option)}
+                  // Désactivé plutôt que masqué : un client habitué doit voir
+                  // que Chéraga existe et qu'il est fermé, pas croire qu'on a
+                  // supprimé l'adresse.
+                  disabled={isClosed}
+                  aria-pressed={store === option}
+                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl border font-heading text-sm font-bold backdrop-blur-sm transition-colors ${
+                    isClosed
+                      ? "cursor-not-allowed border-primary/15 bg-background/40 text-foreground/35"
+                      : store === option
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-primary/25 bg-background/60 text-foreground/70 hover:border-primary/50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className={`text-lg ${
+                        isClosed
+                          ? "icon-[mdi--store-off-outline]"
+                          : "icon-[mdi--map-marker]"
+                      }`}
+                    />
+                    {STORE_LABELS[option]}
+                  </span>
+                  {isClosed && (
+                    <span className="text-xs font-semibold uppercase tracking-wide text-accent-bordeaux/70">
+                      Fermé
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
+
+          {/* Cas du QR : le magasin était pré-sélectionné, et il vient de
+              fermer. Sans ce message, le bouton d'envoi serait grisé sans
+              qu'aucun des deux boutons ci-dessus ne paraisse sélectionné. */}
+          {isSelectedStoreClosed && !allClosed && (
+            <p className="rounded-xl bg-accent-bordeaux/10 px-4 py-3 text-sm text-accent-bordeaux backdrop-blur-sm">
+              {getClosedMessage(store)} Choisissez notre autre adresse.
+            </p>
+          )}
         </section>
 
         {/* ---------- Mode ---------- */}
@@ -493,7 +566,9 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            // Désactivé sur un magasin fermé plutôt que de laisser partir une
+            // requête qu'on sait condamnée au 503.
+            disabled={isSubmitting || isSelectedStoreClosed || allClosed}
             className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 font-heading text-base font-bold text-on-primary transition-all hover:bg-accent-slate active:scale-[0.99] disabled:opacity-60 disabled:active:scale-100"
           >
             {isSubmitting ? (
@@ -504,6 +579,8 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                 />
                 Envoi en cours…
               </>
+            ) : isSelectedStoreClosed || allClosed ? (
+              "Commandes momentanément fermées"
             ) : (
               <>
                 Envoyer ma commande

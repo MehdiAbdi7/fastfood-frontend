@@ -5,6 +5,7 @@ import { FixedBackground } from "@/components/public/FixedBackground";
 import { MenuFilters } from "@/components/publicOrder/MenuFilters";
 import { DishList } from "@/components/publicOrder/DishList";
 import { CartBar } from "@/components/publicOrder/CartBar";
+import { StoreClosedNotice } from "@/components/publicOrder/StoreClosedNotice";
 import type { MenuCategory, MenuItem } from "@/types/menuItem";
 
 export const metadata = {
@@ -20,12 +21,17 @@ export const revalidate = 60;
 /**
  * Server Component : c'est ici que le menu est chargé et la navigation
  * calculée, donc le client reçoit du HTML déjà rempli — pas de skeleton, pas
- * d'attente du JS. Les trois îlots ci-dessous sont les seuls morceaux
- * interactifs, et ils ne se parlent qu'à travers Redux.
+ * d'attente du JS. Les îlots ci-dessous sont les seuls morceaux interactifs,
+ * et ils ne se parlent qu'à travers Redux.
  *
  * Le ticket (CartSheet) n'est plus monté ici mais dans le layout public : il
  * doit rester ouvrable depuis le bouton panier de la navbar, sur toutes les
  * pages.
+ *
+ * L'état d'ouverture des magasins n'est volontairement PAS chargé ici : avec
+ * le `revalidate` ci-dessus, un statut figé dans le HTML pourrait annoncer
+ * « ouvert » jusqu'à une minute après la fermeture. StoreClosedNotice le lit
+ * côté client, où il est toujours frais.
  */
 export default async function CommandePage() {
   const [items, categories] = await Promise.all([
@@ -76,6 +82,10 @@ export default async function CommandePage() {
       {/* relative z-10 obligatoire : sans lui, tout le contenu passerait sous
           le fond fixe (voir le commentaire dans FixedBackground). */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-30 pt-28 sm:pt-28">
+        {/* Avant l'en-tête, donc avant le premier plat : la fermeture doit se
+            lire au premier coup d'œil, pas après avoir scrollé la carte. */}
+        <StoreClosedNotice />
+
         <header className="mb-6 flex flex-col gap-1.5">
           <span className="font-heading text-sm font-bold uppercase tracking-wide text-accent-green">
             Notre carte

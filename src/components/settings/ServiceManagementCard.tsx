@@ -41,7 +41,8 @@ export function ServiceManagementCard() {
       <h2 className="font-heading text-base font-bold text-foreground">Service</h2>
       <p className="text-sm text-foreground/60">
         Ouvrir un nouveau service remet la numérotation des commandes à zéro pour
-        le magasin choisi. Bloqué s&apos;il reste des commandes en cours.
+        le magasin choisi, et rouvre les commandes en ligne. Bloqué s&apos;il
+        reste des commandes en cours.
       </p>
 
       <div className="flex flex-col gap-2">
@@ -85,8 +86,9 @@ export function ServiceManagementCard() {
       >
         <div className="flex flex-col gap-4">
           <p className="text-sm text-foreground/80">
-            La numérotation des commandes repartira de 1. Cette action est bloquée
-            s&apos;il reste des commandes en cours, sauf si tu la forces.
+            La numérotation des commandes repartira de 1, et les commandes en
+            ligne seront rouvertes si elles étaient fermées. Cette action est
+            bloquée s&apos;il reste des commandes en cours, sauf si tu la forces.
           </p>
           {isAdmin && (
             <Switch

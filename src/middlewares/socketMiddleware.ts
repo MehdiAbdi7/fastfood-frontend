@@ -62,9 +62,24 @@ export const socketMiddleware: Middleware = (store) => (next) => (action) => {
     });
 
     socket.on("counter_reset", () => {
+      // StoreStatus inclus : ouvrir un service rouvre les commandes en ligne
+      // côté backend (voir resetCounter). Sans cette invalidation, l'autre
+      // poste continuerait d'afficher l'interrupteur en position fermée.
       store.dispatch(
-        api.util.invalidateTags(["Order", "ServiceStats", "Counter"]),
+        api.util.invalidateTags([
+          "Order",
+          "ServiceStats",
+          "Counter",
+          "StoreStatus",
+        ]),
       );
+    });
+
+    // Un poste vient d'ouvrir ou de fermer les commandes en ligne : tous les
+    // autres doivent voir l'interrupteur basculer, sinon l'équipe se
+    // contredirait au téléphone.
+    socket.on("store_status_changed", () => {
+      store.dispatch(api.util.invalidateTags(["StoreStatus"]));
     });
   }
 
