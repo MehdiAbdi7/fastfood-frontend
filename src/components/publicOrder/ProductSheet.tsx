@@ -338,15 +338,17 @@ export function ProductSheet({
                   en montrant un burger tronqué quelle que soit la hauteur
                   qu'on lui donnait. "contain" fait entrer la photo entière ;
                   le vide latéral se confond avec le fond crème de la fiche.
-                  Corollaire : réduire cette hauteur ne coupe plus rien, ça
-                  affiche seulement le produit plus petit. */}
-              <div className="relative h-72 w-full overflow-hidden bg-primary/5 sm:h-96">
+                  Corollaire : avec "contain", c'est la HAUTEUR seule qui fixe
+                  la taille du produit — élargir le cadre n'y change rien.
+                  sm:h-80 plutôt que h-96 : les 64px rendus permettent à la
+                  section « Retirer » de tenir au-dessus du pied de page. */}
+              <div className="relative h-72 w-full overflow-hidden bg-primary/5 sm:h-80">
                 {item.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={item.imageUrl}
                     alt=""
-                    className="h-full w-full object-contain"
+                    className="h-full w-full object-contain motion-safe:animate-[dishIn_0.45s_cubic-bezier(0.16,1,0.3,1)_both]"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center">
@@ -585,9 +587,19 @@ export function ProductSheet({
               </div>
             </div>
 
+            {/* Fondu au-dessus du pied fixe : sans lui, une section coupée par
+                la barre du bas a l'air d'être la fin de la fiche, et le client
+                ne descend jamais voir les ingrédients à retirer.
+                bottom-20 ≈ la hauteur du pied, pour que le dégradé se pose
+                juste dessus. */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 bottom-20 z-10 h-6 bg-linear-to-t from-background to-transparent"
+            />
+
             {/* ---------- Pied fixe : quantité + ajout ---------- */}
             <div
-              className="flex shrink-0 items-center gap-3 border-t border-border-subtle bg-background p-4"
+              className="relative z-10 flex shrink-0 items-center gap-3 border-t border-border-subtle bg-background p-4"
               style={{
                 paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
               }}
@@ -626,7 +638,15 @@ export function ProductSheet({
                 ) : (
                   <>
                     {isEditing ? "Mettre à jour" : "Ajouter"}
-                    <span className="tabular-nums">
+                    {/* key sur le montant : React remonte l'élément à chaque
+                        changement de prix, ce qui rejoue l'animation. C'est le
+                        seul retour visuel qui confirme qu'ajouter une formule
+                        ou un extra a bien changé ce que le client va payer —
+                        même mécanique que la pastille du CartButton. */}
+                    <span
+                      key={unitPrice * quantity}
+                      className="tabular-nums motion-safe:animate-[toastIn_0.2s_ease-out]"
+                    >
                       · {formatDA(unitPrice * quantity)}
                     </span>
                   </>

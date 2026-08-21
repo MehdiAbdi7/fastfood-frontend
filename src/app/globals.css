@@ -164,6 +164,21 @@ button,
   }
 }
 
+/* Accompagne l'ouverture de la fiche, rien de plus : le produit se pose en
+   même temps que le cadre. Amplitude volontairement faible et durée courte —
+   cette fiche est ouverte plusieurs fois par commande, une animation qu'on
+   remarque au premier passage devient une attente au quatrième. */
+@keyframes dishIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Chiffres à chasse fixe : les montants d'une colonne s'alignent verticalement
    au lieu de danser d'une ligne à l'autre. Indispensable dès qu'on empile des
    prix (ticket, totaux, historique). */

@@ -9,12 +9,18 @@ import { Button } from "@/components/ui/Button";
 import { Switch } from "@/components/ui/Switch";
 import { VariantEditor } from "./VariantEditor";
 import {
+  ExtraGroupsEditor,
+  toDraftGroups,
+  toExtraGroupsPayload,
+  validateExtraGroups,
+  type DraftGroup,
+} from "./ExtraGroupsEditor";
+import {
   useCreateMenuItemMutation,
   useUpdateMenuItemMutation,
   useUploadMenuItemImageMutation,
 } from "@/features/menu/menuItemApi";
 import { useGetMenuCategoriesQuery } from "@/features/menu/menuApi";
-import { useGetMenuExtrasQuery } from "@/features/menu/menuExtraApi";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import type { MenuItem, MenuItemVariant } from "@/types/menuItem";
@@ -32,7 +38,6 @@ export function MenuItemFormModal({
 }: MenuItemFormModalProps) {
   const isEditing = item !== null;
   const { data: categories } = useGetMenuCategoriesQuery();
-  const { data: extras } = useGetMenuExtrasQuery();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -41,7 +46,10 @@ export function MenuItemFormModal({
     { combination: {}, price: 0 },
   ]);
   const [removableIngredients, setRemovableIngredients] = useState("");
-  const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
+  // Remplace selectedExtraIds : la liste plate ne permettait pas de distinguer
+  // « Gratinage » de « Suppléments », d'où les deux blocs mélangés dans le
+  // formulaire et les fromages en double en base.
+  const [extraGroups, setExtraGroups] = useState<DraftGroup[]>([]);
   const [available, setAvailable] = useState(true);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -53,6 +61,12 @@ export function MenuItemFormModal({
     useUploadMenuItemImageMutation();
   const toast = useToast();
   const isLoading = isCreating || isUpdating || isUploading;
+
+  // availableExtras du produit, uniquement pour proposer la reprise de
+  // l'ancien modèle dans l'éditeur de groupes.
+  const legacyExtraIds = (item?.availableExtras ?? []).map((extra) =>
+    typeof extra === "object" ? extra._id : extra,
+  );
 
   // Réinitialise le formulaire à chaque ouverture — évite qu'un item édité
   // laisse des traces dans le formulaire de création suivant.
@@ -75,11 +89,7 @@ export function MenuItemFormModal({
       })),
     );
     setRemovableIngredients(item?.removableIngredients?.join(", ") ?? "");
-    setSelectedExtraIds(
-      (item?.availableExtras ?? []).map((e) =>
-        typeof e === "object" ? e._id : e,
-      ),
-    );
+    setExtraGroups(toDraftGroups(item));
     setAvailable(item?.available ?? true);
     setImageFile(null);
     setImagePreview(item?.imageUrl ?? null);
@@ -96,12 +106,6 @@ export function MenuItemFormModal({
     setImagePreview(URL.createObjectURL(file));
   }
 
-  function toggleExtra(id: string) {
-    setSelectedExtraIds((prev) =>
-      prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id],
-    );
-  }
-
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -115,12 +119,22 @@ export function MenuItemFormModal({
       return;
     }
 
+    const groupsError = validateExtraGroups(extraGroups);
+    if (groupsError) {
+      setError(groupsError);
+      return;
+    }
+
     const payload = {
       name,
       description: description || undefined,
       category: categoryId,
       variants,
-      availableExtras: selectedExtraIds,
+      extraGroups: toExtraGroupsPayload(extraGroups),
+      // Vidé dès qu'on enregistre : extraGroups prime côté backend
+      // (buildExtraContext), garder l'ancienne liste ferait cohabiter deux
+      // sources de vérité dont une seule est lue.
+      availableExtras: [],
       removableIngredients: removableIngredients
         .split(",")
         .map((s) => s.trim())
@@ -247,29 +261,11 @@ export function MenuItemFormModal({
           placeholder="Oignons, Tomates, Cornichons"
         />
 
-        {extras && extras.length > 0 && (
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-foreground">
-              Extras disponibles
-            </label>
-            <div className="flex flex-wrap gap-1.5">
-              {extras.map((extra) => (
-                <button
-                  key={extra._id}
-                  type="button"
-                  onClick={() => toggleExtra(extra._id)}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    selectedExtraIds.includes(extra._id)
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border-subtle text-foreground/60"
-                  }`}
-                >
-                  {extra.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <ExtraGroupsEditor
+          groups={extraGroups}
+          onChange={setExtraGroups}
+          legacyExtraIds={legacyExtraIds}
+        />
 
         <Switch
           checked={available}
