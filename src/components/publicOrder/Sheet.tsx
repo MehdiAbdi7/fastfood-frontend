@@ -17,7 +17,8 @@ interface SheetProps {
    * "center" — boîte centrée à toutes les tailles. Le défaut : une fiche
    *   produit est un objet qu'on examine, on le pose au milieu du champ.
    * "bottom" — collée en bas sur mobile, centrée au-dessus de sm. Réservé au
-   *   ticket, où le geste de tirer depuis le bas fait partie de la métaphore.
+   *   ticket et à la fiche produit, où le geste de tirer depuis le bas fait
+   *   partie de la métaphore et où chaque pixel compte au téléphone.
    */
   placement?: "center" | "bottom";
 }
@@ -101,12 +102,18 @@ export function Sheet({
         }`}
       />
 
+      {/* Toutes les valeurs élargies sont préfixées sm: — le rendu mobile
+          (bord à bord, 92dvh) reste intact, seul le desktop s'élargit. La
+          taille "md" passe à 2xl (672px) : à 512px, la rangée de formules d'un
+          burger tenait tout juste et les ingrédients à retirer débordaient
+          sous le pied de page, alors que l'écran offrait la place. "sm" reste
+          étroit, c'est la largeur d'un ticket de caisse et c'est voulu. */}
       <div
         className={`relative flex w-full flex-col overflow-hidden border border-primary/15 bg-background shadow-2xl transition-all duration-200 ease-out ${
           isCentered
-            ? "max-h-[88dvh] rounded-3xl"
-            : "max-h-[92dvh] rounded-t-3xl sm:max-h-[86vh] sm:rounded-3xl"
-        } ${width === "sm" ? "sm:max-w-md" : "sm:max-w-lg"} ${motionClasses}`}
+            ? "max-h-[88dvh] rounded-3xl sm:max-h-[90dvh]"
+            : "max-h-[92dvh] rounded-t-3xl sm:max-h-[90vh] sm:rounded-3xl"
+        } ${width === "sm" ? "sm:max-w-md" : "sm:max-w-2xl"} ${motionClasses}`}
       >
         {children(close)}
       </div>
