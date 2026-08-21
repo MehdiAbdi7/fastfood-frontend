@@ -340,7 +340,7 @@ export function ProductSheet({
                   le vide latéral se confond avec le fond crème de la fiche.
                   Corollaire : réduire cette hauteur ne coupe plus rien, ça
                   affiche seulement le produit plus petit. */}
-              <div className="relative h-52 w-full overflow-hidden bg-primary/5 sm:h-72">
+              <div className="relative h-72 w-full overflow-hidden bg-primary/5 sm:h-96">
                 {item.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
