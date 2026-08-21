@@ -1,9 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ThemeToggle } from "@/components/public/themeToggle";
 import { StoreSwitcher } from "./StoreSwitcher";
 import { ServiceBadge } from "./ServiceBadge";
+import { UserMenu } from "./UserMenu";
 import { NAV_ITEMS } from "./navConfig";
 
 // Le titre de page est dérivé de navConfig plutôt que passé en prop par
@@ -20,7 +20,10 @@ export function Topbar() {
   const title = usePageTitle();
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border-subtle bg-surface/90 px-4 py-3 backdrop-blur-md sm:px-6">
+    // z-30 et non z-20 : le panneau du UserMenu s'ancre dans ce header, donc
+    // toute la barre doit passer au-dessus du contenu de la page, sinon une
+    // carte en z-20 viendrait recouvrir le menu déroulé.
+    <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border-subtle bg-surface/90 px-4 py-3 backdrop-blur-md sm:px-6">
       <h1 className="font-heading text-lg font-bold text-foreground sm:text-xl">
         {title}
       </h1>
@@ -30,7 +33,9 @@ export function Topbar() {
           <ServiceBadge />
         </div>
         <StoreSwitcher />
-        <ThemeToggle />
+        {/* Le ThemeToggle a rejoint le UserMenu : à trois contrôles plus le
+            titre, la barre débordait sur un écran de 360 px. */}
+        <UserMenu />
       </div>
     </header>
   );

@@ -8,7 +8,7 @@ import { NAV_ITEMS } from "./navConfig";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, isAdmin, logout } = useAuth();
+  const { isAdmin } = useAuth();
 
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
@@ -21,7 +21,7 @@ export function Sidebar() {
         </span>
       </Link>
 
-      <nav className="flex flex-1 flex-col gap-1 px-3">
+      <nav className="flex flex-1 flex-col gap-1 px-3 pb-4">
         {visibleItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -43,27 +43,9 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="flex items-center gap-3 border-t border-border-subtle px-4 py-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 font-heading text-sm font-bold text-primary">
-          {user?.firstname[0]}
-          {user?.lastname[0]}
-        </div>
-        <div className="flex min-w-0 flex-col">
-          <p className="truncate text-sm font-semibold text-foreground">
-            {user?.firstname} {user?.lastname}
-          </p>
-          <p className="truncate text-xs text-foreground/50">
-            {isAdmin ? "Administrateur" : "Employé"}
-          </p>
-        </div>
-        <button
-          onClick={logout}
-          aria-label="Se déconnecter"
-          className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-foreground/50 transition-colors hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
-        >
-          <span className="icon-[mdi--logout] text-lg" />
-        </button>
-      </div>
+      {/* Le bloc profil/déconnexion a été retiré : il vit désormais dans le
+          UserMenu de la topbar, donc accessible aussi sur mobile — où cette
+          sidebar n'est jamais rendue (hidden lg:flex). */}
     </aside>
   );
 }

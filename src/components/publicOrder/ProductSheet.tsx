@@ -14,9 +14,10 @@ import { getEligibleFormulas, resolveEffectiveSize } from "@/lib/formulaRules";
 import type { CartLine, NewCartLine } from "@/lib/cartLine";
 import type { MenuItem } from "@/types/menuItem";
 
-// Plus de constante SINGLE_CHOICE_TYPES : la règle du choix unique est portée
-// par chaque groupe, donc par le produit. C'est ce qui empêche « Gratinage »
-// de s'afficher sur une pizza et « Supplément » sur un tacos.
+// Hauteur de photo dépassée avant que la barre de titre ne devienne opaque.
+// Volontairement inférieure à la photo elle-même : la bascule doit se faire
+// pendant que la photo sort du champ, pas après.
+const TITLE_BAR_OFFSET_PX = 110;
 
 interface ProductSheetProps {
   item: MenuItem;
@@ -44,7 +45,7 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-2.5">
+    <section className="flex flex-col gap-2">
       <div className="flex items-baseline gap-2">
         <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
           {title}
@@ -130,6 +131,10 @@ export function ProductSheet({
     () => initialLine?.formula?.choices ?? {},
   );
 
+  // Pilote la bascule de la barre de titre. Un booléen et non le scrollTop
+  // brut : stocker la position déclencherait un rendu à chaque pixel parcouru.
+  const [isScrolled, setIsScrolled] = useState(false);
+
   const eligibleFormulas = useMemo(() => getEligibleFormulas(item), [item]);
 
   const selectedFormula = useMemo(
@@ -196,6 +201,11 @@ export function ProductSheet({
 
   const isBlocked = missingChoice || unavailableChoice;
 
+  function handleScroll(event: React.UIEvent<HTMLDivElement>) {
+    const scrolled = event.currentTarget.scrollTop > TITLE_BAR_OFFSET_PX;
+    setIsScrolled((previous) => (previous === scrolled ? previous : scrolled));
+  }
+
   function selectFormula(id: string | null) {
     setFormulaId(id);
     setFormulaChoices({}); // les choix d'une formule n'ont pas de sens sur l'autre
@@ -258,7 +268,15 @@ export function ProductSheet({
   }
 
   return (
-    <Sheet onClose={onClose} labelledBy="product-sheet-title">
+    // placement="bottom" comme le ticket : sur mobile la fiche colle en bas et
+    // monte à 92dvh, au lieu d'être centrée avec 16px de marge tout autour.
+    // Une cinquantaine de pixels de gagnés, et le pouce atteint le pied de
+    // page sans changer de prise. Au-dessus de sm, elle reste centrée.
+    <Sheet
+      onClose={onClose}
+      labelledBy="product-sheet-title"
+      placement="bottom"
+    >
       {(close) => {
         function confirm() {
           if (isBlocked) return;
@@ -269,254 +287,298 @@ export function ProductSheet({
 
         return (
           <>
-            {/* ---------- Visuel d'en-tête ---------- */}
-            <div className="relative h-100 sm:h-85 w-full shrink-0 overflow-hidden bg-primary/10 ">
-              {item.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={item.imageUrl}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <span className="icon-[mdi--food] text-5xl text-primary/30" />
-                </div>
-              )}
-
-              {/* Dégradé, et non voile uniforme : le titre reste lisible sans
-                  ternir la photo, qui est l'argument de vente. */}
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent" />
+            {/* ---------- Barre de navigation superposée ----------
+                Transparente sur la photo, opaque dès qu'on descend dans les
+                options : le client garde sous les yeux le nom du produit qu'il
+                configure, sans qu'on lui réserve une bande en permanence. */}
+            <header
+              className={`absolute inset-x-0 top-0 z-20 flex items-center gap-2 px-3 py-2.5 transition-colors duration-200 ${
+                isScrolled
+                  ? "border-b border-border-subtle bg-background/95 backdrop-blur-md"
+                  : ""
+              }`}
+            >
+              <p
+                aria-hidden="true"
+                className={`min-w-0 flex-1 truncate pl-1 font-heading text-base font-bold text-foreground transition-opacity duration-200 ${
+                  isScrolled ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {item.name}
+              </p>
 
               <button
                 type="button"
                 onClick={close}
                 aria-label="Fermer"
-                className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors ${
+                  isScrolled
+                    ? "text-foreground/60 hover:bg-surface-2 hover:text-foreground"
+                    : "bg-black/45 text-white backdrop-blur-sm hover:bg-black/70"
+                }`}
               >
-                <span className="icon-[mdi--close] text-xl" />
+                <span
+                  aria-hidden="true"
+                  className="icon-[mdi--close] text-xl"
+                />
               </button>
+            </header>
 
-              <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 p-4">
+            {/* ---------- Zone défilante ----------
+                La photo est DEDANS, contrairement à avant : elle sort du champ
+                dès qu'on commence à composer, au lieu de confisquer la moitié
+                de l'écran pendant toute la configuration. */}
+            <div
+              onScroll={handleScroll}
+              className="flex-1 overflow-y-auto overscroll-contain"
+            >
+              {/* 176px sur mobile au lieu de 400px. Assez pour reconnaître le
+                  produit et donner envie, pas assez pour repousser les options
+                  hors de vue. */}
+              <div className="relative h-44 w-full overflow-hidden bg-primary/10 sm:h-56">
+                {item.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.imageUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <span className="icon-[mdi--food] text-5xl text-primary/30" />
+                  </div>
+                )}
+
+                {/* Fondu vers le fond de la fiche : le titre placé juste
+                    dessous se pose sur la photo sans coupure nette. */}
+                <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-black/25" />
+              </div>
+
+              {/* Titre et description SOUS la photo, en texte normal — plus en
+                  surimpression. Une description de tacos sur trois lignes
+                  masquait la garniture, et le texte blanc sur photo claire
+                  était par endroits illisible. */}
+              <div className="relative -mt-5 flex flex-col gap-1 px-4">
                 <h2
                   id="product-sheet-title"
-                  className="font-heading text-2xl font-bold leading-tight text-white"
+                  className="font-heading text-2xl font-bold leading-tight text-foreground"
                 >
                   {item.name}
                 </h2>
                 {item.description && (
-                  <p className="text-sm leading-snug text-white/80">
+                  <p className="text-sm leading-relaxed text-foreground/65">
                     {item.description}
                   </p>
                 )}
               </div>
-            </div>
 
-            {/* ---------- Options ---------- */}
-            <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-5">
-              {eligibleFormulas.length > 0 && (
-                <Field title="Formule">
-                  <div className="flex flex-wrap gap-2">
-                    <Choice
-                      isSelected={formulaId === null}
-                      onClick={() => selectFormula(null)}
-                    >
-                      Seul
-                      <span className="tabular-nums text-xs font-normal opacity-70">
-                        {formatDA(variant.price)}
-                      </span>
-                    </Choice>
-
-                    {eligibleFormulas.map((formula) => (
-                      <Choice
-                        key={formula.id}
-                        tone="mustard"
-                        isSelected={formulaId === formula.id}
-                        onClick={() => selectFormula(formula.id)}
-                      >
-                        {formula.name}
-                        <span className="tabular-nums text-xs font-normal opacity-70">
-                          {formula.pricingMode === "fixed"
-                            ? formatDA(formula.price)
-                            : `+${formatDA(formula.price)}`}
-                        </span>
-                      </Choice>
-                    ))}
-                  </div>
-
-                  {selectedFormula &&
-                    selectedFormula.includedNames.length > 0 && (
-                      <p className="flex items-center gap-1.5 text-xs font-semibold text-accent-green">
-                        <span className="icon-[mdi--check-circle] text-sm" />
-                        Inclus : {selectedFormula.includedNames.join(", ")}
-                      </p>
-                    )}
-                </Field>
-              )}
-
-              {/* Choix imposés par la formule (boisson...) — les options
-                  viennent du menu réel, pas d'une liste figée. */}
-              {(selectedFormula?.choices ?? []).map((choice) => {
-                const options =
-                  optionsByCategory[choice.fromCategoryName] ?? [];
-
-                return (
-                  <Field
-                    key={choice.label}
-                    title={choice.label}
-                    hint={{ label: "à choisir", required: true }}
-                  >
-                    {options.length === 0 ? (
-                      <p className="rounded-xl bg-accent-bordeaux/10 px-3 py-2 text-xs text-accent-bordeaux">
-                        Aucune option disponible pour le moment. Choisissez une
-                        autre formule.
-                      </p>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {options.map((option) => (
-                          <Choice
-                            key={option}
-                            tone="green"
-                            isSelected={formulaChoices[choice.label] === option}
-                            onClick={() =>
-                              setFormulaChoices((prev) => ({
-                                ...prev,
-                                [choice.label]: option,
-                              }))
-                            }
-                          >
-                            {option}
-                          </Choice>
-                        ))}
-                      </div>
-                    )}
-                  </Field>
-                );
-              })}
-
-              {/* Variantes — masquées quand la formule impose un format unique */}
-              {!isFixed && item.variants.length > 1 && (
-                <Field title="Taille">
-                  <div className="flex flex-wrap gap-2">
-                    {item.variants.map((current, index) => (
-                      <Choice
-                        key={index}
-                        isSelected={variantIndex === index}
-                        onClick={() => setVariantIndex(index)}
-                      >
-                        {formatVariantLabel(current.combination)}
-                        <span className="tabular-nums text-xs font-normal opacity-70">
-                          {formatDA(current.price)}
-                        </span>
-                      </Choice>
-                    ))}
-                  </div>
-                </Field>
-              )}
-
-              {isFixed && item.variants.length > 1 && (
-                <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs text-foreground/60">
-                  Format unique en {selectedFormula!.name} — pas de taille à
-                  choisir.
-                </p>
-              )}
-
-              {/* Un bloc par groupe déclaré sur le produit : « Gratinage » sur
-                  un tacos, « Suppléments » sur une pizza, chacun avec sa
-                  propre règle de choix. */}
-              {extraGroups.map((group, groupIndex) => (
-                <Field
-                  key={group.label}
-                  title={group.label}
-                  hint={
-                    group.singleChoice
-                      ? { label: "un seul choix" }
-                      : { label: "facultatif" }
-                  }
-                >
-                  <div className="flex flex-wrap gap-2">
-                    {group.options.map((option) => {
-                      const isSelected = selectedExtraIds.includes(
-                        option.extra._id,
-                      );
-                      const price = resolveOptionPrice(option, effectiveSize);
-
-                      return (
-                        <Choice
-                          key={option.extra._id}
-                          tone="green"
-                          isSelected={isSelected}
-                          onClick={() =>
-                            toggleExtra(groupIndex, option.extra._id)
-                          }
-                        >
-                          <span
-                            className={`${
-                              isSelected
-                                ? "icon-[mdi--check-circle]"
-                                : "icon-[mdi--plus-circle-outline]"
-                            } text-base`}
-                          />
-                          {option.extra.name}
-                          {price > 0 && (
-                            <span className="tabular-nums text-xs font-normal opacity-70">
-                              +{formatDA(price)}
-                            </span>
-                          )}
-                        </Choice>
-                      );
-                    })}
-                  </div>
-                </Field>
-              ))}
-
-              {item.removableIngredients &&
-                item.removableIngredients.length > 0 && (
-                  <Field title="Retirer" hint={{ label: "facultatif" }}>
+              <div className="flex flex-col gap-5 px-4 pb-5 pt-4">
+                {eligibleFormulas.length > 0 && (
+                  <Field title="Formule">
                     <div className="flex flex-wrap gap-2">
-                      {item.removableIngredients.map((ingredient) => {
-                        const isExcluded = excluded.includes(ingredient);
+                      <Choice
+                        isSelected={formulaId === null}
+                        onClick={() => selectFormula(null)}
+                      >
+                        Seul
+                        <span className="tabular-nums text-xs font-normal opacity-70">
+                          {formatDA(variant.price)}
+                        </span>
+                      </Choice>
 
-                        return (
-                          <button
-                            key={ingredient}
-                            type="button"
-                            onClick={() => toggleExcluded(ingredient)}
-                            aria-pressed={isExcluded}
-                            className={`flex min-h-11 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${
-                              isExcluded
-                                ? "border-accent-bordeaux bg-accent-bordeaux/10 text-accent-bordeaux line-through"
-                                : "border-border-subtle text-foreground/70 hover:border-primary/50"
-                            }`}
-                          >
-                            <span
-                              className={`${
-                                isExcluded
-                                  ? "icon-[mdi--close-circle]"
-                                  : "icon-[mdi--minus-circle-outline]"
-                              } text-base`}
-                            />
-                            {ingredient}
-                          </button>
-                        );
-                      })}
+                      {eligibleFormulas.map((formula) => (
+                        <Choice
+                          key={formula.id}
+                          tone="mustard"
+                          isSelected={formulaId === formula.id}
+                          onClick={() => selectFormula(formula.id)}
+                        >
+                          {formula.name}
+                          <span className="tabular-nums text-xs font-normal opacity-70">
+                            {formula.pricingMode === "fixed"
+                              ? formatDA(formula.price)
+                              : `+${formatDA(formula.price)}`}
+                          </span>
+                        </Choice>
+                      ))}
+                    </div>
+
+                    {selectedFormula &&
+                      selectedFormula.includedNames.length > 0 && (
+                        <p className="flex items-center gap-1.5 text-xs font-semibold text-accent-green">
+                          <span className="icon-[mdi--check-circle] text-sm" />
+                          Inclus : {selectedFormula.includedNames.join(", ")}
+                        </p>
+                      )}
+                  </Field>
+                )}
+
+                {/* Choix imposés par la formule (boisson...) — les options
+                    viennent du menu réel, pas d'une liste figée. */}
+                {(selectedFormula?.choices ?? []).map((choice) => {
+                  const options =
+                    optionsByCategory[choice.fromCategoryName] ?? [];
+
+                  return (
+                    <Field
+                      key={choice.label}
+                      title={choice.label}
+                      hint={{ label: "à choisir", required: true }}
+                    >
+                      {options.length === 0 ? (
+                        <p className="rounded-xl bg-accent-bordeaux/10 px-3 py-2 text-xs text-accent-bordeaux">
+                          Aucune option disponible pour le moment. Choisissez
+                          une autre formule.
+                        </p>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {options.map((option) => (
+                            <Choice
+                              key={option}
+                              tone="green"
+                              isSelected={
+                                formulaChoices[choice.label] === option
+                              }
+                              onClick={() =>
+                                setFormulaChoices((prev) => ({
+                                  ...prev,
+                                  [choice.label]: option,
+                                }))
+                              }
+                            >
+                              {option}
+                            </Choice>
+                          ))}
+                        </div>
+                      )}
+                    </Field>
+                  );
+                })}
+
+                {/* Variantes — masquées quand la formule impose un format unique */}
+                {!isFixed && item.variants.length > 1 && (
+                  <Field title="Taille">
+                    <div className="flex flex-wrap gap-2">
+                      {item.variants.map((current, index) => (
+                        <Choice
+                          key={index}
+                          isSelected={variantIndex === index}
+                          onClick={() => setVariantIndex(index)}
+                        >
+                          {formatVariantLabel(current.combination)}
+                          <span className="tabular-nums text-xs font-normal opacity-70">
+                            {formatDA(current.price)}
+                          </span>
+                        </Choice>
+                      ))}
                     </div>
                   </Field>
                 )}
 
-              {isEditing && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    removeLine(initialLine!.key);
-                    close();
-                  }}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-accent-bordeaux/30 py-3 text-sm font-bold text-accent-bordeaux transition-colors hover:bg-accent-bordeaux/10"
-                >
-                  <span className="icon-[mdi--trash-can-outline] text-base" />
-                  Retirer du panier
-                </button>
-              )}
+                {isFixed && item.variants.length > 1 && (
+                  <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs text-foreground/60">
+                    Format unique en {selectedFormula!.name} — pas de taille à
+                    choisir.
+                  </p>
+                )}
+
+                {/* Un bloc par groupe déclaré sur le produit : « Gratinage » sur
+                    un tacos, « Suppléments » sur une pizza, chacun avec sa
+                    propre règle de choix. */}
+                {extraGroups.map((group, groupIndex) => (
+                  <Field
+                    key={group.label}
+                    title={group.label}
+                    hint={
+                      group.singleChoice
+                        ? { label: "un seul choix" }
+                        : { label: "facultatif" }
+                    }
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      {group.options.map((option) => {
+                        const isSelected = selectedExtraIds.includes(
+                          option.extra._id,
+                        );
+                        const price = resolveOptionPrice(option, effectiveSize);
+
+                        return (
+                          <Choice
+                            key={option.extra._id}
+                            tone="green"
+                            isSelected={isSelected}
+                            onClick={() =>
+                              toggleExtra(groupIndex, option.extra._id)
+                            }
+                          >
+                            <span
+                              className={`${
+                                isSelected
+                                  ? "icon-[mdi--check-circle]"
+                                  : "icon-[mdi--plus-circle-outline]"
+                              } text-base`}
+                            />
+                            {option.extra.name}
+                            {price > 0 && (
+                              <span className="tabular-nums text-xs font-normal opacity-70">
+                                +{formatDA(price)}
+                              </span>
+                            )}
+                          </Choice>
+                        );
+                      })}
+                    </div>
+                  </Field>
+                ))}
+
+                {item.removableIngredients &&
+                  item.removableIngredients.length > 0 && (
+                    <Field title="Retirer" hint={{ label: "facultatif" }}>
+                      <div className="flex flex-wrap gap-2">
+                        {item.removableIngredients.map((ingredient) => {
+                          const isExcluded = excluded.includes(ingredient);
+
+                          return (
+                            <button
+                              key={ingredient}
+                              type="button"
+                              onClick={() => toggleExcluded(ingredient)}
+                              aria-pressed={isExcluded}
+                              className={`flex min-h-11 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${
+                                isExcluded
+                                  ? "border-accent-bordeaux bg-accent-bordeaux/10 text-accent-bordeaux line-through"
+                                  : "border-border-subtle text-foreground/70 hover:border-primary/50"
+                              }`}
+                            >
+                              <span
+                                className={`${
+                                  isExcluded
+                                    ? "icon-[mdi--close-circle]"
+                                    : "icon-[mdi--minus-circle-outline]"
+                                } text-base`}
+                              />
+                              {ingredient}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </Field>
+                  )}
+
+                {isEditing && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      removeLine(initialLine!.key);
+                      close();
+                    }}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-accent-bordeaux/30 py-3 text-sm font-bold text-accent-bordeaux transition-colors hover:bg-accent-bordeaux/10"
+                  >
+                    <span className="icon-[mdi--trash-can-outline] text-base" />
+                    Retirer du panier
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* ---------- Pied fixe : quantité + ajout ---------- */}
