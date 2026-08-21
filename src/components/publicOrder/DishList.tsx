@@ -24,6 +24,12 @@ function getCategoryId(item: MenuItem): string {
   return typeof item.category === "object" ? item.category._id : item.category;
 }
 
+function getBasePrice(item: MenuItem): number {
+  return item.variants.length
+    ? Math.min(...item.variants.map((variant) => variant.price))
+    : Number.POSITIVE_INFINITY;
+}
+
 /**
  * Grille des plats, et hôte de la fiche produit.
  *
@@ -99,17 +105,49 @@ export function DishList({ items, nav }: DishListProps) {
       ? items.filter((item) => activeIds.includes(getCategoryId(item)))
       : items;
 
-    if (!search.trim()) return byCategory;
+    const searchedItems = !search.trim()
+      ? byCategory
+      : (() => {
+          // La recherche couvre la description : on retrouve souvent un plat
+          // par un ingrédient dont on a oublié le nom.
+          const query = search.toLowerCase();
+          return byCategory.filter(
+            (item) =>
+              item.name.toLowerCase().includes(query) ||
+              item.description?.toLowerCase().includes(query),
+          );
+        })();
 
-    // La recherche couvre la description : on retrouve souvent un plat par un
-    // ingrédient dont on a oublié le nom.
-    const query = search.toLowerCase();
-    return byCategory.filter(
-      (item) =>
-        item.name.toLowerCase().includes(query) ||
-        item.description?.toLowerCase().includes(query),
+    const sections =
+      nav.find((group) => group.label === groupLabel)?.sections ?? [];
+    const sectionRankByItemId = new Map(
+      sections.flatMap((section, index) =>
+        section.itemIds.map((itemId) => [itemId, index] as const),
+      ),
     );
+
+    return [...searchedItems].sort((a, b) => {
+      const sectionA =
+        sectionRankByItemId.get(a._id) ?? Number.POSITIVE_INFINITY;
+      const sectionB =
+        sectionRankByItemId.get(b._id) ?? Number.POSITIVE_INFINITY;
+      return (
+        sectionA - sectionB ||
+        getBasePrice(a) - getBasePrice(b) ||
+        a.name.localeCompare(b.name, "fr")
+      );
+    });
   }, [items, nav, groupLabel, subCategoryId, search]);
+
+  const sectionsByItemId = useMemo(() => {
+    const sections =
+      nav.find((group) => group.label === groupLabel)?.sections ?? [];
+    return new Map(
+      sections.flatMap((section) =>
+        section.itemIds.map((itemId) => [itemId, section.label] as const),
+      ),
+    );
+  }, [nav, groupLabel]);
 
   const configuredItem = sheet
     ? (items.find((item) => item._id === sheet.menuItemId) ?? null)
@@ -190,14 +228,30 @@ export function DishList({ items, nav }: DishListProps) {
         // tacos s'y étale sur quatre lignes à côté d'une photo minuscule.
         // Une carte horizontale a besoin de largeur, pas de densité.
         <div className="grid gap-3 xl:grid-cols-2">
-          {filteredItems.map((item) => (
-            <DishCard
-              key={item._id}
-              item={item}
-              inCart={quantityByItem[item._id] ?? 0}
-              onSelect={handleSelect}
-            />
-          ))}
+          {filteredItems.map((item, index) => {
+            const sectionLabel = sectionsByItemId.get(item._id);
+            const previousSectionLabel =
+              index > 0
+                ? sectionsByItemId.get(filteredItems[index - 1]._id)
+                : null;
+            const showSection =
+              sectionLabel && sectionLabel !== previousSectionLabel;
+
+            return (
+              <div key={item._id} className="contents">
+                {showSection && (
+                  <h2 className="col-span-full mt-3 border-b border-primary/20 pb-2 font-heading text-lg font-bold text-foreground first:mt-0">
+                    {sectionLabel}
+                  </h2>
+                )}
+                <DishCard
+                  item={item}
+                  inCart={quantityByItem[item._id] ?? 0}
+                  onSelect={handleSelect}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
 

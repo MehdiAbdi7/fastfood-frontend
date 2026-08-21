@@ -115,7 +115,7 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
         Catégories
       </p>
 
-      <div className="scrollbar-hide flex gap-2 overflow-x-auto lg:flex-col lg:gap-1.5 lg:overflow-x-visible">
+      <div className="order-1 scrollbar-hide flex gap-2 overflow-x-auto lg:order-2 lg:flex-col lg:gap-1.5 lg:overflow-x-visible">
         <GroupTab
           label="Tout le menu"
           count={totalCount}
@@ -135,25 +135,30 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
 
       {/* Second niveau, seulement si le groupe fusionne plusieurs catégories */}
       {activeGroup && activeGroup.subs.length > 1 && (
-        <div className="scrollbar-hide flex items-center gap-1 overflow-x-auto rounded-2xl bg-primary/5 px-2 py-1 lg:ml-2 lg:flex-col lg:items-stretch lg:gap-0.5 lg:overflow-x-visible lg:rounded-xl lg:px-1.5 lg:py-1.5">
-          {/* La flèche indique l'imbrication en ligne ; en colonne, le retrait
+        <div className="order-2 flex flex-col gap-1 rounded-2xl bg-primary/5 px-2 py-2 lg:order-1 lg:ml-2 lg:rounded-xl lg:px-1.5 lg:py-1.5">
+          <span className="px-3 pb-0.5 text-[10px] font-bold uppercase tracking-wide text-foreground/40">
+            Sous-catégories
+          </span>
+          <div className="scrollbar-hide flex items-center gap-1 overflow-x-auto lg:flex-col lg:items-stretch lg:gap-0.5 lg:overflow-x-visible">
+            {/* La flèche indique l'imbrication en ligne ; en colonne, le retrait
               et la barre latérale des SubTab la disent déjà. */}
-          <span className="icon-[mdi--subdirectory-arrow-right] shrink-0 text-base text-foreground/30 lg:hidden" />
-          <SubTab
-            label="Tout"
-            count={activeGroup.count}
-            isSelected={subCategoryId === null}
-            onClick={() => dispatch(subCategorySelected(null))}
-          />
-          {activeGroup.subs.map((sub) => (
+            <span className="icon-[mdi--subdirectory-arrow-right] shrink-0 text-base text-foreground/30 lg:hidden" />
             <SubTab
-              key={sub.categoryId}
-              label={sub.label}
-              count={sub.count}
-              isSelected={subCategoryId === sub.categoryId}
-              onClick={() => dispatch(subCategorySelected(sub.categoryId))}
+              label="Tout"
+              count={activeGroup.count}
+              isSelected={subCategoryId === null}
+              onClick={() => dispatch(subCategorySelected(null))}
             />
-          ))}
+            {activeGroup.subs.map((sub) => (
+              <SubTab
+                key={sub.categoryId}
+                label={sub.label}
+                count={sub.count}
+                isSelected={subCategoryId === sub.categoryId}
+                onClick={() => dispatch(subCategorySelected(sub.categoryId))}
+              />
+            ))}
+          </div>
         </div>
       )}
     </aside>

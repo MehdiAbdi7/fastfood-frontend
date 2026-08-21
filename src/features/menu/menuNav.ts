@@ -7,11 +7,18 @@ export interface MenuNavSub {
   count: number;
 }
 
+export interface MenuNavSection {
+  label: string;
+  itemIds: string[];
+  count: number;
+}
+
 export interface MenuNavGroup {
   label: string;
   categoryIds: string[];
   count: number;
   subs: MenuNavSub[]; // vide si le groupe ne fusionne qu'une catégorie
+  sections: MenuNavSection[];
 }
 
 function getCategoryId(item: MenuItem): string {
@@ -68,6 +75,21 @@ export function buildMenuNav(
               count: counts[category._id] ?? 0,
             }))
           : [],
+      sections: (config.sections ?? [])
+        .map((section) => {
+          const sectionItems = items.filter(
+            (item) =>
+              matching.some(
+                (category) => category._id === getCategoryId(item),
+              ) && section.test(item),
+          );
+          return {
+            label: section.label,
+            itemIds: sectionItems.map((item) => item._id),
+            count: sectionItems.length,
+          };
+        })
+        .filter((section) => section.count > 0),
     });
   }
 
@@ -79,6 +101,7 @@ export function buildMenuNav(
       categoryIds: [category._id],
       count: counts[category._id] ?? 0,
       subs: [],
+      sections: [],
     });
   }
 

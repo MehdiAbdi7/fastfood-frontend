@@ -45,12 +45,12 @@ export const CATEGORY_GROUPS: CategoryGroupConfig[] = [
     categoryNames: ["Pizzas"],
     sections: [
       {
-        label: "Sauce Blanche",
+        label: "Sauce blanche",
         test: (item) => descriptionIncludes(item, "blanche"),
       },
       {
-        label: "Sauce Tomate",
-        test: (item) => descriptionIncludes(item, "tomate"),
+        label: "Sauce rouge",
+        test: (item) => !descriptionIncludes(item, "blanche"),
       },
     ],
   },
