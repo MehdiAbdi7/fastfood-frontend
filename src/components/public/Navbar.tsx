@@ -2,20 +2,33 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { useNavbar } from "@/features/navbar/useNavbar";
 import { ThemeToggle } from "./themeToggle";
 import { CartButton } from "./CartButton";
 
+// « À propos » et « Contact » pointent désormais vers de vraies pages et non
+// plus vers des ancres de l'accueil. Les sections restent en place sur la page
+// d'accueil — elles y servent de teaser — mais un client qui clique dans la
+// barre attend une page, pas un saut de 2000 pixels.
 const NAV_LINKS = [
-  { href: "/#accueil", label: "Accueil" },
+  { href: "/", label: "Accueil" },
   { href: "/commande", label: "Menu" },
-  { href: "/#a-propos", label: "À propos" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/a-propos", label: "À propos" },
+  { href: "/contact", label: "Contact" },
 ];
+
+// L'accueil doit être une correspondance EXACTE : startsWith("/") serait vrai
+// pour toutes les routes du site, et les quatre liens s'allumeraient ensemble.
+function isActiveLink(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 const Navbar = () => {
   const { isScrolled, isMenuOpen, toggleMenu, closeMenu } = useNavbar();
+  const pathname = usePathname();
 
   return (
     <header
@@ -35,8 +48,7 @@ const Navbar = () => {
         >
           {/* Hauteur fixée en CSS, largeur en auto : le rapport d'aspect réel
               du fichier est respecté, et Next n'a plus de divergence à
-              signaler entre les dimensions déclarées et le rendu. Même
-              traitement que dans le Footer. */}
+              signaler entre les dimensions déclarées et le rendu. */}
           <Image
             src="/logo-niwa.png"
             alt="Niwa Food"
@@ -53,16 +65,34 @@ const Navbar = () => {
 
         {/* Liens desktop */}
         <div className="hidden items-center gap-8 font-heading text-sm font-bold shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 md:flex md:bg-background md:rounded-4xl md:px-6 md:py-2">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              className="group relative text-foreground dark:text-foreground py-1 transition-colors duration-300 ease-out hover:text-accent-mustard"
-              href={link.href}
-            >
-              {link.label}
-              <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent-mustard transition-transform duration-500 ease-out group-hover:scale-x-100" />
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isActive = isActiveLink(pathname, link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                // aria-current plutôt qu'une simple couleur : la page courante
+                // doit être annoncée, pas seulement montrée.
+                aria-current={isActive ? "page" : undefined}
+                className={`group relative py-1 transition-colors duration-300 ease-out ${
+                  isActive
+                    ? "text-accent-mustard"
+                    : "text-foreground dark:text-foreground hover:text-accent-mustard"
+                }`}
+              >
+                {link.label}
+                {/* Le soulignement est déjà déployé sur la page courante, et
+                    se déploie au survol ailleurs : une seule mécanique pour
+                    deux états, donc rien de nouveau à comprendre. */}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 w-full origin-left bg-accent-mustard transition-transform duration-500 ease-out ${
+                    isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                  }`}
+                />
+              </Link>
+            );
+          })}
         </div>
 
         {/* gap resserré sur mobile : le panier vient s'intercaler ici, et à
@@ -177,27 +207,42 @@ const Navbar = () => {
 
           {/* Liens */}
           <div className="flex flex-1 flex-col gap-8 px-6 pt-6">
-            {NAV_LINKS.map((link, index) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={closeMenu}
-                // Hors du parcours clavier quand le panneau est refermé : il
-                // reste dans le DOM, translaté hors écran, donc ses liens
-                // seraient encore focalisables sans ce garde.
-                tabIndex={isMenuOpen ? undefined : -1}
-                style={{
-                  transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
-                }}
-                className={`rounded-2xl px-4 py-3 font-heading text-lg text-foreground font-semibold border-b border-primary transition-all duration-300 ease-out ${
-                  isMenuOpen
-                    ? "translate-x-0 opacity-100"
-                    : "translate-x-4 opacity-0"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link, index) => {
+              const isActive = isActiveLink(pathname, link.href);
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMenu}
+                  aria-current={isActive ? "page" : undefined}
+                  // Hors du parcours clavier quand le panneau est refermé : il
+                  // reste dans le DOM, translaté hors écran, donc ses liens
+                  // seraient encore focalisables sans ce garde.
+                  tabIndex={isMenuOpen ? undefined : -1}
+                  style={{
+                    transitionDelay: isMenuOpen ? `${index * 60}ms` : "0ms",
+                  }}
+                  className={`flex items-center justify-between rounded-2xl border-b px-4 py-3 font-heading text-lg font-semibold transition-all duration-300 ease-out ${
+                    isActive
+                      ? "border-accent-mustard bg-primary/10 text-accent-mustard"
+                      : "border-primary text-foreground"
+                  } ${
+                    isMenuOpen
+                      ? "translate-x-0 opacity-100"
+                      : "translate-x-4 opacity-0"
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="icon-[mdi--circle-medium] text-xl"
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
           {/* CTA en bas du panneau */}

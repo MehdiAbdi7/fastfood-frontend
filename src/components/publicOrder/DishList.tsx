@@ -6,12 +6,18 @@ import { ProductSheet } from "./ProductSheet";
 import { useCart } from "@/features/publicOrder/useCart";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
+  activeAnchorChanged,
   filtersReset,
-  selectGroupLabel,
   selectSearch,
-  selectSubCategoryId,
 } from "@/features/publicOrder/browseSlice";
 import { selectProductSheet } from "@/features/publicOrder/cartSlice";
+import {
+  buildMenuSections,
+  buildSpyAnchors,
+  sortMenuItems,
+  subAnchorId,
+} from "@/features/publicOrder/menuBlocks";
+import { useSectionSpy } from "@/features/publicOrder/useSectionSpy";
 import type { MenuNavGroup } from "@/features/menu/menuNav";
 import type { MenuItem } from "@/types/menuItem";
 
@@ -20,31 +26,72 @@ interface DishListProps {
   nav: MenuNavGroup[];
 }
 
-function getCategoryId(item: MenuItem): string {
-  return typeof item.category === "object" ? item.category._id : item.category;
-}
+// Décalage réservé sous la barre de navigation fixe et, sur mobile, sous le
+// bandeau de filtres collant. Sans lui, un titre visé par une ancre se range
+// DERRIÈRE ces deux barres et le client croit avoir atterri au mauvais endroit.
+// Sur lg, le bandeau devient une colonne latérale : seule la navbar compte.
+const ANCHOR_OFFSET = "scroll-mt-52 lg:scroll-mt-28";
 
-function getBasePrice(item: MenuItem): number {
-  return item.variants.length
-    ? Math.min(...item.variants.map((variant) => variant.price))
-    : Number.POSITIVE_INFINITY;
+function SectionTitle({
+  id,
+  label,
+  count,
+}: {
+  id: string;
+  label: string;
+  count: number;
+}) {
+  return (
+    <>
+      {/* L'ancre est un repère de hauteur nulle, POSÉ AVANT le titre et non
+          sur lui. Un élément sticky rapporte sa position collée, pas sa
+          position dans le flux : quand on est déjà dans la section, son titre
+          est figé à 80px du haut, scrollIntoView en déduit qu'on y est et ne
+          défile pas. Le repère, lui, reste où il est vraiment. */}
+      <span
+        id={id}
+        aria-hidden="true"
+        className={`block h-0 ${ANCHOR_OFFSET}`}
+      />
+
+      {/* Collant à partir de lg uniquement. Sur mobile, le bandeau de filtres
+          occupe déjà le haut de l'écran : empiler un second élément collant
+          mangerait un tiers de la hauteur utile d'un téléphone. */}
+      <div className="lg:sticky lg:top-20 lg:z-20">
+        <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-background/85 px-4 py-2.5 backdrop-blur-xl dark:bg-primary/15">
+          <h2 className="font-heading text-lg font-bold text-foreground">
+            {label}
+          </h2>
+          <span className="tabular-nums rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
+            {count}
+          </span>
+          {/* Filet doré qui s'éteint vers la droite : reprend la lumière des
+              cadres de la page d'accueil, sans en ajouter une de plus. */}
+          <span
+            aria-hidden="true"
+            className="h-px flex-1 bg-linear-to-r from-primary/50 to-transparent"
+          />
+        </div>
+      </div>
+    </>
+  );
 }
 
 /**
  * Grille des plats, et hôte de la fiche produit.
  *
+ * La carte s'affiche EN ENTIER, découpée en sections : plus de filtrage qui
+ * masque 30 plats sur 35. Choisir une catégorie fait défiler jusqu'à elle, et
+ * la colonne de gauche suit le scroll — le client sait toujours où il est, et
+ * tombe sur des produits qu'il n'aurait pas pensé à chercher.
+ *
  * La fiche vit ici et non dans un composant frère : c'est le seul endroit qui
  * détient déjà le menu complet. L'isoler ailleurs obligerait à sérialiser une
  * deuxième fois tout le catalogue dans le payload RSC.
- *
- * C'est aussi pour cette raison que la réconciliation du panier restauré est
- * portée ici : le layout, qui hydrate, ne connaît pas le menu.
  */
 export function DishList({ items, nav }: DishListProps) {
   const dispatch = useAppDispatch();
   const search = useAppSelector(selectSearch);
-  const groupLabel = useAppSelector(selectGroupLabel);
-  const subCategoryId = useAppSelector(selectSubCategoryId);
   const sheet = useAppSelector(selectProductSheet);
 
   const {
@@ -58,6 +105,9 @@ export function DishList({ items, nav }: DishListProps) {
     unavailableNotice,
     dismissNotice,
   } = useCart();
+
+  const query = search.trim().toLowerCase();
+  const isSearching = query.length > 0;
 
   // Chaîne primitive et non tableau : la référence d'un tableau change à
   // chaque rendu, ce qui relancerait l'effet en boucle.
@@ -96,58 +146,38 @@ export function DishList({ items, nav }: DishListProps) {
     return options;
   }, [items]);
 
-  const filteredItems = useMemo(() => {
-    const activeIds = subCategoryId
-      ? [subCategoryId]
-      : (nav.find((group) => group.label === groupLabel)?.categoryIds ?? null);
+  const sections = useMemo(() => buildMenuSections(nav, items), [nav, items]);
+  const anchors = useMemo(() => buildSpyAnchors(sections), [sections]);
 
-    const byCategory = activeIds
-      ? items.filter((item) => activeIds.includes(getCategoryId(item)))
-      : items;
-
-    const searchedItems = !search.trim()
-      ? byCategory
-      : (() => {
-          // La recherche couvre la description : on retrouve souvent un plat
-          // par un ingrédient dont on a oublié le nom.
-          const query = search.toLowerCase();
-          return byCategory.filter(
-            (item) =>
-              item.name.toLowerCase().includes(query) ||
-              item.description?.toLowerCase().includes(query),
-          );
-        })();
-
-    const sections =
-      nav.find((group) => group.label === groupLabel)?.sections ?? [];
-    const sectionRankByItemId = new Map(
-      sections.flatMap((section, index) =>
-        section.itemIds.map((itemId) => [itemId, index] as const),
+  // La recherche couvre la description : on retrouve souvent un plat par un
+  // ingrédient dont on a oublié le nom.
+  const results = useMemo(() => {
+    if (!isSearching) return [];
+    return sortMenuItems(
+      items.filter(
+        (item) =>
+          item.name.toLowerCase().includes(query) ||
+          item.description?.toLowerCase().includes(query),
       ),
     );
+  }, [items, query, isSearching]);
 
-    return [...searchedItems].sort((a, b) => {
-      const sectionA =
-        sectionRankByItemId.get(a._id) ?? Number.POSITIVE_INFINITY;
-      const sectionB =
-        sectionRankByItemId.get(b._id) ?? Number.POSITIVE_INFINITY;
-      return (
-        sectionA - sectionB ||
-        getBasePrice(a) - getBasePrice(b) ||
-        a.name.localeCompare(b.name, "fr")
-      );
-    });
-  }, [items, nav, groupLabel, subCategoryId, search]);
-
-  const sectionsByItemId = useMemo(() => {
-    const sections =
-      nav.find((group) => group.label === groupLabel)?.sections ?? [];
-    return new Map(
-      sections.flatMap((section) =>
-        section.itemIds.map((itemId) => [itemId, section.label] as const),
+  useSectionSpy(
+    anchors,
+    (anchor) =>
+      dispatch(
+        activeAnchorChanged({ group: anchor.group, subKey: anchor.subKey }),
       ),
-    );
-  }, [nav, groupLabel]);
+    !isSearching,
+  );
+
+  // Pendant une recherche, il n'y a plus de section à désigner : laisser une
+  // catégorie allumée ferait croire à un filtre encore actif.
+  useEffect(() => {
+    if (isSearching) {
+      dispatch(activeAnchorChanged({ group: null, subKey: null }));
+    }
+  }, [isSearching, dispatch]);
 
   const configuredItem = sheet
     ? (items.find((item) => item._id === sheet.menuItemId) ?? null)
@@ -176,13 +206,27 @@ export function DishList({ items, nav }: DishListProps) {
     openProduct(item._id);
   }
 
+  function renderCard(item: MenuItem) {
+    return (
+      <DishCard
+        key={item._id}
+        item={item}
+        inCart={quantityByItem[item._id] ?? 0}
+        onSelect={handleSelect}
+      />
+    );
+  }
+
   return (
     <>
       {/* Un article disparu en silence serait pire que pas de panier persisté
           du tout : le client doit savoir pourquoi son total a baissé. */}
       {unavailableNotice.length > 0 && (
-        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-accent-mustard/40 bg-accent-mustard/10 px-4 py-3">
-          <span className="icon-[mdi--information-outline] mt-0.5 shrink-0 text-lg text-accent-mustard" />
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-accent-mustard/40 bg-accent-mustard/10 px-4 py-3 backdrop-blur-sm">
+          <span
+            aria-hidden="true"
+            className="icon-[mdi--information-outline] mt-0.5 shrink-0 text-lg text-accent-mustard"
+          />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <p className="font-heading text-sm font-bold text-foreground">
               {unavailableNotice.length > 1
@@ -200,58 +244,81 @@ export function DishList({ items, nav }: DishListProps) {
             aria-label="Fermer"
             className="shrink-0 text-foreground/40 transition-colors hover:text-foreground"
           >
-            <span className="icon-[mdi--close] text-lg" />
+            <span aria-hidden="true" className="icon-[mdi--close] text-lg" />
           </button>
         </div>
       )}
 
-      {filteredItems.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-20 text-center">
-          <span className="icon-[mdi--silverware-clean] text-4xl text-foreground/25" />
-          <p className="font-heading text-lg font-bold text-foreground">
-            Rien ne correspond
-          </p>
-          <p className="max-w-xs text-sm text-foreground/60">
-            Essayez une autre catégorie, ou effacez la recherche.
-          </p>
-          <button
-            type="button"
-            onClick={() => dispatch(filtersReset())}
-            className="mt-2 rounded-full border border-primary px-5 py-2.5 text-sm font-bold text-primary transition-colors hover:bg-primary/10"
-          >
-            Revoir tout le menu
-          </button>
-        </div>
+      {isSearching ? (
+        results.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-20 text-center">
+            <span
+              aria-hidden="true"
+              className="icon-[mdi--silverware-clean] text-4xl text-foreground/25"
+            />
+            <p className="font-heading text-lg font-bold text-foreground">
+              Rien ne correspond
+            </p>
+            <p className="max-w-xs text-sm text-foreground/60">
+              Essayez un autre ingrédient, ou effacez la recherche pour
+              parcourir toute la carte.
+            </p>
+            <button
+              type="button"
+              onClick={() => dispatch(filtersReset())}
+              className="mt-2 rounded-full border border-primary px-5 py-2.5 text-sm font-bold text-primary transition-colors hover:bg-primary/10"
+            >
+              Revoir tout le menu
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-foreground/60">
+              <span className="tabular-nums font-bold text-foreground">
+                {results.length}
+              </span>{" "}
+              plat{results.length > 1 ? "s" : ""} pour «&nbsp;{search.trim()}
+              &nbsp;»
+            </p>
+            {/* Deux colonnes maximum, et seulement à partir de xl. En trois
+                colonnes, la colonne de texte tombe à ~230 px : une description
+                de tacos s'y étale sur quatre lignes à côté d'une photo
+                minuscule. Une carte horizontale a besoin de largeur, pas de
+                densité. */}
+            <div className="grid gap-3 xl:grid-cols-2">
+              {results.map(renderCard)}
+            </div>
+          </div>
+        )
       ) : (
-        // Deux colonnes maximum, et seulement à partir de xl. En trois
-        // colonnes, la colonne de texte tombe à ~230 px : une description de
-        // tacos s'y étale sur quatre lignes à côté d'une photo minuscule.
-        // Une carte horizontale a besoin de largeur, pas de densité.
-        <div className="grid gap-3 xl:grid-cols-2">
-          {filteredItems.map((item, index) => {
-            const sectionLabel = sectionsByItemId.get(item._id);
-            const previousSectionLabel =
-              index > 0
-                ? sectionsByItemId.get(filteredItems[index - 1]._id)
-                : null;
-            const showSection =
-              sectionLabel && sectionLabel !== previousSectionLabel;
+        <div className="flex flex-col gap-8">
+          {sections.map((section) => (
+            <section key={section.id} aria-label={section.label}>
+              <SectionTitle
+                id={section.id}
+                label={section.label}
+                count={section.count}
+              />
 
-            return (
-              <div key={item._id} className="contents">
-                {showSection && (
-                  <h2 className="col-span-full mt-3 border-b border-primary/20 pb-2 font-heading text-lg font-bold text-foreground first:mt-0">
-                    {sectionLabel}
-                  </h2>
-                )}
-                <DishCard
-                  item={item}
-                  inCart={quantityByItem[item._id] ?? 0}
-                  onSelect={handleSelect}
-                />
+              <div className="mt-4 flex flex-col gap-5">
+                {section.blocks.map((block) => (
+                  <div key={block.key}>
+                    {block.label && (
+                      <p
+                        id={subAnchorId(block.key)}
+                        className={`${ANCHOR_OFFSET} mb-2.5 pl-1 font-heading text-xs font-bold uppercase tracking-wider text-accent-mustard lg:scroll-mt-40`}
+                      >
+                        {block.label}
+                      </p>
+                    )}
+                    <div className="grid gap-3 xl:grid-cols-2">
+                      {block.items.map(renderCard)}
+                    </div>
+                  </div>
+                ))}
               </div>
-            );
-          })}
+            </section>
+          ))}
         </div>
       )}
 

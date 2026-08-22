@@ -1,40 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SOCIALS, STORE_LOCATIONS } from "@/config/locations";
 
+// Mêmes destinations que la barre du haut : deux listes qui divergent, c'est
+// un visiteur qui atterrit ailleurs selon l'endroit où il a cliqué.
 const NAV_LINKS = [
-  { href: "/#accueil", label: "Accueil" },
-  { href: "/#menu", label: "Menu" },
-  { href: "/#a-propos", label: "À propos" },
-  { href: "/#contact", label: "Contact" },
-];
-
-const LOCATIONS = [
-  { name: "Kouba", phone: "0552 52 00 76" },
-  { name: "Chéraga", phone: "0549 18 97 27" },
-];
-
-const SOCIALS = [
-  {
-    href: "https://www.facebook.com/niwafood",
-    label: "Niwa Food sur Facebook",
-    icon: "icon-[mdi--facebook]",
-    bg: "bg-blue-700/30",
-    fg: "bg-blue-700",
-  },
-  {
-    href: "https://www.instagram.com/niwafood/",
-    label: "Niwa Food sur Instagram",
-    icon: "icon-[line-md--instagram]",
-    bg: "bg-rose-500/20",
-    fg: "bg-rose-600",
-  },
-  {
-    href: "https://www.tiktok.com/@niwafood",
-    label: "Niwa Food sur Tiktok",
-    icon: "icon-[line-md--tiktok]",
-    bg: "bg-black/80",
-    fg: "bg-white",
-  },
+  { href: "/", label: "Accueil" },
+  { href: "/commande", label: "Menu" },
+  { href: "/a-propos", label: "À propos" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const Footer = () => {
@@ -76,7 +50,10 @@ const Footer = () => {
                 aria-label={social.label}
                 className={`flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-300 hover:scale-110 ${social.bg}`}
               >
-                <span className={`${social.icon} ${social.fg} text-xl`} />
+                <span
+                  aria-hidden="true"
+                  className={`${social.icon} ${social.fg} text-xl`}
+                />
               </Link>
             ))}
           </div>
@@ -108,18 +85,21 @@ const Footer = () => {
           </span>
 
           <div className="flex flex-col gap-4">
-            {LOCATIONS.map((location) => (
+            {STORE_LOCATIONS.map((location) => (
               <div
-                key={location.name}
+                key={location.slug}
                 className="flex flex-col items-center gap-1 md:items-start"
               >
                 <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-                  <span className="icon-[mdi--map-marker] text-accent-green" />
+                  <span
+                    aria-hidden="true"
+                    className="icon-[mdi--map-marker] text-accent-green"
+                  />
                   {location.name}
                 </span>
 
                 <a
-                  href={`tel:${location.phone.replace(/\s/g, "")}`}
+                  href={location.phoneHref}
                   className="text-sm text-foreground/70 transition-colors hover:text-accent-green"
                 >
                   {location.phone}
@@ -144,7 +124,10 @@ const Footer = () => {
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-bold text-background dark:text-foreground transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
           >
             Commander
-            <span className="icon-[line-md--arrow-right-circle-twotone] text-lg" />
+            <span
+              aria-hidden="true"
+              className="icon-[line-md--arrow-right-circle-twotone] text-lg"
+            />
           </Link>
         </div>
       </div>
