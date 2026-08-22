@@ -336,22 +336,44 @@ export function ProductSheet({
                   produits détourés, presque carrés. "cover" remplissait la
                   boîte en rognant le pain du haut et la salade du bas — donc
                   en montrant un burger tronqué quelle que soit la hauteur
-                  qu'on lui donnait. "contain" fait entrer la photo entière ;
-                  le vide latéral se confond avec le fond crème de la fiche.
+                  qu'on lui donnait. "contain" fait entrer la photo entière.
                   Corollaire : avec "contain", c'est la HAUTEUR seule qui fixe
                   la taille du produit — élargir le cadre n'y change rien.
                   sm:h-80 plutôt que h-96 : les 64px rendus permettent à la
-                  section « Retirer » de tenir au-dessus du pied de page. */}
-              <div className="relative h-72 w-full overflow-hidden bg-primary/5 sm:h-80">
+                  section « Retirer » de tenir au-dessus du pied de page.
+                  Le dégradé descend vers la couleur de la fiche : la jonction
+                  photo/titre disparaît au lieu de marquer une frontière. */}
+              <div className="relative h-90 w-full overflow-hidden bg-linear-to-b from-surface-2 to-background ">
+                {/* Halo de studio. Un aplat uniforme derrière un détourage
+                    donne un sticker collé sur un mur ; un dégradé radial
+                    centré un peu haut simule la source lumineuse qui a servi
+                    à la prise de vue. */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-radial-[at_50%_38%] from-primary/12 via-primary/4 to-transparent"
+                />
+
                 {item.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={item.imageUrl}
-                    alt=""
-                    className="h-full w-full object-contain motion-safe:animate-[dishIn_0.45s_cubic-bezier(0.16,1,0.3,1)_both]"
-                  />
+                  <>
+                    {/* Ombre de contact : l'ellipse floue est ce qui pose
+                        l'objet sur une surface au lieu de le laisser en
+                        apesanteur. C'est le détail qui sépare une photo de
+                        catalogue d'un PNG posé là. */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-x-0 bottom-6 mx-auto h-4 w-2/5 rounded-[50%] bg-black/20 blur-md"
+                    />
+                    {/* relative obligatoire : sans lui, l'image non
+                        positionnée passe SOUS le halo et l'ombre. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.imageUrl}
+                      alt=""
+                      className="relative h-full w-full object-contain motion-safe:animate-[dishIn_0.45s_cubic-bezier(0.16,1,0.3,1)_both]"
+                    />
+                  </>
                 ) : (
-                  <div className="flex h-full items-center justify-center">
+                  <div className="relative flex h-full items-center justify-center">
                     <span className="icon-[mdi--food] text-5xl text-primary/30" />
                   </div>
                 )}

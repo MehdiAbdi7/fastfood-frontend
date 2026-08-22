@@ -115,7 +115,7 @@ export function Sheet({
           isCentered
             ? "max-h-[88dvh] rounded-3xl sm:max-h-[90dvh]"
             : "max-h-[94dvh] rounded-t-3xl sm:max-h-[92dvh] sm:rounded-3xl"
-        } ${width === "sm" ? "sm:max-w-md" : "sm:max-w-2xl"} ${motionClasses}`}
+        } ${width === "sm" ? "sm:max-w-md" : "sm:max-w-xl"} ${motionClasses}`}
       >
         {children(close)}
       </div>
