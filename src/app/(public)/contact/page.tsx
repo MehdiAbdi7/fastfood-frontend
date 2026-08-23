@@ -133,7 +133,7 @@ export default function ContactPage() {
             serveur pour recevoir un message, et un champ qui n'envoie nulle
             part est pire qu'une absence de champ. Les vraies voies de contact
             d'un fast-food sont le téléphone et les messages privés. */}
-        <section className="mt-16 flex flex-col items-center gap-4 rounded-[2rem] border border-primary bg-background/70 px-6 py-10 text-center shadow-[0_0_30px_-8px_rgba(217,169,77,0.7)] backdrop-blur-md dark:bg-primary/15">
+        <section className="mt-16 flex flex-col items-center gap-4 rounded-4xl border border-primary bg-background/70 px-6 py-10 text-center shadow-[0_0_30px_-8px_rgba(217,169,77,0.7)] backdrop-blur-md dark:bg-primary/15">
           <h2 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
             Une question, une remarque ?
           </h2>
@@ -150,7 +150,7 @@ export default function ContactPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className={`flex h-12 items-center gap-2 rounded-full px-5 font-heading text-sm font-bold text-foreground transition-transform duration-300 motion-safe:hover:scale-105 ${social.bg}`}
+                className={`flex h-12 items-center gap-2 rounded-full px-5 font-heading text-sm font-bold text-white transition-transform duration-300 motion-safe:hover:scale-105 ${social.bg}`}
               >
                 <span
                   aria-hidden="true"
