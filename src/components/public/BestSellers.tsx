@@ -55,7 +55,7 @@ export function BestSellers() {
   return (
     <section
       id="menu"
-      className="relative  isolate overflow-hidden px-2 py-16 sm:px-8"
+      className="relative bg-background isolate overflow-hidden px-2 py-16 sm:px-8"
     >
       <div className="relative z-10 mx-auto max-w-6xl rounded-4xl border border-primary background px-1 sm:px-4 py-8 shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md dark:bg-primary/30 ">
         <div className="mb-10 flex flex-col items-center gap-2 text-center sm:mb-14">
