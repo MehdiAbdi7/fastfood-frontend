@@ -64,7 +64,10 @@ export default function UtilisateursPage() {
       </div>
 
       {!users || users.length === 0 ? (
-        <EmptyState icon="icon-[mdi--account-group-outline]" title="Aucun compte" />
+        <EmptyState
+          icon="icon-[mdi--account-group-outline]"
+          title="Aucun compte"
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {users.map((user) => {
@@ -72,15 +75,19 @@ export default function UtilisateursPage() {
             return (
               <div
                 key={user._id}
-                className="flex items-center justify-between rounded-xl border border-border-subtle bg-surface px-4 py-3"
+                // Mobile : identité sur une ligne, badges + actions sur la suivante.
+                // sm+ : tout revient sur une seule ligne comme avant.
+                className="flex flex-col gap-3 rounded-xl border border-border-subtle bg-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 font-heading text-sm font-bold text-primary">
+                {/* Identité — min-w-0 casse le min-width:auto du flex item,
+                    sinon l'email long pousse les actions hors de l'écran. */}
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 font-heading text-sm font-bold text-primary">
                     {user.firstname[0]}
                     {user.lastname[0]}
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-foreground">
+                  <div className="flex min-w-0 flex-col">
+                    <span className="truncate font-semibold text-foreground">
                       {user.firstname} {user.lastname}
                       {isSelf && (
                         <span className="ml-1.5 text-xs text-foreground/40">
@@ -88,44 +95,50 @@ export default function UtilisateursPage() {
                         </span>
                       )}
                     </span>
-                    <span className="text-xs text-foreground/50">
+                    <span className="truncate text-xs text-foreground/50">
                       {user.email}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                      user.role === "admin"
-                        ? "bg-accent-mustard/15 text-accent-mustard"
-                        : "bg-accent-green/15 text-accent-green"
-                    }`}
-                  >
-                    {user.role === "admin" ? "Admin" : "Employé"}
-                  </span>
-                  {user.store && (
-                    <span className="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-foreground/60">
-                      {STORE_LABELS[user.store]}
-                    </span>
-                  )}
-
-                  <button
-                    onClick={() => setEditingUser(user)}
-                    aria-label="Modifier"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
-                  >
-                    <span className="icon-[mdi--pencil-outline] text-base" />
-                  </button>
-                  {!isSelf && (
-                    <button
-                      onClick={() => setDeletingUser(user)}
-                      aria-label="Supprimer"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                {/* Badges + actions */}
+                <div className="flex items-center justify-between gap-2 sm:justify-end">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${
+                        user.role === "admin"
+                          ? "bg-accent-mustard/15 text-accent-mustard"
+                          : "bg-accent-green/15 text-accent-green"
+                      }`}
                     >
-                      <span className="icon-[mdi--trash-can-outline] text-base" />
+                      {user.role === "admin" ? "Admin" : "Employé"}
+                    </span>
+                    {user.store && (
+                      <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-foreground/60">
+                        {STORE_LABELS[user.store]}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* shrink-0 : les boutons ne se compressent jamais */}
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      onClick={() => setEditingUser(user)}
+                      aria-label="Modifier"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                    >
+                      <span className="icon-[mdi--pencil-outline] text-base" />
                     </button>
-                  )}
+                    {!isSelf && (
+                      <button
+                        onClick={() => setDeletingUser(user)}
+                        aria-label="Supprimer"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                      >
+                        <span className="icon-[mdi--trash-can-outline] text-base" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
