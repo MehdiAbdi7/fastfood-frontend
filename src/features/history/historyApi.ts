@@ -83,7 +83,7 @@ export interface HistoryPage {
  * l'URL, et le validateur Zod du backend rejette la chaîne littérale
  * "undefined" — un 400 sur un filtre parfaitement légitime (« Tous »).
  */
-function pruneParams(params: Record<string, unknown>): Record<string, unknown> {
+function pruneParams<T extends object>(params: T): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(params).filter(
       ([, value]) => value !== undefined && value !== null && value !== "",
@@ -144,7 +144,10 @@ export const historyApi = api.injectEndpoints({
      * et le validateur Zod rejetterait la chaîne "undefined".
      */
     getHistory: builder.query<HistoryPage, HistoryParams>({
-      query: (params) => ({ url: "/orders/history", params: pruneParams(params) }),
+      query: (params) => ({
+        url: "/orders/history",
+        params: pruneParams(params),
+      }),
       transformResponse: (response: ApiEnvelope<HistoryPage>) => response.data,
       providesTags: [{ type: "Order", id: "LIST" }],
     }),
