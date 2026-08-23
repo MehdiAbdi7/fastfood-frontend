@@ -1,240 +1,179 @@
 "use client";
 
 import { useState } from "react";
-import {
-  HistoryBreadcrumb,
-  MONTH_NAMES,
-} from "@/components/history/HistoryBreadcrumb";
-import { HistoryDrillList } from "@/components/history/HistoryDrillList";
+import { HistoryToolbar } from "@/components/history/HistoryToolbar";
+import { HistoryCalendar } from "@/components/history/HistoryCalendar";
+import { HistoryOrderList } from "@/components/history/HistoryOrderList";
 import { OrderDetailModal } from "@/components/orders/OrderDetailModal";
-import { Button } from "@/components/ui/Button";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { SkeletonGrid } from "@/components/ui/Skeleton";
-import { EmptyState } from "@/components/ui/EmptyState";
 import {
+  useGetHistoryQuery,
   useGetHistoryYearsQuery,
   useGetHistoryMonthsQuery,
   useGetHistoryDaysQuery,
-  useGetHistoryOrdersQuery,
 } from "@/features/history/historyApi";
+import { useHistorySelection } from "@/features/history/useHistorySelection";
+import { useDebouncedValue } from "@/features/history/useDebouncedValue";
 import { useActiveStore } from "@/features/store/useActiveStore";
-import { exportOrdersToCsv } from "@/lib/exportCsv";
-import { formatDA, formatTime } from "@/lib/format";
-import { ORDER_TYPE_LABELS } from "@/lib/orderLabels";
-import type { OrderType } from "@/types/order";
+import { exportHistoryToCsv } from "@/lib/exportCsv";
+import { formatSelectionLabel, formatServiceDayKey } from "@/lib/calendar";
 
-const TYPE_TABS: OrderType[] = ["dine_in", "takeaway", "delivery"];
+// Fixé côté front ET plafonné côté backend (max 100). En dur plutôt qu'en
+// réglage : personne n'a jamais demandé à changer ce nombre, et une option de
+// plus, c'est une décision de plus à prendre pour l'utilisateur.
+const PAGE_SIZE = 20;
 
+/**
+ * Historique des ventes.
+ *
+ * Le calendrier n'est PAS un chemin de navigation mais un FILTRE : il reste
+ * affiché en permanence, et cliquer une case resserre la liste du dessous au
+ * lieu de changer d'écran. C'est ce qui permet de comparer deux jours en deux
+ * clics, là où l'ancien drill-down imposait de remonter puis redescendre.
+ *
+ * Tout le travail lourd — plage de dates, recherche, tri, découpage en pages,
+ * totaux — est fait par MongoDB (voir order.controller.ts::getHistory). Le
+ * navigateur ne reçoit jamais plus de 20 lignes projetées, quelle que soit la
+ * taille de l'historique.
+ */
 export default function HistoriquePage() {
-  const { activeStore } = useActiveStore();
-  const [type, setType] = useState<OrderType>("dine_in");
-  const [year, setYear] = useState<number | null>(null);
-  const [month, setMonth] = useState<number | null>(null);
-  const [day, setDay] = useState<number | null>(null);
-  const [page, setPage] = useState(1);
+  const { activeStore, isAllStores } = useActiveStore();
+  const {
+    selection,
+    apiType,
+    sortBy,
+    sortOrder,
+    setType,
+    setYear,
+    toggleMonth,
+    toggleDay,
+    setSearch,
+    setSort,
+    setPage,
+    clearSelection,
+  } = useHistorySelection();
+
   const [openOrderId, setOpenOrderId] = useState<string | null>(null);
 
-  const baseParams = { type, store: activeStore };
+  // Ne part au serveur qu'une fois la frappe stabilisée — le champ, lui, reste
+  // piloté par la valeur brute (voir HistoryToolbar).
+  const debouncedSearch = useDebouncedValue(selection.search);
 
-  function resetTo(level: "root" | "year" | "month") {
-    if (level === "root") {
-      setYear(null);
-      setMonth(null);
-      setDay(null);
-    } else if (level === "year") {
-      setMonth(null);
-      setDay(null);
-    } else {
-      setDay(null);
-    }
-  }
+  // `apiType` vaut undefined en vue « Tous » : la clé est alors retirée de
+  // l'URL par pruneParams, et le backend la traduit en $in sur tous les types.
+  const baseParams = { type: apiType, store: activeStore };
 
-  function changeType(nextType: OrderType) {
-    setType(nextType);
-    resetTo("root");
-  }
+  const yearsQuery = useGetHistoryYearsQuery(baseParams);
 
-  const yearsQuery = useGetHistoryYearsQuery(baseParams, {
-    skip: year !== null,
-  });
+  /**
+   * Année effective : celle choisie explicitement, sinon la plus récente.
+   *
+   * DÉRIVÉE, jamais posée par un effet. Un `useEffect` qui appellerait
+   * `setYear` au chargement provoquerait un rendu de plus, un appel réseau
+   * jeté, et un clignotement à chaque changement de type de commande.
+   * L'agrégation trie déjà les années du plus récent au plus ancien.
+   */
+  const year = selection.year ?? yearsQuery.data?.[0]?.year ?? null;
+
   const monthsQuery = useGetHistoryMonthsQuery(
     { ...baseParams, year: year ?? 0 },
-    { skip: year === null || month !== null },
+    { skip: year === null },
   );
+
+  // Les jours ne sont chargés que si un mois est ouvert : sinon c'est un appel
+  // pour une grille que personne ne regarde.
   const daysQuery = useGetHistoryDaysQuery(
-    { ...baseParams, year: year ?? 0, month: month ?? 0 },
-    { skip: year === null || month === null || day !== null },
+    { ...baseParams, year: year ?? 0, month: selection.month ?? 0 },
+    { skip: year === null || selection.month === null },
   );
-  const ordersQuery = useGetHistoryOrdersQuery(
+
+  const historyQuery = useGetHistoryQuery(
     {
       ...baseParams,
       year: year ?? 0,
-      month: month ?? 0,
-      day: day ?? 0,
-      page,
-      limit: 20,
+      // `undefined` et non `null` : historyApi retire les clés indéfinies de
+      // l'URL, ce qui laisse le backend déduire le bon niveau de précision.
+      month: selection.month ?? undefined,
+      day: selection.day ?? undefined,
+      search: debouncedSearch.trim() || undefined,
+      sortBy,
+      sortOrder,
+      page: selection.page,
+      limit: PAGE_SIZE,
     },
-    { skip: year === null || month === null || day === null },
+    { skip: year === null },
   );
 
-  const isLoading =
-    (year === null && yearsQuery.isLoading) ||
-    (year !== null && month === null && monthsQuery.isLoading) ||
-    (month !== null && day === null && daysQuery.isLoading) ||
-    (day !== null && ordersQuery.isLoading);
+  const selectionLabel = formatSelectionLabel(
+    year,
+    selection.month,
+    selection.day,
+  );
+
+  function handleExport() {
+    const orders = historyQuery.data?.orders;
+    if (!orders?.length || year === null) return;
+
+    const period = formatServiceDayKey(year, selection.month, selection.day);
+    // selection.type et non apiType : « all » doit apparaître dans le nom du
+    // fichier, sinon deux exports de périmètres différents portent le même nom.
+    exportHistoryToCsv(
+      orders,
+      `niwa-${selection.type}-${period}-p${selection.page}.csv`,
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <HistoryBreadcrumb
-          year={year}
-          month={month}
-          day={day}
-          onNavigate={resetTo}
+      <HistoryToolbar
+        type={selection.type}
+        search={selection.search}
+        sort={selection.sort}
+        onTypeChange={setType}
+        onSearchChange={setSearch}
+        onSortChange={setSort}
+      />
+
+      <HistoryCalendar
+        years={yearsQuery.data ?? []}
+        months={monthsQuery.data ?? []}
+        days={daysQuery.data ?? []}
+        year={year}
+        month={selection.month}
+        day={selection.day}
+        isLoadingYears={yearsQuery.isLoading}
+        isLoadingMonths={monthsQuery.isLoading}
+        isLoadingDays={daysQuery.isLoading}
+        onSelectYear={setYear}
+        onToggleMonth={toggleMonth}
+        onToggleDay={toggleDay}
+      />
+
+      {/* Rien à lister tant qu'aucune année n'existe : le calendrier affiche
+          déjà son propre état vide, en rajouter un second serait redondant. */}
+      {year !== null && (
+        <HistoryOrderList
+          orders={historyQuery.data?.orders ?? []}
+          summary={historyQuery.data?.summary}
+          selectionLabel={selectionLabel}
+          currentPage={historyQuery.data?.currentPage ?? selection.page}
+          totalPages={historyQuery.data?.totalPages ?? 1}
+          isLoading={historyQuery.isLoading}
+          isFetching={historyQuery.isFetching}
+          isError={historyQuery.isError}
+          hasSearch={debouncedSearch.trim().length > 0}
+          isSingleDay={selection.day !== null}
+          // La colonne magasin n'a de sens que dans la vue « tous les
+          // magasins » d'un admin : ailleurs, elle répéterait la même valeur
+          // sur chaque ligne.
+          showStore={isAllStores}
+          // La colonne type ne s'affiche qu'en vue « Tous » : ailleurs elle
+          // répéterait la même valeur sur chaque ligne.
+          showType={selection.type === "all"}
+          onPageChange={setPage}
+          onOpenOrder={setOpenOrderId}
+          onExport={handleExport}
+          onClearFilters={clearSelection}
         />
-
-        <div className="flex gap-1.5">
-          {TYPE_TABS.map((t) => (
-            <button
-              key={t}
-              onClick={() => changeType(t)}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
-                type === t
-                  ? "bg-primary text-on-primary"
-                  : "bg-surface-2 text-foreground/60 hover:text-foreground"
-              }`}
-            >
-              {ORDER_TYPE_LABELS[t]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {isLoading && <SkeletonGrid count={5} />}
-
-      {!isLoading && year === null && (
-        <HistoryDrillList
-          rows={(yearsQuery.data ?? []).map((y) => ({
-            key: y.year,
-            label: y.year.toString(),
-            count: y.count,
-            totalSales: y.totalSales,
-          }))}
-          onSelect={(key) => setYear(Number(key))}
-          emptyLabel={`Aucune commande "${ORDER_TYPE_LABELS[type]}" terminée pour l'instant`}
-        />
-      )}
-
-      {!isLoading && year !== null && month === null && (
-        <HistoryDrillList
-          rows={(monthsQuery.data ?? []).map((m) => ({
-            key: m.month,
-            label: MONTH_NAMES[m.month - 1],
-            count: m.count,
-            totalSales: m.totalSales,
-          }))}
-          onSelect={(key) => setMonth(Number(key))}
-          emptyLabel="Aucune commande cette année"
-        />
-      )}
-
-      {!isLoading && month !== null && day === null && (
-        <HistoryDrillList
-          rows={(daysQuery.data ?? []).map((d) => ({
-            key: d.day,
-            label: `${d.day} ${MONTH_NAMES[month - 1]}`,
-            count: d.count,
-            totalSales: d.totalSales,
-          }))}
-          onSelect={(key) => setDay(Number(key))}
-          emptyLabel="Aucune commande ce mois-ci"
-        />
-      )}
-
-      {!isLoading && day !== null && (
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-foreground/60">
-              {ordersQuery.data?.totalCount ?? 0} commande(s)
-            </p>
-            {ordersQuery.data && ordersQuery.data.orders.length > 0 && (
-              <Button
-                variant="secondary"
-                size="sm"
-                icon="icon-[mdi--download-outline]"
-                onClick={() =>
-                  exportOrdersToCsv(
-                    ordersQuery.data!.orders,
-                    `niwa-${type}-${year}-${month}-${day}.csv`,
-                  )
-                }
-              >
-                Exporter cette page (CSV)
-              </Button>
-            )}
-          </div>
-
-          {!ordersQuery.data || ordersQuery.data.orders.length === 0 ? (
-            <EmptyState
-              icon="icon-[mdi--receipt-text-outline]"
-              title="Aucune commande ce jour-là"
-            />
-          ) : (
-            <div className="flex flex-col gap-2">
-              {ordersQuery.data.orders.map((order) => (
-                <button
-                  key={order._id}
-                  onClick={() => setOpenOrderId(order._id)}
-                  className="flex items-center justify-between rounded-xl border border-border-subtle bg-surface px-4 py-3 text-left hover:border-primary"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="font-heading text-lg font-bold text-foreground">
-                      #{order.dailyNumber}
-                    </span>
-                    <span className="text-sm text-foreground/70">
-                      {order.client.fullName}
-                    </span>
-                    {order.completedAt && (
-                      <span className="text-xs text-foreground/40">
-                        {formatTime(order.completedAt)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={order.status} />
-                    <span className="font-bold text-accent-green">
-                      {formatDA(order.totalPrice)}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {ordersQuery.data && ordersQuery.data.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Précédent
-              </Button>
-              <span className="text-sm text-foreground/60">
-                {ordersQuery.data.currentPage} / {ordersQuery.data.totalPages}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={page >= ordersQuery.data.totalPages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Suivant
-              </Button>
-            </div>
-          )}
-        </div>
       )}
 
       <OrderDetailModal
