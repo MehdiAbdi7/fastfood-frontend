@@ -46,7 +46,7 @@ const METHOD = [
     text: "Aucun burger n'attend sous une lampe. Le pain passe au grill au moment où la commande tombe, pas avant.",
   },
   {
-    icon: "icon-[mdi--sauce]",
+    icon: "icon-[mdi--water]",
     title: "Les sauces, faites ici",
     text: "L'américaine, l'orientale, la blanche : elles sortent de notre cuisine, pas d'un bidon. C'est ce qui fait qu'un burger a un goût qu'on ne retrouve pas ailleurs.",
   },
