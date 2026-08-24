@@ -1,7 +1,16 @@
 import type { Store } from "./store";
 import type { RestaurantTable } from "./table";
 
-export type OrderType = "dine_in" | "takeaway" | "delivery";
+/**
+ * Miroir de src/config/orderTypes.ts côté backend.
+ *
+ * Une LISTE et non seulement une union de types : les onglets de filtre ont
+ * besoin d'itérer dessus, et une seconde liste recopiée dans un composant
+ * finirait par oublier un mode de service.
+ */
+export const ORDER_TYPES = ["dine_in", "takeaway", "delivery"] as const;
+
+export type OrderType = (typeof ORDER_TYPES)[number];
 export type OrderStatus =
   | "pending"
   | "ready"
@@ -46,6 +55,18 @@ export interface Order {
   status: OrderStatus;
   store: Store;
   dailyNumber: number;
+  /**
+   * Journée commerciale d'appartenance (ISO, minuit UTC).
+   *
+   * Dérivée de l'heure d'OUVERTURE du service : une commande encaissée à 00h20
+   * appartient au service de la veille. C'est le seul axe temporel de
+   * l'historique et du calendrier — `completedAt` ne sert qu'à l'affichage de
+   * l'heure et au tri à l'intérieur d'un même service.
+   *
+   * Toujours l'afficher avec formatServiceDate() (timeZone UTC), jamais avec
+   * formatDateTime(), sous peine de décaler la date d'un jour.
+   */
+  serviceDate: string;
   table?: RestaurantTable | string | null;
   client: OrderClient;
   items: OrderItem[];
@@ -142,7 +163,7 @@ export interface ServiceStats {
   topItems: { name: string; quantity: number }[];
 }
 
-// --- Historique ---
+// --- Historique (agrégations du calendrier) ---
 
 export interface HistoryYearEntry {
   year: number;

@@ -39,8 +39,8 @@ export default async function DashboardLayout({
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar />
-          <main className="flex-1 overflow-x-clip px-4 pb-24 pt-4 sm:px-6 sm:pb-8 sm:pt-6 lg:pb-8">
-            {children}
+          <main className="flex-1 overflow-x-clip px-4 pb-24 pt-5 sm:px-6 sm:pb-8 sm:pt-7 lg:px-8 lg:pb-8">
+            <div className="mx-auto w-full max-w-[1600px]">{children}</div>
           </main>
         </div>
 

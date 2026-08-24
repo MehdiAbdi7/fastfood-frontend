@@ -14,9 +14,9 @@ interface BestSellerCardProps {
 // Décrit la largeur d'AFFICHAGE de la vignette, pas le poids du fichier : le
 // navigateur choisit la variante du srcset avec cette seule information, avant
 // même d'avoir appliqué le CSS. Elle suit les `basis` du carrousel (≈42% de la
-// largeur écran sur mobile, ≈28% en sm, ≈210 px en lg dans un max-w-6xl).
+// largeur écran sur mobile, ≈28% en sm, ≈300 px en lg dans un max-w-6xl).
 const CARD_IMAGE_SIZES =
-  "(max-width: 640px) 42vw, (max-width: 1024px) 28vw, 210px";
+  "(max-width: 640px) 42vw, (max-width: 1024px) 28vw, 300px";
 
 export function BestSellerCard({
   item,
@@ -68,11 +68,11 @@ export function BestSellerCard({
       </div>
 
       {/* Contenu */}
-      <div className="relative flex flex-1 flex-col gap-1 p-3 pt-5">
+      <div className="relative flex flex-1 flex-col items-center gap-1 p-3 pt-5 text-center">
         {/* Étiquette de prix, épinglée à cheval sur la photo et le contenu */}
-        <div className="absolute -top-3.5 right-3 z-10 -rotate-3">
+        <div className="absolute -top-4 right-2 z-10 -rotate-3">
           <div
-            className="flex items-center gap-1.5 bg-accent-green py-1 pl-3.5 pr-2.5 text-[11px] font-bold text-on-primary shadow-md"
+            className="flex items-center gap-1.5 whitespace-nowrap bg-accent-green py-1.5 pl-4 pr-3 text-xs font-bold text-on-primary shadow-[0_4px_12px_rgba(0,0,0,0.35)] ring-1 ring-background/30"
             style={{
               clipPath: "polygon(12px 0, 100% 0, 100% 100%, 12px 100%, 0 50%)",
             }}

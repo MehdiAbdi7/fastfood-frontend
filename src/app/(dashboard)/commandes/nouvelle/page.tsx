@@ -32,6 +32,7 @@ export default function NewOrderPage() {
   const { user, isAdmin } = useAuth();
   const { activeStore } = useActiveStore();
   const toast = useToast();
+  const [isMobileTicketOpen, setIsMobileTicketOpen] = useState(false);
 
   const [type, setType] = useState<OrderType>("dine_in");
   const [manualStore, setManualStore] = useState<Store | "">("");
@@ -174,298 +175,346 @@ export default function NewOrderPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-6">
-      {/* ---------- Colonne menu ---------- */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="mb-5 flex items-center gap-3">
-          <Link
-            href="/commandes"
-            aria-label="Retour aux commandes"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/60 transition-colors hover:border-primary hover:text-foreground"
-          >
-            <span className="icon-[mdi--arrow-left] text-xl" />
-          </Link>
+    <div className="flex flex-col gap-6 pb-24 lg:pb-0">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-6">
+        {/* ---------- Colonne menu ---------- */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="mb-5 flex items-center gap-3">
+            <Link
+              href="/commandes"
+              aria-label="Retour aux commandes"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/60 transition-colors hover:border-primary hover:text-foreground"
+            >
+              <span className="icon-[mdi--arrow-left] text-xl" />
+            </Link>
 
-          <div>
-            <h1 className="font-heading text-xl font-bold leading-tight text-foreground">
-              Prise de commande
-            </h1>
+            <div>
+              <h1 className="font-heading text-xl font-bold leading-tight text-foreground">
+                Prise de commande
+              </h1>
 
-            <p className="text-sm text-foreground/55">
-              Pour un client au comptoir ou au téléphone
-            </p>
+              <p className="text-sm text-foreground/55">
+                Pour un client au comptoir ou au téléphone
+              </p>
+            </div>
           </div>
+
+          <MenuBrowser
+            quantityByItem={quantityByItem}
+            onSelect={handleSelectProduct}
+          />
         </div>
 
-        <MenuBrowser
-          quantityByItem={quantityByItem}
-          onSelect={handleSelectProduct}
-        />
-      </div>
-
-      {/* ---------- Ticket ----------
+        {/* ---------- Ticket ----------
           max-h + colonne à trois zones : un élément sticky PLUS HAUT que le
           viewport se comporte comme un élément normal et défile avec la page —
           il fallait donc descendre jusqu'au bout de la grille produits pour
           atteindre « Envoyer en cuisine ». On plafonne la hauteur, seule la
           zone centrale défile, et le bouton reste toujours à l'écran.
           calc : 5rem = topbar sticky (top-20) + 1.5rem de respiration en bas. */}
-      <aside className="w-full shrink-0 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5.5rem)] lg:w-88">
-        <div className="ticket-notch surface-card relative flex flex-col p-5 pb-7 lg:max-h-[calc(100vh-5.5rem)]">
-          {/* Zone défilante : entête, formulaire et lignes du ticket. */}
-          <div className="flex min-h-0 flex-1 flex-col gap-4 lg:overflow-y-auto lg:pr-1">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-heading text-base font-bold text-foreground">
-                Ticket
-              </h2>
+        <aside
+          className={`${isMobileTicketOpen ? "flex" : "hidden"} fixed inset-x-0 bottom-0 z-40 max-h-[88dvh] w-full flex-col overflow-y-auto lg:sticky lg:top-20 lg:flex lg:max-h-[calc(100vh-5.5rem)] lg:w-88 lg:overflow-visible`}
+        >
+          <div className="ticket-notch surface-card relative flex flex-col p-5 pb-7 lg:max-h-[calc(100vh-5.5rem)]">
+            <button
+              type="button"
+              onClick={() => setIsMobileTicketOpen(false)}
+              aria-label="Fermer le ticket"
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/60 hover:text-foreground lg:hidden"
+            >
+              <span className="icon-[mdi--close] text-lg" />
+            </button>
+            {/* Zone défilante : entête, formulaire et lignes du ticket. */}
+            <div className="flex min-h-0 flex-1 flex-col gap-4 lg:overflow-y-auto lg:pr-1">
+              <div className="flex items-baseline justify-between pr-12">
+                <h2 className="font-heading text-base font-bold text-foreground">
+                  Ticket
+                </h2>
 
-              <span className="tabular-nums text-xs font-semibold text-foreground/50">
-                {itemsCount} article
-                {itemsCount > 1 ? "s" : ""}
-              </span>
-            </div>
+                <span className="tabular-nums text-xs font-semibold text-foreground/50">
+                  {itemsCount} article
+                  {itemsCount > 1 ? "s" : ""}
+                </span>
+              </div>
 
-            {/* Type de commande */}
-            <div className="grid grid-cols-3 gap-1.5">
-              {TYPE_OPTIONS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setType(t)}
-                  className={`flex flex-col items-center gap-1 rounded-xl border py-2.5 text-[11px] font-bold transition-colors ${
-                    type === t
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border-subtle text-foreground/55 hover:text-foreground"
-                  }`}
-                >
-                  <span className={`${ORDER_TYPE_ICONS[t]} text-lg`} />
+              {/* Type de commande */}
+              <div className="grid grid-cols-3 gap-1.5">
+                {TYPE_OPTIONS.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setType(t)}
+                    className={`flex flex-col items-center gap-1 rounded-xl border py-2.5 text-[11px] font-bold transition-colors ${
+                      type === t
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border-subtle text-foreground/55 hover:text-foreground"
+                    }`}
+                  >
+                    <span className={`${ORDER_TYPE_ICONS[t]} text-lg`} />
 
-                  {ORDER_TYPE_LABELS[t]}
-                </button>
-              ))}
-            </div>
+                    {ORDER_TYPE_LABELS[t]}
+                  </button>
+                ))}
+              </div>
 
-            <div className="flex flex-col gap-3">
-              {needsStoreSelector && (
-                <Select
-                  id="store"
-                  label="Magasin"
-                  value={manualStore}
-                  onChange={(e) => {
-                    setManualStore(e.target.value as Store);
-                    setTableId("");
-                  }}
-                  placeholder="Choisir un magasin"
-                  options={Object.entries(STORE_LABELS).map(
-                    ([value, label]) => ({
-                      value,
-                      label,
-                    }),
-                  )}
-                />
-              )}
+              <div className="flex flex-col gap-3">
+                {needsStoreSelector && (
+                  <Select
+                    id="store"
+                    label="Magasin"
+                    value={manualStore}
+                    onChange={(e) => {
+                      setManualStore(e.target.value as Store);
+                      setTableId("");
+                    }}
+                    placeholder="Choisir un magasin"
+                    options={Object.entries(STORE_LABELS).map(
+                      ([value, label]) => ({
+                        value,
+                        label,
+                      }),
+                    )}
+                  />
+                )}
 
-              {type === "dine_in" && (
-                <Select
-                  id="table"
-                  label="Table"
-                  value={tableId}
-                  onChange={(e) => setTableId(e.target.value)}
-                  placeholder={
-                    resolvedStore
-                      ? "Choisir une table"
-                      : "Choisis d'abord un magasin"
-                  }
-                  disabled={!resolvedStore}
-                  options={(tables ?? [])
-                    .slice()
-                    .sort((a, b) => a.tableN - b.tableN)
-                    .map((t) => ({
-                      value: t._id,
-                      label: `Table ${t.tableN} — ${
-                        t.status === "occupied" ? "occupée" : "libre"
-                      }`,
-                    }))}
-                />
-              )}
+                {type === "dine_in" && (
+                  <Select
+                    id="table"
+                    label="Table"
+                    value={tableId}
+                    onChange={(e) => setTableId(e.target.value)}
+                    placeholder={
+                      resolvedStore
+                        ? "Choisir une table"
+                        : "Choisis d'abord un magasin"
+                    }
+                    disabled={!resolvedStore}
+                    options={(tables ?? [])
+                      .slice()
+                      .sort((a, b) => a.tableN - b.tableN)
+                      .map((t) => ({
+                        value: t._id,
+                        label: `Table ${t.tableN} — ${
+                          t.status === "occupied" ? "occupée" : "libre"
+                        }`,
+                      }))}
+                  />
+                )}
 
-              <Input
-                id="fullName"
-                label="Nom du client"
-                placeholder="Ex : Yacine"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-              />
-
-              {type !== "dine_in" && (
                 <Input
-                  id="phone"
-                  label="Téléphone"
-                  placeholder="05 00 00 00 00"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  id="fullName"
+                  label="Nom du client"
+                  placeholder="Ex : Yacine"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                 />
-              )}
 
-              {type === "delivery" && (
+                {type !== "dine_in" && (
+                  <Input
+                    id="phone"
+                    label="Téléphone"
+                    placeholder="05 00 00 00 00"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                )}
+
+                {type === "delivery" && (
+                  <Input
+                    id="address"
+                    label="Adresse"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                )}
+
                 <Input
-                  id="address"
-                  label="Adresse"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  id="remark"
+                  label="Remarque"
+                  placeholder="Sans oignons, bien cuit..."
+                  value={remark}
+                  onChange={(e) => setRemark(e.target.value)}
                 />
-              )}
+              </div>
 
-              <Input
-                id="remark"
-                label="Remarque"
-                placeholder="Sans oignons, bien cuit..."
-                value={remark}
-                onChange={(e) => setRemark(e.target.value)}
-              />
-            </div>
+              {/* Lignes du ticket */}
+              <div className="flex flex-col gap-2.5 border-t border-dashed border-border-subtle pt-4">
+                {cart.length === 0 ? (
+                  <div className="flex flex-col items-center gap-1.5 py-6 text-center">
+                    <span className="icon-[mdi--receipt-text-plus-outline] text-2xl text-foreground/25" />
 
-            {/* Lignes du ticket */}
-            <div className="flex flex-col gap-2.5 border-t border-dashed border-border-subtle pt-4">
-              {cart.length === 0 ? (
-                <div className="flex flex-col items-center gap-1.5 py-6 text-center">
-                  <span className="icon-[mdi--receipt-text-plus-outline] text-2xl text-foreground/25" />
+                    <p className="text-sm font-semibold text-foreground/60">
+                      Ticket vide
+                    </p>
 
-                  <p className="text-sm font-semibold text-foreground/60">
-                    Ticket vide
-                  </p>
+                    <p className="text-xs text-foreground/40">
+                      Touche un produit pour l&apos;ajouter
+                    </p>
+                  </div>
+                ) : (
+                  cart.map((line) => {
+                    const variantLabel = formatVariantLabel(
+                      line.variant.combination,
+                    );
 
-                  <p className="text-xs text-foreground/40">
-                    Touche un produit pour l&apos;ajouter
-                  </p>
-                </div>
-              ) : (
-                cart.map((line) => {
-                  const variantLabel = formatVariantLabel(
-                    line.variant.combination,
-                  );
+                    return (
+                      <div key={line.key} className="flex items-center gap-2.5">
+                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-surface-2">
+                          {line.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={line.imageUrl}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <span className="icon-[mdi--food] text-base text-foreground/30" />
+                            </div>
+                          )}
+                        </div>
 
-                  return (
-                    <div key={line.key} className="flex items-center gap-2.5">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-surface-2">
-                        {line.imageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={line.imageUrl}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center">
-                            <span className="icon-[mdi--food] text-base text-foreground/30" />
-                          </div>
-                        )}
-                      </div>
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <p className="truncate text-xs font-bold text-foreground">
+                            {line.name}
+                          </p>
 
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <p className="truncate text-xs font-bold text-foreground">
-                          {line.name}
-                        </p>
+                          <p className="tabular-nums text-xs text-foreground/50">
+                            {variantLabel !== "Standard"
+                              ? `${variantLabel} · `
+                              : ""}
+                            {formatDA(getLineUnitPrice(line))}
+                          </p>
 
-                        <p className="tabular-nums text-xs text-foreground/50">
-                          {variantLabel !== "Standard"
-                            ? `${variantLabel} · `
-                            : ""}
-                          {formatDA(getLineUnitPrice(line))}
-                        </p>
-
-                        {/* La cuisine doit voir les options sur le ticket,
+                          {/* La cuisine doit voir les options sur le ticket,
                             pas seulement leur effet sur le prix. */}
-                        {line.extras.length > 0 && (
-                          <p className="truncate text-xs text-accent-green">
-                            +{" "}
-                            {line.extras.map((extra) => extra.name).join(", ")}
-                          </p>
-                        )}
+                          {line.extras.length > 0 && (
+                            <p className="truncate text-xs text-accent-green">
+                              +{" "}
+                              {line.extras
+                                .map((extra) => extra.name)
+                                .join(", ")}
+                            </p>
+                          )}
 
-                        {line.excludedIngredients.length > 0 && (
-                          <p className="truncate text-xs text-accent-bordeaux">
-                            sans {line.excludedIngredients.join(", ")}
-                          </p>
-                        )}
-                      </div>
+                          {line.excludedIngredients.length > 0 && (
+                            <p className="truncate text-xs text-accent-bordeaux">
+                              sans {line.excludedIngredients.join(", ")}
+                            </p>
+                          )}
+                        </div>
 
-                      <div className="flex shrink-0 items-center gap-1 rounded-lg bg-surface-2 p-0.5">
+                        <div className="flex shrink-0 items-center gap-1 rounded-lg bg-surface-2 p-0.5">
+                          <button
+                            onClick={() =>
+                              setQuantity(line.key, line.quantity - 1)
+                            }
+                            aria-label={`Retirer un ${line.name}`}
+                            className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-bordeaux"
+                          >
+                            <span className="icon-[mdi--minus] text-sm" />
+                          </button>
+
+                          <span className="tabular-nums w-5 text-center text-xs font-bold text-foreground">
+                            {line.quantity}
+                          </span>
+
+                          <button
+                            onClick={() =>
+                              setQuantity(line.key, line.quantity + 1)
+                            }
+                            aria-label={`Ajouter un ${line.name}`}
+                            className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-green"
+                          >
+                            <span className="icon-[mdi--plus] text-sm" />
+                          </button>
+                        </div>
+
                         <button
-                          onClick={() =>
-                            setQuantity(line.key, line.quantity - 1)
-                          }
-                          aria-label={`Retirer un ${line.name}`}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-bordeaux"
+                          onClick={() => removeFromCart(line.key)}
+                          aria-label={`Supprimer ${line.name} du ticket`}
+                          className="shrink-0 text-foreground/25 hover:text-accent-bordeaux"
                         >
-                          <span className="icon-[mdi--minus] text-sm" />
-                        </button>
-
-                        <span className="tabular-nums w-5 text-center text-xs font-bold text-foreground">
-                          {line.quantity}
-                        </span>
-
-                        <button
-                          onClick={() =>
-                            setQuantity(line.key, line.quantity + 1)
-                          }
-                          aria-label={`Ajouter un ${line.name}`}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-green"
-                        >
-                          <span className="icon-[mdi--plus] text-sm" />
+                          <span className="icon-[mdi--close] text-base" />
                         </button>
                       </div>
-
-                      <button
-                        onClick={() => removeFromCart(line.key)}
-                        aria-label={`Supprimer ${line.name} du ticket`}
-                        className="shrink-0 text-foreground/25 hover:text-accent-bordeaux"
-                      >
-                        <span className="icon-[mdi--close] text-base" />
-                      </button>
-                    </div>
-                  );
-                })
-              )}
+                    );
+                  })
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Zone figée : totaux et action. shrink-0 empêche le flex parent de
+            {/* Zone figée : totaux et action. shrink-0 empêche le flex parent de
               la comprimer quand le ticket se remplit — sans lui, le bouton
               s'écraserait progressivement à mesure qu'on ajoute des articles. */}
-          <div className="flex shrink-0 flex-col gap-4 pt-4">
-            <TicketTotals itemsTotal={total} itemsCount={itemsCount} />
+            <div className="flex shrink-0 flex-col gap-4 pt-4">
+              <TicketTotals itemsTotal={total} itemsCount={itemsCount} />
 
-            {type === "delivery" && (
-              <p className="-mt-2 text-xs text-foreground/45">
-                Les frais de livraison seront ajoutés depuis la fiche commande.
-              </p>
-            )}
+              {type === "delivery" && (
+                <p className="-mt-2 text-xs text-foreground/45">
+                  Les frais de livraison seront ajoutés depuis la fiche
+                  commande.
+                </p>
+              )}
 
-            {error && (
-              <p className="rounded-lg bg-accent-bordeaux/10 px-3 py-2 text-sm text-accent-bordeaux">
-                {error}
-              </p>
-            )}
+              {error && (
+                <p className="rounded-lg bg-accent-bordeaux/10 px-3 py-2 text-sm text-accent-bordeaux">
+                  {error}
+                </p>
+              )}
 
-            <Button
-              size="lg"
-              icon="icon-[mdi--check-circle-outline]"
-              onClick={handleSubmit}
-              isLoading={isSubmitting}
-              disabled={cart.length === 0}
-              className="w-full"
-            >
-              Envoyer en cuisine
-            </Button>
+              <Button
+                size="lg"
+                icon="icon-[mdi--check-circle-outline]"
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+                disabled={cart.length === 0}
+                className="w-full"
+              >
+                Envoyer en cuisine
+              </Button>
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      <ProductConfigModal
-        item={configuringItem}
-        onClose={() => setConfiguringItem(null)}
-        onConfirm={handleConfirmConfiguredLine}
-      />
+        <ProductConfigModal
+          item={configuringItem}
+          onClose={() => setConfiguringItem(null)}
+          onConfirm={handleConfirmConfiguredLine}
+        />
+      </div>
+
+      {isMobileTicketOpen && (
+        <button
+          type="button"
+          aria-label="Fermer le ticket"
+          onClick={() => setIsMobileTicketOpen(false)}
+          className="fixed inset-0 z-30 bg-black/55 backdrop-blur-sm lg:hidden"
+        />
+      )}
+
+      <button
+        type="button"
+        onClick={() => setIsMobileTicketOpen(true)}
+        className={`${isMobileTicketOpen ? "hidden" : "flex"} fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 min-h-14 items-center justify-between rounded-2xl bg-primary px-4 py-2.5 text-left text-on-primary shadow-[0_8px_24px_rgba(61,39,22,0.3)] transition-transform active:scale-[0.98] lg:hidden`}
+      >
+        <span className="flex items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-on-primary/15">
+            <span className="icon-[mdi--receipt-text-outline] text-xl" />
+          </span>
+          <span className="flex flex-col">
+            <span className="text-xs font-semibold text-on-primary/75">
+              Votre ticket
+            </span>
+            <span className="font-heading text-sm font-bold">
+              {itemsCount} article{itemsCount > 1 ? "s" : ""}
+            </span>
+          </span>
+        </span>
+        <span className="flex items-center gap-2 font-heading font-bold">
+          {formatDA(total)}
+          <span className="icon-[mdi--chevron-up] text-xl" />
+        </span>
+      </button>
     </div>
   );
 }

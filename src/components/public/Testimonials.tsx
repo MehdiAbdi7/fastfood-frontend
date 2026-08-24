@@ -127,13 +127,16 @@ export function Testimonials() {
       className="relative isolate overflow-hidden px-2 py-16 sm:px-8 sm:py-20"
     >
       <div className="mx-auto max-w-4xl rounded-4xl background dark:bg-primary/30 px-4 py-8 shadow-[0_0_25px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md sm:px-8 sm:py-12 border border-primary">
-        <div className="mb-10 flex flex-col items-center gap-2 text-center">
-          <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
-            Ils nous font confiance
+        <div className="mb-8 flex flex-col items-center gap-2 text-center sm:mb-10">
+          <span className="font-heading text-sm font-bold uppercase tracking-[0.18em] text-foreground/70">
+            La parole aux habitués
           </span>
           <h2 className="font-heading text-3xl font-bold text-accent-green sm:text-4xl">
             Ce que disent nos clients
           </h2>
+          <p className="max-w-md text-sm text-foreground/80">
+            Des expériences partagées après un passage chez Niwa Food.
+          </p>
         </div>
 
         {/* aria-live="polite" : le contenu change tout seul toutes les cinq
@@ -223,6 +226,10 @@ export function Testimonials() {
               />
             ))}
           </div>
+
+          <span className="sr-only">
+            Avis {currentIndex + 1} sur {TESTIMONIALS.length}
+          </span>
 
           <button
             type="button"

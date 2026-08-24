@@ -14,9 +14,10 @@ const BEST_SELLER_NAMES = [
   "POLINI",
   "MALOSSI",
   "GIVI",
-  "ARAI",
-  "GILERA",
+  "VESPA",
+  "Tacos Classique",
   "SAMOURAI",
+  "Galets Box",
   "Frites Niwa",
   "Salade César",
 ];
@@ -57,17 +58,19 @@ export function BestSellers() {
       id="menu"
       className="relative bg-background isolate overflow-hidden px-2 py-16 sm:px-8"
     >
-      <div className="relative z-10 mx-auto max-w-6xl rounded-4xl border border-primary background px-1 sm:px-4 py-8 shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md dark:bg-primary/30 ">
-        <div className="mb-10 flex flex-col items-center gap-2 text-center sm:mb-14">
-          <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
-            Nos incontournables
-          </span>
-          <h2 className="font-heading text-3xl font-bold text-accent-green sm:text-4xl">
-            Les best-sellers Niwa
-          </h2>
-          <p className="mx-auto max-w-md text-sm text-foreground">
-            Touchez un plat pour le composer.
-          </p>
+      <div className="relative z-10 mx-auto max-w-6xl rounded-4xl border border-primary background px-1 sm:px-4 py-4 shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md dark:bg-primary/30 ">
+        <div className="mb-8 flex flex-col items-center gap-4 text-center sm:mb-10 lg:flex-row lg:items-center lg:justify-center lg:px-6">
+          <div>
+            <span className="font-heading text-sm font-bold uppercase tracking-[0.18em] text-foreground/70">
+              La sélection Niwa
+            </span>
+            <h2 className="mt-1 font-heading text-3xl font-bold text-accent-green sm:text-4xl">
+              Les best-sellers
+            </h2>
+            <p className="mx-auto mt-1 max-w-md text-sm text-foreground lg:mx-0">
+              Les recettes que nos clients choisissent encore et encore.
+            </p>
+          </div>
         </div>
 
         {isLoading && (
@@ -120,7 +123,7 @@ export function BestSellers() {
               {...scrollerHandlers}
               role="region"
               aria-label="Carrousel des best-sellers"
-              className="scrollbar-hide -my-6 flex gap-4 overflow-x-auto overscroll-x-contain px-1 py-6"
+              className="scrollbar-hide -my-6 flex gap-4 overflow-x-auto overscroll-x-contain px-1 py-4"
             >
               {/* Trois copies : c'est ce qui donne la boucle. Les deux
                   latérales sont aria-hidden ET hors parcours clavier — un
@@ -131,7 +134,7 @@ export function BestSellers() {
                   <div
                     key={`${copy}-${item._id}`}
                     aria-hidden={copy !== 1}
-                    className="shrink-0 basis-[38%] sm:basis-[28%] lg:basis-[18%]"
+                    className="shrink-0 basis-[38%] sm:basis-[28%] lg:basis-[22%]"
                   >
                     <BestSellerCard item={item} isDuplicate={copy !== 1} />
                   </div>
@@ -141,13 +144,13 @@ export function BestSellers() {
           </div>
         )}
 
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center border-t border-primary/20 pt-4">
           <Link
             href="/commande"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-on-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
+            className="group inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3 font-bold text-on-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
           >
-            Voir tout le menu
-            <span className="icon-[line-md--arrow-right-circle-twotone] text-xl" />
+            Explorer tout le menu
+            <span className="icon-[line-md--arrow-right-circle-twotone] text-xl transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </div>
       </div>

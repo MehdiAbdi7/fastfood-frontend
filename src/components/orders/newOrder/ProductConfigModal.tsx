@@ -195,7 +195,8 @@ export function ProductConfigModal({
       isOpen={item !== null}
       onClose={onClose}
       title={item.name}
-      size="md"
+      size="lg"
+      hideHeader
       footer={
         <div className="flex w-full items-center justify-between gap-3">
           <div className="flex items-center gap-1 rounded-xl bg-surface-2 p-1">
@@ -229,6 +230,50 @@ export function ProductConfigModal({
       }
     >
       <div className="flex flex-col gap-5">
+        <div className="relative -mx-5 -mt-4 overflow-hidden bg-linear-to-b from-surface-2 to-background">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fermer la fiche produit"
+            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/85 text-foreground/60 shadow-sm backdrop-blur-sm hover:text-foreground"
+          >
+            <span className="icon-[mdi--close] text-xl" />
+          </button>
+          <div className="relative h-64 w-full sm:h-72">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-radial-[at_50%_38%] from-primary/12 via-primary/4 to-transparent"
+            />
+            {item.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={item.imageUrl}
+                alt=""
+                className="relative h-full w-full object-contain motion-safe:animate-[dishIn_0.45s_cubic-bezier(0.16,1,0.3,1)_both]"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <span className="icon-[mdi--food] text-5xl text-primary/30" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <h2
+            id="modal-title"
+            className="font-heading text-2xl font-bold leading-tight text-foreground"
+          >
+            {item.name}
+          </h2>
+        </div>
+
+        {item.description && (
+          <p className="text-sm leading-relaxed text-foreground/65">
+            {item.description}
+          </p>
+        )}
+
         {/* Formules */}
         {eligibleFormulas.length > 0 && (
           <div className="flex flex-col gap-2">

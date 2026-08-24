@@ -37,8 +37,8 @@ export function HowItWorks() {
     >
       <div className="mx-auto max-w-6xl rounded-4xl background dark:bg-primary/30 px-4 py-8 shadow-[0_0_25px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md sm:px-8 sm:py-12 border border-primary">
         <div className="mb-10 flex flex-col items-center gap-2 text-center sm:mb-14">
-          <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
-            Simple et rapide
+          <span className="font-heading text-sm font-bold uppercase tracking-[0.18em] text-foreground/70">
+            En quatre temps
           </span>
           <h2 className="font-heading text-3xl font-bold text-accent-green sm:text-4xl">
             Comment ça marche
@@ -48,14 +48,18 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="relative grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+          <div
+            aria-hidden="true"
+            className="absolute left-[12%] right-[12%] top-14 hidden border-t border-dashed border-accent-green/50 lg:block"
+          />
           {STEPS.map((step, index) => (
             <div
               key={step.title}
-              className="group relative flex flex-col items-center gap-3 rounded-3xl border border-primary bg-background p-6 text-center shadow-food-sm transition-all duration-300 motion-safe:hover:-translate-y-1.5 hover:shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] hover:shadow-primary cursor-pointer"
+              className="group relative z-10 flex flex-col items-center gap-3 rounded-3xl border border-primary bg-background p-6 text-center shadow-food-sm transition-all duration-300 motion-safe:hover:-translate-y-1.5 hover:shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] hover:shadow-primary cursor-pointer"
             >
-              <span className="absolute -top-4 -left-2 flex h-8 w-8 items-center justify-center rounded-full bg-accent-green font-heading text-sm font-bold text-on-primary shadow-md">
-                {index + 1}
+              <span className="absolute right-4 top-4 font-heading text-xs font-bold tracking-widest text-accent-green/70">
+                {String(index + 1).padStart(2, "0")}
               </span>
 
               <span className={`${step.icon} text-4xl text-accent-green`} />

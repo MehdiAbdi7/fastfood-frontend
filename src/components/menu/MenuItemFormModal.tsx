@@ -182,9 +182,9 @@ export function MenuItemFormModal({
         onSubmit={handleSubmit}
         className="flex flex-col gap-4"
       >
-        <div className="flex gap-4">
-          <div className="flex flex-col items-center gap-2">
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-surface-2">
+        <div className="grid gap-4 sm:grid-cols-[9rem_minmax(0,1fr)] sm:items-start">
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative h-28 w-36 overflow-hidden rounded-2xl border border-border-subtle bg-surface-2 shadow-sm sm:w-full">
               {imagePreview ? (
                 // <img> volontaire ici : imagePreview peut être une blob: URL
                 // (aperçu local avant upload), que next/image ne sait pas
@@ -202,8 +202,9 @@ export function MenuItemFormModal({
                 </div>
               )}
             </div>
-            <label className="cursor-pointer text-xs font-semibold text-primary hover:underline">
-              Choisir une image
+            <label className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary/5 text-xs font-bold text-primary transition-colors hover:bg-primary/10">
+              <span className="icon-[mdi--image-edit-outline] text-base" />
+              {imagePreview ? "Changer l'image" : "Ajouter une image"}
               <input
                 type="file"
                 accept="image/*"
@@ -213,7 +214,7 @@ export function MenuItemFormModal({
             </label>
           </div>
 
-          <div className="flex flex-1 flex-col gap-3">
+          <div className="flex min-w-0 flex-col gap-3">
             <Input
               id="name"
               label="Nom du produit"
@@ -235,7 +236,7 @@ export function MenuItemFormModal({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 border-t border-border-subtle pt-4">
           <label
             htmlFor="description"
             className="text-sm font-semibold text-foreground"
@@ -247,7 +248,7 @@ export function MenuItemFormModal({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="rounded-xl border border-border-subtle bg-surface px-3.5 py-2.5 text-foreground outline-none focus:border-primary"
+            className="min-h-20 w-full resize-y rounded-xl border border-border-subtle bg-surface px-3.5 py-2.5 text-foreground outline-none transition-colors focus:border-primary"
           />
         </div>
 

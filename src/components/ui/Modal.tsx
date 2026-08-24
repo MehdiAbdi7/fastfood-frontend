@@ -11,6 +11,7 @@ interface ModalProps {
   children: React.ReactNode;
   size?: "sm" | "md" | "lg";
   footer?: React.ReactNode;
+  hideHeader?: boolean;
 }
 
 const SIZE_CLASSES = {
@@ -26,6 +27,7 @@ export function Modal({
   children,
   size = "md",
   footer,
+  hideHeader = false,
 }: ModalProps) {
   // Echap pour fermer + verrou de défilement pendant que la modale est ouverte.
   useEffect(() => {
@@ -64,25 +66,29 @@ export function Modal({
       />
 
       <div
-        className={`relative flex max-h-[85vh] w-full flex-col rounded-2xl border border-border-subtle bg-surface shadow-food-md ${SIZE_CLASSES[size]}`}
+        className={`relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-food-md ${SIZE_CLASSES[size]}`}
       >
-        <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
-          <h2
-            id="modal-title"
-            className="font-heading text-lg font-bold text-foreground"
-          >
-            {title}
-          </h2>
-          <button
-            onClick={onClose}
-            aria-label="Fermer"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-surface-2 hover:text-foreground"
-          >
-            <span className="icon-[mdi--close] text-xl" />
-          </button>
-        </div>
+        {!hideHeader && (
+          <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
+            <h2
+              id="modal-title"
+              className="font-heading text-lg font-bold text-foreground"
+            >
+              {title}
+            </h2>
+            <button
+              onClick={onClose}
+              aria-label="Fermer"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-surface-2 hover:text-foreground"
+            >
+              <span className="icon-[mdi--close] text-xl" />
+            </button>
+          </div>
+        )}
 
-        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          {children}
+        </div>
 
         {footer && (
           <div className="flex items-center justify-end gap-2 border-t border-border-subtle px-5 py-4">

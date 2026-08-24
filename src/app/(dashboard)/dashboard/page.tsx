@@ -22,16 +22,27 @@ const STATUS_ORDER: OrderStatus[] = [
 
 function StoreServicePanel({ stats }: { stats: ServiceStats }) {
   return (
-    <section className="flex flex-col gap-4 rounded-3xl border border-border-subtle bg-surface-2/50 p-4 sm:p-5">
-      <div className="flex items-center justify-between">
-        <h2 className="font-heading text-base font-bold text-foreground">
-          {STORE_LABELS[stats.store]}
-        </h2>
-        <p className="text-xs text-foreground/50">
-          {stats.serviceStartedAt
-            ? `Service depuis ${formatTime(stats.serviceStartedAt)}`
-            : "Aucun service ouvert"}
-        </p>
+    <section className="surface-card flex flex-col gap-5 p-4 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-4">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-green/15 text-accent-green">
+            <span className="icon-[mdi--store-outline] text-xl" />
+          </span>
+          <div>
+            <h2 className="font-heading text-lg font-bold text-foreground">
+              {STORE_LABELS[stats.store]}
+            </h2>
+            <p className="flex items-center gap-1.5 text-xs text-foreground/50">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent-green" />
+              {stats.serviceStartedAt
+                ? `Service depuis ${formatTime(stats.serviceStartedAt)}`
+                : "Aucun service ouvert"}
+            </p>
+          </div>
+        </div>
+        <span className="rounded-full bg-accent-green/10 px-3 py-1 text-xs font-bold text-accent-green">
+          Service en cours
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -61,7 +72,7 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
         />
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 border-b border-border-subtle pb-5">
         {STATUS_ORDER.filter((status) => stats.byStatus[status]).map(
           (status) => (
             <div
@@ -80,15 +91,15 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
       {(stats.byType.length > 0 || stats.topItems.length > 0) && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {stats.byType.length > 0 && (
-            <div>
-              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/50">
+            <div className="rounded-2xl bg-surface-2/45 p-4">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground/50">
                 Répartition par type
               </p>
               <div className="flex flex-col gap-1.5">
                 {stats.byType.map((entry) => (
                   <div
                     key={entry._id}
-                    className="flex items-center justify-between rounded-lg bg-surface px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-xl bg-surface px-3 py-2.5 text-sm"
                   >
                     <span className="text-foreground/80">
                       {ORDER_TYPE_LABELS[entry._id]}
@@ -103,15 +114,15 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
           )}
 
           {stats.topItems.length > 0 && (
-            <div>
-              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/50">
+            <div className="rounded-2xl bg-surface-2/45 p-4">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground/50">
                 Top produits
               </p>
               <div className="flex flex-col gap-1.5">
                 {stats.topItems.map((item, index) => (
                   <div
                     key={item.name}
-                    className="flex items-center justify-between rounded-lg bg-surface px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-xl bg-surface px-3 py-2.5 text-sm"
                   >
                     <span className="flex items-center gap-2 text-foreground/80">
                       <span className="text-xs font-bold text-primary">
@@ -143,10 +154,24 @@ export default function DashboardHomePage() {
   } = useGetServiceStatsQuery({ store: activeStore });
 
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-sm text-foreground/60">
-        Bonjour {user?.firstname} — voici l&apos;activité du service en cours.
-      </p>
+    <div className="flex flex-col gap-7">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="mb-1 text-xs font-bold uppercase tracking-[0.18em] text-accent-green">
+            Vue d&apos;ensemble
+          </p>
+          <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            Bonjour {user?.firstname}
+          </h2>
+          <p className="mt-1 text-sm text-foreground/60">
+            Voici l&apos;activité de ton service en cours.
+          </p>
+        </div>
+        <div className="flex w-fit items-center gap-2 rounded-full border border-border-subtle bg-surface px-3 py-2 text-xs font-semibold text-foreground/60">
+          <span className="icon-[mdi--pulse] text-base text-accent-green" />
+          Suivi en temps réel
+        </div>
+      </header>
 
       {isLoading && (
         <div className="flex flex-col gap-3">
