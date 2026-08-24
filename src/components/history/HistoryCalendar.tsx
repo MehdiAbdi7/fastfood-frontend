@@ -1,13 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  MONTH_SHORT_NAMES,
-  WEEKDAY_LABELS,
-  buildMonthGrid,
-} from "@/lib/calendar";
+import { WEEKDAY_LABELS, buildMonthGrid } from "@/lib/calendar";
 import { formatCompactDA, formatDA } from "@/lib/format";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Select } from "@/components/ui/Select";
 import type {
   HistoryDayEntry,
   HistoryMonthEntry,
@@ -78,7 +75,7 @@ function CalendarCell({
       // min-h-14 : à 7 colonnes sur un écran de 360 px une case fait ~44 px de
       // large, on garde donc au moins autant en hauteur pour rester au-dessus
       // de la cible tactile minimale.
-      className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 py-1.5 transition-colors ${
+      className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 py-1.5 transition-colors lg:min-h-11 lg:rounded-lg lg:py-1 ${
         isSelected
           ? "border-primary bg-primary text-on-primary shadow-sm"
           : activeStats
@@ -103,7 +100,7 @@ function CalendarCell({
       ) : (
         // Réserve la même hauteur que la ligne de CA, pour que les cases
         // actives et inactives restent parfaitement alignées.
-        <span aria-hidden="true" className="h-[10px]" />
+        <span aria-hidden="true" className="h-2.5" />
       )}
     </button>
   );
@@ -111,9 +108,12 @@ function CalendarCell({
 
 function CalendarSkeleton({ cells }: { cells: number }) {
   return (
-    <div className="grid grid-cols-7 gap-1.5">
+    <div className="grid grid-cols-7 gap-1.5 lg:gap-1">
       {Array.from({ length: cells }).map((_, index) => (
-        <Skeleton key={index} className="h-14 rounded-xl" />
+        <Skeleton
+          key={index}
+          className="h-14 rounded-xl lg:h-11 lg:rounded-lg"
+        />
       ))}
     </div>
   );
@@ -137,17 +137,6 @@ export function HistoryCalendar({
   // 31 recherches linéaires à chaque rendu — dont un par frappe dans le champ
   // de recherche. La Map ramène chaque accès à O(1) et n'est reconstruite que
   // lorsque les données changent réellement.
-  const monthStats = useMemo(
-    () =>
-      new Map(
-        months.map((entry) => [
-          entry.month,
-          { count: entry.count, totalSales: entry.totalSales },
-        ]),
-      ),
-    [months],
-  );
-
   const dayStats = useMemo(
     () =>
       new Map(
@@ -168,7 +157,7 @@ export function HistoryCalendar({
 
   if (isLoadingYears) {
     return (
-      <section className="surface-card flex flex-col gap-4 p-4 sm:p-5">
+      <section className="surface-card flex flex-col gap-4 p-4 sm:p-5 lg:gap-3 lg:p-4">
         <Skeleton className="h-9 w-48 rounded-full" />
         <CalendarSkeleton cells={12} />
       </section>
@@ -193,63 +182,30 @@ export function HistoryCalendar({
   }
 
   return (
-    <section className="surface-card flex flex-col gap-4 p-4 sm:p-5">
-      {/* ---------- Années ----------
-          Une simple rangée de pastilles : contrairement aux mois et aux jours,
-          on ne grise pas les années sans vente — personne n'a besoin de voir
-          2019 barré. Seules les années réellement présentes sont proposées. */}
-      <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto pb-0.5">
-        <span className="shrink-0 font-heading text-xs font-bold uppercase tracking-wide text-foreground/45">
-          Année
-        </span>
-        {years.map((entry) => (
-          <button
-            key={entry.year}
-            type="button"
-            onClick={() => onSelectYear(entry.year)}
-            aria-pressed={year === entry.year}
-            className={`shrink-0 rounded-full border px-4 py-1.5 font-heading text-sm font-bold transition-colors ${
-              year === entry.year
-                ? "border-primary bg-primary text-on-primary"
-                : "border-border-subtle text-foreground/70 hover:border-primary hover:text-foreground"
-            }`}
-          >
-            {entry.year}
-            <span
-              className={`tabular-nums ml-1.5 text-xs font-semibold ${
-                year === entry.year ? "opacity-70" : "text-foreground/40"
-              }`}
-            >
-              {entry.count}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* ---------- Mois ----------
-          12 cases fixes, toujours toutes affichées. C'est précisément ce que
-          l'ancien écran ne faisait pas : il listait uniquement les mois actifs,
-          donc impossible de voir d'un coup d'œil qu'il manquait juillet. */}
-      <div className="flex flex-col gap-1.5">
-        {isLoadingMonths ? (
-          <CalendarSkeleton cells={12} />
-        ) : (
-          <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
-            {MONTH_SHORT_NAMES.map((name, index) => {
-              const monthNumber = index + 1;
-              return (
-                <CalendarCell
-                  key={name}
-                  label={name}
-                  title={`${name} ${year}`}
-                  stats={monthStats.get(monthNumber)}
-                  isSelected={month === monthNumber}
-                  onClick={() => onToggleMonth(monthNumber)}
-                />
-              );
-            })}
-          </div>
-        )}
+    <section className="surface-card flex flex-col gap-4 p-4 sm:p-5 lg:gap-3 lg:p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Select
+          id="history-year"
+          label="Année"
+          value={year?.toString() ?? ""}
+          onChange={(event) => onSelectYear(Number(event.target.value))}
+          options={years.map((entry) => ({
+            value: entry.year.toString(),
+            label: `${entry.year} · ${entry.count} commande${entry.count > 1 ? "s" : ""}`,
+          }))}
+        />
+        <Select
+          id="history-month"
+          label="Mois"
+          value={month?.toString() ?? ""}
+          onChange={(event) => onToggleMonth(Number(event.target.value))}
+          disabled={isLoadingMonths || months.length === 0}
+          placeholder={isLoadingMonths ? "Chargement..." : "Choisir un mois"}
+          options={months.map((entry) => ({
+            value: entry.month.toString(),
+            label: `${new Intl.DateTimeFormat("fr-FR", { month: "long" }).format(new Date(2020, entry.month - 1, 1))} · ${entry.count} commande${entry.count > 1 ? "s" : ""}`,
+          }))}
+        />
       </div>
 
       {/* ---------- Jours ----------
@@ -257,8 +213,8 @@ export function HistoryCalendar({
           cases vides sous les mois n'apprendrait rien et doublerait la hauteur
           du bloc sur mobile. */}
       {year !== null && month !== null && (
-        <div className="flex flex-col gap-1.5 border-t border-dashed border-border-subtle pt-4">
-          <div className="grid grid-cols-7 gap-1.5">
+        <div className="flex flex-col gap-1.5 border-t border-dashed border-border-subtle pt-4 lg:gap-1 lg:pt-3">
+          <div className="grid grid-cols-7 gap-1.5 lg:gap-1">
             {WEEKDAY_LABELS.map((label) => (
               <span
                 key={label}
@@ -273,7 +229,7 @@ export function HistoryCalendar({
           {isLoadingDays ? (
             <CalendarSkeleton cells={35} />
           ) : (
-            <div className="grid grid-cols-7 gap-1.5">
+            <div className="grid grid-cols-7 gap-1.5 lg:gap-1">
               {dayGrid.map((dayNumber, index) =>
                 dayNumber === null ? (
                   // Case de remplissage avant le 1er du mois. aria-hidden :
@@ -281,7 +237,7 @@ export function HistoryCalendar({
                   <span
                     key={`pad-${index}`}
                     aria-hidden="true"
-                    className="min-h-14"
+                    className="min-h-14 lg:min-h-11"
                   />
                 ) : (
                   <CalendarCell

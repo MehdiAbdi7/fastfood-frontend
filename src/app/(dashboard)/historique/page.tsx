@@ -80,11 +80,15 @@ export default function HistoriquePage() {
     { skip: year === null },
   );
 
-  // Les jours ne sont chargés que si un mois est ouvert : sinon c'est un appel
-  // pour une grille que personne ne regarde.
+  // Le premier mois disponible est le mois actif par défaut : la grille des
+  // jours reste donc visible dès l'ouverture, sans imposer un clic préalable.
+  const activeMonth = selection.month ?? monthsQuery.data?.[0]?.month ?? null;
+
+  // Les jours sont chargés pour le mois actif, même quand il s'agit du mois
+  // proposé automatiquement par l'API.
   const daysQuery = useGetHistoryDaysQuery(
-    { ...baseParams, year: year ?? 0, month: selection.month ?? 0 },
-    { skip: year === null || selection.month === null },
+    { ...baseParams, year: year ?? 0, month: activeMonth ?? 0 },
+    { skip: year === null || activeMonth === null },
   );
 
   const historyQuery = useGetHistoryQuery(
@@ -93,7 +97,7 @@ export default function HistoriquePage() {
       year: year ?? 0,
       // `undefined` et non `null` : historyApi retire les clés indéfinies de
       // l'URL, ce qui laisse le backend déduire le bon niveau de précision.
-      month: selection.month ?? undefined,
+      month: activeMonth ?? undefined,
       day: selection.day ?? undefined,
       search: debouncedSearch.trim() || undefined,
       sortBy,
@@ -104,11 +108,7 @@ export default function HistoriquePage() {
     { skip: year === null },
   );
 
-  const selectionLabel = formatSelectionLabel(
-    year,
-    selection.month,
-    selection.day,
-  );
+  const selectionLabel = formatSelectionLabel(year, activeMonth, selection.day);
 
   function handleExport() {
     const orders = historyQuery.data?.orders;
@@ -144,7 +144,7 @@ export default function HistoriquePage() {
         months={monthsQuery.data ?? []}
         days={daysQuery.data ?? []}
         year={year}
-        month={selection.month}
+        month={activeMonth}
         day={selection.day}
         isLoadingYears={yearsQuery.isLoading}
         isLoadingMonths={monthsQuery.isLoading}
