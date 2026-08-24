@@ -144,7 +144,7 @@ export function BestSellers() {
           </div>
         )}
 
-        <div className="mt-8 flex justify-center border-t border-primary/20 pt-6">
+        <div className="mt-8 flex justify-center border-t border-primary/20 pt-4">
           <Link
             href="/commande"
             className="group inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3 font-bold text-on-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"

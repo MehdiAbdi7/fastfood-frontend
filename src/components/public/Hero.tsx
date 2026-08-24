@@ -33,12 +33,12 @@ export function Hero() {
   return (
     <section className="background relative isolate overflow-hidden px-4 py-14 sm:px-2 sm:py-16">
       {/* Contenu */}
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-10 pt-20 pb-10 lg:grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-20 lg:px-6">
-        <div className="order-2 w-full lg:order-2 lg:translate-x-12">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-10 pt-20 pb-10 md:grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] md:gap-8 md:px-4 lg:gap-20 lg:px-6">
+        <div className="order-2 w-full md:order-2 md:translate-x-3 lg:translate-x-12">
           <HeroCarousel slides={heroSlides} />
         </div>
 
-        <div className="order-1 flex flex-col items-center justify-between lg:order-1 lg:items-start">
+        <div className="order-1 flex flex-col items-center justify-between md:order-1 md:items-start">
           {/* Texte avec stagger */}
           <div className="flex max-w-2xl flex-col items-center gap-5 text-center md:items-start md:text-left">
             <span className="animate-[slideInLeft_0.6s_ease-out_0.1s_both] font-heading text-md md:text-lg font-bold uppercase tracking-wide text-accent-green">
