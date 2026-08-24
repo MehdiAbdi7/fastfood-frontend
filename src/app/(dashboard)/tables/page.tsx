@@ -6,6 +6,7 @@ import { TableFormModal } from "@/components/tables/TableFormModal";
 import { Button } from "@/components/ui/Button";
 import { SkeletonGrid } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import { useGetTablesQuery } from "@/features/tables/tableApi";
 import { useActiveStore } from "@/features/store/useActiveStore";
 import { useAuth } from "@/features/auth/useAuth";
@@ -28,7 +29,9 @@ export default function TablesPage() {
     isError,
   } = useGetTablesQuery({ store: activeStore });
 
-  const [editingTable, setEditingTable] = useState<RestaurantTable | null>(null);
+  const [editingTable, setEditingTable] = useState<RestaurantTable | null>(
+    null,
+  );
   const [isCreating, setIsCreating] = useState(false);
 
   if (isLoading) return <SkeletonGrid count={8} />;
@@ -54,7 +57,10 @@ export default function TablesPage() {
           }
           action={
             isAdmin && (
-              <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
+              <Button
+                icon="icon-[mdi--plus]"
+                onClick={() => setIsCreating(true)}
+              >
                 Ajouter une table
               </Button>
             )
@@ -81,14 +87,19 @@ export default function TablesPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8">
-      {isAdmin && (
-        <div className="flex justify-end">
-          <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
-            Ajouter une table
-          </Button>
-        </div>
-      )}
+    <div className="flex flex-col gap-7">
+      <PageHeader
+        eyebrow="Salle"
+        title="Tables"
+        description="Visualise l'implantation de la salle et garde chaque table à jour."
+        action={
+          isAdmin ? (
+            <Button icon="icon-[mdi--plus]" onClick={() => setIsCreating(true)}>
+              Ajouter une table
+            </Button>
+          ) : undefined
+        }
+      />
 
       {Object.entries(groups).map(([store, storeTables]) => (
         <section key={store} className="flex flex-col gap-3">

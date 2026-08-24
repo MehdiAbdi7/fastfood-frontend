@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SkeletonGrid } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import {
   useGetUsersQuery,
   useDeleteUserMutation,
@@ -53,15 +54,20 @@ export default function UtilisateursPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button
-          icon="icon-[mdi--account-plus-outline]"
-          onClick={() => setIsCreating(true)}
-        >
-          Nouveau compte
-        </Button>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        eyebrow="Administration"
+        title="Équipe"
+        description="Gère les accès et les rôles des personnes qui font vivre les restaurants."
+        action={
+          <Button
+            icon="icon-[mdi--account-plus-outline]"
+            onClick={() => setIsCreating(true)}
+          >
+            Nouveau compte
+          </Button>
+        }
+      />
 
       {!users || users.length === 0 ? (
         <EmptyState

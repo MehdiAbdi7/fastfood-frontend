@@ -9,6 +9,7 @@ import { useNewOrderAlert } from "@/components/orders/useNewOrderAlert";
 import { Button } from "@/components/ui/Button";
 import { SkeletonGrid } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import { useGetOrdersQuery } from "@/features/orders/orderApi";
 import { useActiveStore } from "@/features/store/useActiveStore";
 import type { Order, OrderType } from "@/types/order";
@@ -74,23 +75,28 @@ export default function CommandesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        eyebrow="Opérations"
+        title="Commandes"
+        description="Pilote les commandes en cours et fais avancer chaque ticket au bon moment."
+        action={
+          <Button
+            icon="icon-[mdi--plus]"
+            onClick={() => router.push("/commandes/nouvelle")}
+          >
+            Nouvelle commande
+          </Button>
+        }
+      />
+
+      <div className="flex flex-col gap-3">
         <OrderFilters
           typeFilter={typeFilter}
           onTypeFilterChange={setTypeFilter}
           search={search}
           onSearchChange={setSearch}
         />
-        {/* Page dédiée (pas une modale) : parcours visuel du menu pour un
-            client au comptoir qui ne sait pas scanner le QR code. */}
-        <Button
-          icon="icon-[mdi--plus]"
-          onClick={() => router.push("/commandes/nouvelle")}
-          className="shrink-0"
-        >
-          Nouvelle commande
-        </Button>
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-4">

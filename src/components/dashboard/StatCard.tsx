@@ -12,9 +12,14 @@ const ACCENT_CLASSES: Record<NonNullable<StatCardProps["accent"]>, string> = {
   bordeaux: "bg-accent-bordeaux/15 text-accent-bordeaux",
 };
 
-export function StatCard({ icon, label, value, accent = "primary" }: StatCardProps) {
+export function StatCard({
+  icon,
+  label,
+  value,
+  accent = "primary",
+}: StatCardProps) {
   return (
-    <div className="surface-card flex items-center gap-3 p-4">
+    <div className="surface-card flex items-center gap-3 p-4 transition-transform duration-200 hover:-translate-y-0.5">
       <div
         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${ACCENT_CLASSES[accent]}`}
       >

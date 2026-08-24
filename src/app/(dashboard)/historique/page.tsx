@@ -16,6 +16,7 @@ import { useDebouncedValue } from "@/features/history/useDebouncedValue";
 import { useActiveStore } from "@/features/store/useActiveStore";
 import { exportHistoryToCsv } from "@/lib/exportCsv";
 import { formatSelectionLabel, formatServiceDayKey } from "@/lib/calendar";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 
 // Fixé côté front ET plafonné côté backend (max 100). En dur plutôt qu'en
 // réglage : personne n'a jamais demandé à changer ce nombre, et une option de
@@ -123,7 +124,12 @@ export default function HistoriquePage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        eyebrow="Analyse"
+        title="Historique"
+        description="Retrouve, filtre et exporte les ventes passées de tes établissements."
+      />
       <HistoryToolbar
         type={selection.type}
         search={selection.search}

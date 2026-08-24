@@ -62,13 +62,16 @@ export function Contact() {
       className="relative isolate overflow-hidden px-2 sm:px-4 py-16 sm:py-20"
     >
       <div className="mx-auto max-w-6xl rounded-4xl shadow-[0_0_25px_5px_rgba(217,169,77,0.45)] shadow-primary/30 backdrop-blur-md px-6 sm:px-2 py-6 background dark:bg-primary/30 border border-primary">
-        <div className="mb-8 flex flex-col gap-2 text-center">
-          <span className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
-            Où nous trouver
+        <div className="mb-8 flex flex-col items-center gap-2 text-center sm:mb-10">
+          <span className="font-heading text-sm font-bold uppercase tracking-[0.18em] text-foreground/70">
+            Venez nous voir
           </span>
           <h2 className="font-heading text-3xl font-bold text-accent-green sm:text-4xl">
             Deux adresses, un seul régal
           </h2>
+          <p className="max-w-md text-sm text-foreground/80">
+            Deux cuisines, la même exigence de fraîcheur et de générosité.
+          </p>
         </div>
 
         {/* max-w-4xl et non la pleine largeur du bloc : en aspect ratio, la
@@ -159,8 +162,10 @@ export function Contact() {
           ))}
         </div>
 
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <p className="text-sm text-foreground/70">Suivez-nous</p>
+        <div className="mt-8 flex flex-col items-center gap-3 border-t border-primary/20 pt-6">
+          <p className="font-heading text-sm font-bold uppercase tracking-[0.16em] text-foreground/70">
+            Suivez l&apos;aventure
+          </p>
 
           <div className="flex items-center justify-center gap-2">
             {SOCIALS.map((social) => (

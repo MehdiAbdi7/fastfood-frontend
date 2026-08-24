@@ -31,25 +31,27 @@ const heroSlides: HeroSlide[] = [
 
 export function Hero() {
   return (
-    <section className="background relative isolate overflow-hidden px-4 sm:px-2 py-14 sm:py-16 ">
+    <section className="background relative isolate overflow-hidden px-4 py-14 sm:px-2 sm:py-16">
       {/* Contenu */}
-      <div className="relative z-10 mx-auto flex flex-col lg:flex-row w-full max-w-7xl items-center justify-evenly pt-20 pb-10 gap-10">
-        <HeroCarousel slides={heroSlides} />
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-10 pt-20 pb-10 lg:grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-20 lg:px-6">
+        <div className="order-2 w-full lg:order-2 lg:translate-x-12">
+          <HeroCarousel slides={heroSlides} />
+        </div>
 
-        <div className="flex flex-col justify-between items-center">
+        <div className="order-1 flex flex-col items-center justify-between lg:order-1 lg:items-start">
           {/* Texte avec stagger */}
-          <div className="flex flex-col items-center text-center md:text-left gap-5  md:items-start">
+          <div className="flex max-w-2xl flex-col items-center gap-5 text-center md:items-start md:text-left">
             <span className="animate-[slideInLeft_0.6s_ease-out_0.1s_both] font-heading text-md md:text-lg font-bold uppercase tracking-wide text-accent-green">
               Fast-food fait maison
             </span>
 
-            <h1 className="animate-[slideInLeft_0.6s_ease-out_0.2s_both] font-heading text-4xl font-bold leading-tight text-foreground sm:text-6xl">
+            <h1 className="animate-[slideInLeft_0.6s_ease-out_0.2s_both] font-heading text-4xl font-bold leading-[1.08] text-foreground sm:text-5xl lg:text-6xl">
               Commandez vos
               <br /> <span className="text-primary">plats préférés</span>
               <br /> en toute simplicité
             </h1>
 
-            <p className="animate-[slideInLeft_0.6s_ease-out_0.3s_both] mx-auto max-w-md text-foreground font-semibold md:mx-0">
+            <p className="animate-[slideInLeft_0.6s_ease-out_0.3s_both] mx-auto max-w-lg font-semibold leading-relaxed text-foreground md:mx-0">
               <span className="text-lg  text-accent-green">
                 Tacos, pizzas, burgers et salades{" "}
               </span>
@@ -59,7 +61,7 @@ export function Hero() {
 
             <Link
               href="/commande"
-              className="animate-[slideInLeft_0.6s_ease-out_0.4s_both] inline-flex w-fit items-center gap-2 rounded-full bg-primary my-4 px-3 py-3 font-bold text-background dark:text-foreground transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
+              className="animate-[slideInLeft_0.6s_ease-out_0.4s_both] my-4 inline-flex w-fit items-center gap-3 rounded-full bg-primary px-5 py-3 font-bold text-background transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate dark:text-foreground"
             >
               Passer votre commande
               <span className="icon-[line-md--arrow-right-circle-twotone] text-2xl" />
