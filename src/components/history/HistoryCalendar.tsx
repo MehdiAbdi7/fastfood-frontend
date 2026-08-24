@@ -1,7 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
+<<<<<<< HEAD
 import { MONTH_NAMES, WEEKDAY_LABELS, buildMonthGrid } from "@/lib/calendar";
+=======
+import { WEEKDAY_LABELS, buildMonthGrid } from "@/lib/calendar";
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
 import { formatCompactDA, formatDA } from "@/lib/format";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Select } from "@/components/ui/Select";
@@ -32,6 +36,7 @@ interface CellStats {
 }
 
 /**
+<<<<<<< HEAD
  * Deux gabarits, un seul composant.
  *
  * Sous xl, le calendrier est pleine largeur et empilé au-dessus de la liste :
@@ -46,6 +51,8 @@ interface CellStats {
  */
 
 /**
+=======
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
  * Une case du calendrier.
  *
  * Trois états, et ils doivent se distinguer AUTREMENT que par la seule
@@ -88,9 +95,14 @@ function CalendarCell({
       }
       // min-h-14 : à 7 colonnes sur un écran de 360 px une case fait ~44 px de
       // large, on garde donc au moins autant en hauteur pour rester au-dessus
+<<<<<<< HEAD
       // de la cible tactile minimale. En colonne latérale (xl), on redescend à
       // 40 px : la souris s'en accommode, et le bloc entier tient à l'écran.
       className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 py-1.5 transition-colors xl:min-h-10 xl:gap-0 xl:rounded-lg xl:px-0 xl:py-1 ${
+=======
+      // de la cible tactile minimale.
+      className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 py-1.5 transition-colors lg:min-h-11 lg:rounded-lg lg:py-1 ${
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
         isSelected
           ? "border-primary bg-primary text-on-primary shadow-sm"
           : activeStats
@@ -98,7 +110,11 @@ function CalendarCell({
             : "cursor-not-allowed border-transparent bg-surface-2/40 text-foreground/25"
       }`}
     >
+<<<<<<< HEAD
       <span className="font-heading text-sm font-bold leading-none xl:text-xs">
+=======
+      <span className="font-heading text-sm font-bold leading-none">
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
         {label}
       </span>
 
@@ -106,7 +122,11 @@ function CalendarCell({
           jours de fermeture remplirait la grille de bruit. */}
       {activeStats ? (
         <span
+<<<<<<< HEAD
           className={`tabular-nums text-[10px] font-semibold leading-none xl:text-[9px] ${
+=======
+          className={`tabular-nums text-[10px] font-semibold leading-none ${
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
             isSelected ? "opacity-80" : "text-accent-green"
           }`}
         >
@@ -115,7 +135,11 @@ function CalendarCell({
       ) : (
         // Réserve la même hauteur que la ligne de CA, pour que les cases
         // actives et inactives restent parfaitement alignées.
+<<<<<<< HEAD
         <span aria-hidden="true" className="h-2.5 xl:h-2" />
+=======
+        <span aria-hidden="true" className="h-2.5" />
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
       )}
     </button>
   );
@@ -123,11 +147,19 @@ function CalendarCell({
 
 function CalendarSkeleton({ cells }: { cells: number }) {
   return (
+<<<<<<< HEAD
     <div className="grid grid-cols-7 gap-1.5 xl:gap-1">
       {Array.from({ length: cells }).map((_, index) => (
         <Skeleton
           key={index}
           className="h-14 rounded-xl xl:h-10 xl:rounded-lg"
+=======
+    <div className="grid grid-cols-7 gap-1.5 lg:gap-1">
+      {Array.from({ length: cells }).map((_, index) => (
+        <Skeleton
+          key={index}
+          className="h-14 rounded-xl lg:h-11 lg:rounded-lg"
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
         />
       ))}
     </div>
@@ -172,7 +204,11 @@ export function HistoryCalendar({
 
   if (isLoadingYears) {
     return (
+<<<<<<< HEAD
       <section className="surface-card flex flex-col gap-4 p-4 sm:p-5 xl:gap-3 xl:p-3">
+=======
+      <section className="surface-card flex flex-col gap-4 p-4 sm:p-5 lg:gap-3 lg:p-4">
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
         <Skeleton className="h-9 w-48 rounded-full" />
         <CalendarSkeleton cells={12} />
       </section>
@@ -181,7 +217,11 @@ export function HistoryCalendar({
 
   if (years.length === 0) {
     return (
+<<<<<<< HEAD
       <section className="surface-card flex flex-col items-center gap-2 p-8 text-center xl:p-5">
+=======
+      <section className="surface-card flex flex-col items-center gap-2 p-8 text-center">
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
         <span
           aria-hidden="true"
           className="icon-[mdi--calendar-blank-outline] text-3xl text-foreground/25"
@@ -197,6 +237,7 @@ export function HistoryCalendar({
   }
 
   return (
+<<<<<<< HEAD
     <section className="surface-card flex flex-col gap-4 p-4 sm:p-5 xl:gap-3 xl:p-3">
       {/* Un intitulé de section, visible seulement en colonne latérale : sorti
           du flux principal, le bloc a besoin de dire ce qu'il est. Empilé, sa
@@ -209,6 +250,10 @@ export function HistoryCalendar({
           colonne latérale : à 320 px, deux <select> côte à côte ne montrent
           plus que « Sept… ». */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1 xl:gap-2">
+=======
+    <section className="surface-card flex flex-col gap-4 p-4 sm:p-5 lg:gap-3 lg:p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
         <Select
           id="history-year"
           label="Année"
@@ -216,9 +261,13 @@ export function HistoryCalendar({
           onChange={(event) => onSelectYear(Number(event.target.value))}
           options={years.map((entry) => ({
             value: entry.year.toString(),
+<<<<<<< HEAD
             // « vente » et non « commande » : plus court, et l'historique ne
             // contient que des commandes encaissées.
             label: `${entry.year} · ${entry.count} vente${entry.count > 1 ? "s" : ""}`,
+=======
+            label: `${entry.year} · ${entry.count} commande${entry.count > 1 ? "s" : ""}`,
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
           }))}
         />
         <Select
@@ -228,11 +277,17 @@ export function HistoryCalendar({
           onChange={(event) => onToggleMonth(Number(event.target.value))}
           disabled={isLoadingMonths || months.length === 0}
           placeholder={isLoadingMonths ? "Chargement..." : "Choisir un mois"}
+<<<<<<< HEAD
           // MONTH_NAMES plutôt qu'un Intl.DateTimeFormat construit à chaque
           // ligne : même résultat, sans instancier un formateur par mois.
           options={months.map((entry) => ({
             value: entry.month.toString(),
             label: `${MONTH_NAMES[entry.month - 1]} · ${entry.count} vente${entry.count > 1 ? "s" : ""}`,
+=======
+          options={months.map((entry) => ({
+            value: entry.month.toString(),
+            label: `${new Intl.DateTimeFormat("fr-FR", { month: "long" }).format(new Date(2020, entry.month - 1, 1))} · ${entry.count} commande${entry.count > 1 ? "s" : ""}`,
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
           }))}
         />
       </div>
@@ -242,13 +297,22 @@ export function HistoryCalendar({
           cases vides sous les mois n'apprendrait rien et doublerait la hauteur
           du bloc sur mobile. */}
       {year !== null && month !== null && (
+<<<<<<< HEAD
         <div className="flex flex-col gap-1.5 border-t border-dashed border-border-subtle pt-4 xl:gap-1 xl:pt-3">
           <div className="grid grid-cols-7 gap-1.5 xl:gap-1">
+=======
+        <div className="flex flex-col gap-1.5 border-t border-dashed border-border-subtle pt-4 lg:gap-1 lg:pt-3">
+          <div className="grid grid-cols-7 gap-1.5 lg:gap-1">
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
             {WEEKDAY_LABELS.map((label) => (
               <span
                 key={label}
                 aria-hidden="true"
+<<<<<<< HEAD
                 className="text-center text-[11px] font-bold uppercase tracking-wide text-foreground/35 xl:text-[10px] xl:tracking-normal"
+=======
+                className="text-center text-[11px] font-bold uppercase tracking-wide text-foreground/35"
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
               >
                 {label}
               </span>
@@ -258,7 +322,11 @@ export function HistoryCalendar({
           {isLoadingDays ? (
             <CalendarSkeleton cells={35} />
           ) : (
+<<<<<<< HEAD
             <div className="grid grid-cols-7 gap-1.5 xl:gap-1">
+=======
+            <div className="grid grid-cols-7 gap-1.5 lg:gap-1">
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
               {dayGrid.map((dayNumber, index) =>
                 dayNumber === null ? (
                   // Case de remplissage avant le 1er du mois. aria-hidden :
@@ -266,7 +334,11 @@ export function HistoryCalendar({
                   <span
                     key={`pad-${index}`}
                     aria-hidden="true"
+<<<<<<< HEAD
                     className="min-h-14 xl:min-h-10"
+=======
+                    className="min-h-14 lg:min-h-11"
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
                   />
                 ) : (
                   <CalendarCell
@@ -282,7 +354,11 @@ export function HistoryCalendar({
             </div>
           )}
 
+<<<<<<< HEAD
           <p className="pt-1 text-xs leading-snug text-foreground/45">
+=======
+          <p className="pt-1 text-xs text-foreground/45">
+>>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
             Les jours sans service sont grisés. Touchez à nouveau une case
             sélectionnée pour revenir au mois entier.
           </p>
