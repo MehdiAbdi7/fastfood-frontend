@@ -78,7 +78,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
     <div
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative order-2 mx-auto aspect-square w-full max-w-80 max-h-80 bg-linear-to-t from-primary/50 via-transparent to-transparent rounded-full shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary sm:mx-0 sm:max-w-120 sm:max-h-120 md:max-w-96 md:max-h-96"
+      className="relative order-2 mx-auto aspect-square w-full max-w-80 max-h-80 bg-linear-to-t from-primary/50 via-transparent to-transparent rounded-full shadow-[0_0_30px_5px_rgba(217,169,77,0.45)] shadow-primary sm:mx-0 sm:max-w-120 sm:max-h-120 md:max-w-[min(44vw,30rem)] md:max-h-[min(44vw,30rem)]"
     >
       <div
         className="absolute bottom-[6%] left-1/2 h-[8%] w-[70%]  rounded-full "
