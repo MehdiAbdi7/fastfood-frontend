@@ -5,10 +5,7 @@ import { HistoryToolbar } from "@/components/history/HistoryToolbar";
 import { HistoryCalendar } from "@/components/history/HistoryCalendar";
 import { HistoryOrderList } from "@/components/history/HistoryOrderList";
 import { OrderDetailModal } from "@/components/orders/OrderDetailModal";
-<<<<<<< HEAD
 import { EmptyState } from "@/components/ui/EmptyState";
-=======
->>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
 import {
   useGetHistoryQuery,
   useGetHistoryYearsQuery,
@@ -31,7 +28,6 @@ const PAGE_SIZE = 20;
  * Historique des ventes.
  *
  * Le calendrier n'est PAS un chemin de navigation mais un FILTRE : il reste
-<<<<<<< HEAD
  * affiché en permanence, et cliquer une case resserre la liste au lieu de
  * changer d'écran. C'est ce qui permet de comparer deux jours en deux clics,
  * là où l'ancien drill-down imposait de remonter puis redescendre.
@@ -48,11 +44,6 @@ const PAGE_SIZE = 20;
  * `flex-row-reverse` plutôt qu'un réordonnancement du JSX : le calendrier
  * reste PREMIER dans le DOM, donc au-dessus de la liste sur mobile — c'est là
  * qu'il sert de point d'entrée — tout en s'affichant à droite sur desktop.
-=======
- * affiché en permanence, et cliquer une case resserre la liste du dessous au
- * lieu de changer d'écran. C'est ce qui permet de comparer deux jours en deux
- * clics, là où l'ancien drill-down imposait de remonter puis redescendre.
->>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
  *
  * Tout le travail lourd — plage de dates, recherche, tri, découpage en pages,
  * totaux — est fait par MongoDB (voir order.controller.ts::getHistory). Le
@@ -153,12 +144,9 @@ export default function HistoriquePage() {
         title="Historique"
         description="Retrouve, filtre et exporte les ventes passées de tes établissements."
       />
-<<<<<<< HEAD
 
       {/* Les filtres transverses restent pleine largeur, AU-DESSUS des deux
           colonnes : ils s'appliquent aussi bien au calendrier qu'à la liste. */}
-=======
->>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
       <HistoryToolbar
         type={selection.type}
         search={selection.search}
@@ -168,7 +156,6 @@ export default function HistoriquePage() {
         onSortChange={setSort}
       />
 
-<<<<<<< HEAD
       <div className="flex flex-col gap-6 xl:flex-row-reverse xl:items-start xl:gap-5">
         {/* ---------- Calendrier ----------
             Collant sous la topbar (sticky top-16 + une respiration) : il reste
@@ -235,50 +222,6 @@ export default function HistoriquePage() {
           )}
         </div>
       </div>
-=======
-      <HistoryCalendar
-        years={yearsQuery.data ?? []}
-        months={monthsQuery.data ?? []}
-        days={daysQuery.data ?? []}
-        year={year}
-        month={activeMonth}
-        day={selection.day}
-        isLoadingYears={yearsQuery.isLoading}
-        isLoadingMonths={monthsQuery.isLoading}
-        isLoadingDays={daysQuery.isLoading}
-        onSelectYear={setYear}
-        onToggleMonth={toggleMonth}
-        onToggleDay={toggleDay}
-      />
-
-      {/* Rien à lister tant qu'aucune année n'existe : le calendrier affiche
-          déjà son propre état vide, en rajouter un second serait redondant. */}
-      {year !== null && (
-        <HistoryOrderList
-          orders={historyQuery.data?.orders ?? []}
-          summary={historyQuery.data?.summary}
-          selectionLabel={selectionLabel}
-          currentPage={historyQuery.data?.currentPage ?? selection.page}
-          totalPages={historyQuery.data?.totalPages ?? 1}
-          isLoading={historyQuery.isLoading}
-          isFetching={historyQuery.isFetching}
-          isError={historyQuery.isError}
-          hasSearch={debouncedSearch.trim().length > 0}
-          isSingleDay={selection.day !== null}
-          // La colonne magasin n'a de sens que dans la vue « tous les
-          // magasins » d'un admin : ailleurs, elle répéterait la même valeur
-          // sur chaque ligne.
-          showStore={isAllStores}
-          // La colonne type ne s'affiche qu'en vue « Tous » : ailleurs elle
-          // répéterait la même valeur sur chaque ligne.
-          showType={selection.type === "all"}
-          onPageChange={setPage}
-          onOpenOrder={setOpenOrderId}
-          onExport={handleExport}
-          onClearFilters={clearSelection}
-        />
-      )}
->>>>>>> 73d2d1ded1f3fb1a3c3f9b67f83f08345e40012e
 
       <OrderDetailModal
         orderId={openOrderId}
