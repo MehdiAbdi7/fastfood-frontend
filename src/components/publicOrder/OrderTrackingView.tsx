@@ -15,22 +15,36 @@ interface Step {
   icon: string;
 }
 
-// La suite d'étapes dépend du mode : une commande à emporter ne passe jamais
-// par "en livraison", afficher l'étape grisée laisserait croire à une attente
-// supplémentaire.
+/**
+ * Le parcours affiché au client, par mode de service.
+ *
+ * DEUX PIÈGES à garder en tête en modifiant ces listes.
+ *
+ * 1. Il n'existe PAS de statut « en préparation » distinct. `pending` couvre
+ *    à la fois « la commande est arrivée » et « la cuisine est dessus », parce
+ *    qu'un statut de plus, c'est un clic de plus par commande en plein coup de
+ *    feu. Le libellé de `pending` doit donc porter les deux idées — et surtout
+ *    PAS celui de `ready`, qui signifie que le plat est terminé. C'est
+ *    exactement l'erreur qui traînait sur dine_in : un client voyait
+ *    « en préparation » alors que son burger l'attendait au passe.
+ *
+ * 2. La suite d'étapes dépend du mode : une commande à emporter ne passe
+ *    jamais par « en livraison », afficher l'étape grisée laisserait croire à
+ *    une attente supplémentaire.
+ */
 const STEPS_BY_TYPE: Record<OrderType, Step[]> = {
   dine_in: [
     {
       status: "pending",
       label: "Commande reçue",
-      hint: "La cuisine l'a sous les yeux.",
-      icon: "icon-[mdi--receipt-text-check-outline]",
+      hint: "C'est en préparation.",
+      icon: "icon-[mdi--chef-hat]",
     },
     {
       status: "ready",
-      label: "En préparation",
-      hint: "On s'en occupe, ça arrive.",
-      icon: "icon-[mdi--chef-hat]",
+      label: "Prête",
+      hint: "On vous l'apporte à table.",
+      icon: "icon-[mdi--room-service-outline]",
     },
     {
       status: "completed",
@@ -43,8 +57,8 @@ const STEPS_BY_TYPE: Record<OrderType, Step[]> = {
     {
       status: "pending",
       label: "Commande reçue",
-      hint: "La cuisine l'a sous les yeux.",
-      icon: "icon-[mdi--receipt-text-check-outline]",
+      hint: "C'est en préparation.",
+      icon: "icon-[mdi--chef-hat]",
     },
     {
       status: "ready",
@@ -63,8 +77,8 @@ const STEPS_BY_TYPE: Record<OrderType, Step[]> = {
     {
       status: "pending",
       label: "Commande reçue",
-      hint: "La cuisine l'a sous les yeux.",
-      icon: "icon-[mdi--receipt-text-check-outline]",
+      hint: "C'est en préparation.",
+      icon: "icon-[mdi--chef-hat]",
     },
     {
       status: "ready",
@@ -174,12 +188,22 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
         >
           Réessayer
         </button>
-        <Link
-          href="/commande"
-          className="text-sm font-semibold text-accent-green"
-        >
-          Retour à la carte
-        </Link>
+        {/* Deux sorties : reprendre une commande, ou retrouver la sienne par
+            son numéro si c'est le lien qui est cassé. */}
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/commande"
+            className="text-sm font-semibold text-accent-green"
+          >
+            Retour à la carte
+          </Link>
+          <Link
+            href="/commande/suivi"
+            className="text-sm font-semibold text-primary underline"
+          >
+            Chercher par numéro
+          </Link>
+        </div>
       </div>
     );
   }
@@ -235,7 +259,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
             d&apos;une erreur.
           </p>
           <Link
-            href="/#contact"
+            href="/contact"
             className="mt-1 text-sm font-bold text-accent-bordeaux underline"
           >
             Voir nos numéros
