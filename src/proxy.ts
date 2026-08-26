@@ -5,6 +5,9 @@ const AUTH_COOKIE_NAME = "niwa_token";
 // Doit rester aligné sur navConfig.ts. Un oubli ici ne crée pas de faille —
 // le layout dashboard revérifie la session côté serveur — mais provoque un
 // aller-retour inutile avant la redirection.
+//
+// /livraison en fait partie : c'est l'espace du livreur, aussi protégé que
+// le reste, même s'il ne figure dans aucune barre de navigation.
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/commandes",
@@ -13,6 +16,7 @@ const PROTECTED_PREFIXES = [
   "/historique",
   "/utilisateurs",
   "/parametres",
+  "/livraison",
 ];
 
 /**
@@ -26,7 +30,10 @@ const PROTECTED_PREFIXES = [
  * code tourne sur le runtime Edge, où jsonwebtoken n'est pas disponible. Ce
  * n'est donc pas une barrière de sécurité, mais une optimisation qui évite de
  * rendre une page pour rien. L'autorisation réelle reste faite par le backend
- * à chaque appel, et par getSession() dans le layout dashboard.
+ * à chaque appel, et par getSession() dans les layouts.
+ *
+ * Il ne connaît pas non plus le RÔLE, pour la même raison : c'est aux layouts
+ * (dashboard) et (livraison) d'aiguiller chacun vers son espace.
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -46,6 +53,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Destination volontairement neutre : le rôle est inconnu ici, donc on
+  // envoie vers /dashboard, et le layout redirigera un livreur vers
+  // /livraison. Un aller-retour de plus, mais aucune supposition fausse.
   if (pathname === "/login" && hasSession) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }

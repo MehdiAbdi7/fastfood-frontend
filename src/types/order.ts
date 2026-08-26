@@ -49,6 +49,19 @@ export interface OrderClient {
   address?: string;
 }
 
+/**
+ * Livreur tel que populé par le backend sur getOrders / getOrderById.
+ *
+ * Projection volontairement courte (firstname lastname tel) : la fiche
+ * commande n'a besoin que de savoir QUI porte la course et comment le joindre.
+ */
+export interface OrderDeliveryPerson {
+  _id: string;
+  firstname: string;
+  lastname: string;
+  tel?: string;
+}
+
 export interface Order {
   _id: string;
   type: OrderType;
@@ -59,15 +72,16 @@ export interface Order {
    * Journée commerciale d'appartenance (ISO, minuit UTC).
    *
    * Dérivée de l'heure d'OUVERTURE du service : une commande encaissée à 00h20
-   * appartient au service de la veille. C'est le seul axe temporel de
-   * l'historique et du calendrier — `completedAt` ne sert qu'à l'affichage de
-   * l'heure et au tri à l'intérieur d'un même service.
-   *
-   * Toujours l'afficher avec formatServiceDate() (timeZone UTC), jamais avec
-   * formatDateTime(), sous peine de décaler la date d'un jour.
+   * appartient au service de la veille. Toujours l'afficher avec
+   * formatServiceDate() (timeZone UTC), jamais avec formatDateTime().
    */
   serviceDate: string;
   table?: RestaurantTable | string | null;
+  /**
+   * Livreur assigné, ou absent. Populé en objet par le dashboard, brut
+   * (ObjectId) partout ailleurs — d'où l'union.
+   */
+  deliveryPerson?: OrderDeliveryPerson | string | null;
   client: OrderClient;
   items: OrderItem[];
   remark?: string;
@@ -78,10 +92,21 @@ export interface Order {
   updatedAt: string;
 }
 
+/**
+ * Lit le livreur d'une commande, quel que soit l'état du populate.
+ *
+ * Renvoie null quand le champ est absent ou n'est qu'un identifiant : dans ce
+ * dernier cas il n'y a rien d'affichable, et deviner un nom serait pire que ne
+ * rien montrer.
+ */
+export function getDeliveryPerson(
+  order: Pick<Order, "deliveryPerson">,
+): OrderDeliveryPerson | null {
+  const person = order.deliveryPerson;
+  return person && typeof person === "object" ? person : null;
+}
+
 // Ce que renvoie GET /orders/:id/track — route publique, sans authentification.
-// La projection du backend exclut téléphone et adresse : la room de suivi est
-// ouverte à quiconque connaît l'id. Un type distinct plutôt qu'un Order
-// partiel, pour que le compilateur interdise de lire un champ absent.
 export interface OrderTracking {
   _id: string;
   type: OrderType;

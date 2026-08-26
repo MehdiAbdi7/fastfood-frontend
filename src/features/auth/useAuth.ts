@@ -6,6 +6,17 @@ import { sessionCleared, sessionLoaded } from "./authSlice";
 import { useLoginMutation, useLogoutMutation } from "./authApi";
 import { api } from "@/server/api";
 
+/**
+ * Page d'accueil d'un rôle, après connexion ou déconnexion.
+ *
+ * Un livreur n'a rien à faire sur /dashboard : le layout l'en chasserait, mais
+ * autant l'envoyer directement au bon endroit plutôt que de lui faire traverser
+ * une redirection.
+ */
+export function getHomePathForRole(role?: string): string {
+  return role === "delivery" ? "/livraison" : "/dashboard";
+}
+
 export function useAuth() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -44,6 +55,12 @@ export function useAuth() {
     status,
     isAuthenticated: status === "authenticated",
     isAdmin: user?.role === "admin",
+    isDelivery: user?.role === "delivery",
+    // « Travaille dans le restaurant », admin compris — même définition que
+    // le middleware isStaff côté backend. À utiliser pour masquer ce qu'un
+    // livreur ne doit pas voir : c'est l'API qui protège réellement, ceci
+    // évite seulement d'afficher un bouton qui répondrait 403.
+    isStaff: user?.role === "admin" || user?.role === "employee",
     login,
     logout,
     isLoginLoading,

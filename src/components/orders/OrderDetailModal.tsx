@@ -8,10 +8,12 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { DeliveryPersonModal } from "./DeliveryPersonModal";
 import {
   useGetOrderByIdQuery,
   useUpdateOrderStatusMutation,
   useSetDeliveryFeeMutation,
+  useSetDeliveryPersonMutation,
   useDeleteOrderMutation,
 } from "@/features/orders/orderApi";
 import { useAuth } from "@/features/auth/useAuth";
@@ -22,6 +24,7 @@ import { formatDA, formatDateTime } from "@/lib/format";
 import { formatVariantLabel } from "@/lib/variantLabel";
 import { ORDER_TYPE_LABELS } from "@/lib/orderLabels";
 import { printOrderTicket } from "@/lib/printTicket";
+import { getDeliveryPerson } from "@/types/order";
 
 interface OrderDetailModalProps {
   orderId: string | null;
@@ -43,12 +46,19 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
     useUpdateOrderStatusMutation();
   const [setDeliveryFee, { isLoading: isSavingFee }] =
     useSetDeliveryFeeMutation();
+  const [setDeliveryPerson, { isLoading: isSavingPerson }] =
+    useSetDeliveryPersonMutation();
   const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [feeInput, setFeeInput] = useState("");
   const [isEditingFee, setIsEditingFee] = useState(false);
+
+  // Deux usages distincts de la même modale : l'envoi en livraison (qui change
+  // aussi le statut) et la simple correction d'assignation.
+  const [isDispatchOpen, setIsDispatchOpen] = useState(false);
+  const [isReassignOpen, setIsReassignOpen] = useState(false);
 
   const isOpen = orderId !== null;
 
@@ -57,19 +67,64 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
     onClose();
   }
 
+  const primaryAction = order ? getPrimaryAction(order) : null;
+  const deliveryPerson = order ? getDeliveryPerson(order) : null;
+
+  // L'envoi en livraison passe par le choix du livreur : c'est un geste unique
+  // au comptoir (« celle-là, c'est Karim qui la prend »), donc un seul appel.
+  const needsDispatch = primaryAction?.status === "out_for_delivery";
+
   async function handlePrimaryAction() {
-    if (!order) return;
-    const action = getPrimaryAction(order);
-    if (!action) return;
+    if (!order || !primaryAction) return;
+
+    if (needsDispatch) {
+      setIsDispatchOpen(true);
+      return;
+    }
+
     try {
-      await updateStatus({ id: order._id, status: action.status }).unwrap();
+      await updateStatus({
+        id: order._id,
+        status: primaryAction.status,
+      }).unwrap();
       toast.success(
-        `Commande #${order.dailyNumber} — ${action.label.toLowerCase()}`,
+        `Commande #${order.dailyNumber} — ${primaryAction.label.toLowerCase()}`,
       );
     } catch (err) {
       toast.error(
         getApiErrorMessage(err, "Impossible de mettre à jour la commande"),
       );
+    }
+  }
+
+  async function handleDispatch(deliveryPersonId: string | null) {
+    if (!order) return;
+    try {
+      await updateStatus({
+        id: order._id,
+        status: "out_for_delivery",
+        deliveryPerson: deliveryPersonId,
+      }).unwrap();
+      toast.success(`Commande #${order.dailyNumber} partie en livraison`);
+      setIsDispatchOpen(false);
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Impossible d'envoyer la commande"));
+    }
+  }
+
+  async function handleReassign(deliveryPersonId: string | null) {
+    if (!order) return;
+    try {
+      await setDeliveryPerson({
+        id: order._id,
+        deliveryPerson: deliveryPersonId,
+      }).unwrap();
+      toast.success(
+        deliveryPersonId ? "Livreur mis à jour" : "Livreur retiré",
+      );
+      setIsReassignOpen(false);
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Impossible de changer le livreur"));
     }
   }
 
@@ -116,7 +171,6 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
     }
   }
 
-  const primaryAction = order ? getPrimaryAction(order) : null;
   const tableLabel =
     order?.type === "dine_in" && order.table && typeof order.table === "object"
       ? `Table ${order.table.tableN}`
@@ -158,7 +212,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               <Button
                 icon={primaryAction.icon}
                 onClick={handlePrimaryAction}
-                isLoading={isUpdatingStatus}
+                isLoading={isUpdatingStatus && !needsDispatch}
               >
                 {primaryAction.label}
               </Button>
@@ -226,6 +280,38 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               </button>
             </div>
           </div>
+
+          {/* Livreur — affiché dès que la commande est partie, pour que
+              n'importe quel poste sache qui appeler si le client s'impatiente. */}
+          {order.type === "delivery" &&
+            order.status === "out_for_delivery" && (
+              <div className="flex items-center justify-between gap-3 rounded-xl bg-surface-2 px-3 py-2.5">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span
+                    aria-hidden="true"
+                    className="icon-[mdi--moped-outline] shrink-0 text-xl text-primary"
+                  />
+                  <div className="flex min-w-0 flex-col">
+                    <span className="truncate text-sm font-semibold text-foreground">
+                      {deliveryPerson
+                        ? `${deliveryPerson.firstname} ${deliveryPerson.lastname}`
+                        : "Sans livreur assigné"}
+                    </span>
+                    <span className="tabular-nums text-xs text-foreground/50">
+                      {deliveryPerson?.tel ??
+                        "Vous validerez la livraison ici"}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsReassignOpen(true)}
+                  className="shrink-0 text-xs font-bold text-primary hover:underline"
+                >
+                  Changer
+                </button>
+              </div>
+            )}
 
           {order.remark && (
             <div className="rounded-xl bg-accent-mustard/10 px-3 py-2 text-sm text-foreground/80">
@@ -361,6 +447,27 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
 
       {order && (
         <>
+          <DeliveryPersonModal
+            isOpen={isDispatchOpen}
+            onClose={() => setIsDispatchOpen(false)}
+            store={order.store}
+            onConfirm={handleDispatch}
+            isSubmitting={isUpdatingStatus}
+            title={`Envoyer la commande #${order.dailyNumber}`}
+            confirmLabel="Envoyer en livraison"
+          />
+
+          <DeliveryPersonModal
+            isOpen={isReassignOpen}
+            onClose={() => setIsReassignOpen(false)}
+            store={order.store}
+            currentDeliveryPersonId={deliveryPerson?._id ?? null}
+            onConfirm={handleReassign}
+            isSubmitting={isSavingPerson}
+            title="Changer de livreur"
+            confirmLabel="Enregistrer"
+          />
+
           <ConfirmDialog
             isOpen={isCancelConfirmOpen}
             onClose={() => setIsCancelConfirmOpen(false)}

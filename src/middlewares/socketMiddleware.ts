@@ -2,6 +2,7 @@ import type { Middleware, UnknownAction } from "@reduxjs/toolkit";
 import { io, type Socket } from "socket.io-client";
 import { api } from "@/server/api";
 import { sessionLoaded, sessionCleared } from "@/features/auth/authSlice";
+import { MY_DELIVERIES_TAG } from "@/features/delivery/deliveryApi";
 
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL ??
@@ -24,12 +25,16 @@ export const socketMiddleware: Middleware = (store) => (next) => (action) => {
   // Ouverture : le user vient d'être posé (login, ou arrivée sur le dashboard
   // avec une session déjà valide). Un payload null signifie « pas connecté ».
   if (sessionLoaded.match(typedAction)) {
-    if (!typedAction.payload) {
+    const user = typedAction.payload;
+
+    if (!user) {
       disconnect();
       return result;
     }
 
     if (socket?.connected) return result;
+
+    const isDelivery = user.role === "delivery";
 
     // Plus de `auth: { token }` : le token est dans un cookie httpOnly, que le
     // JavaScript ne peut pas lire. withCredentials fait joindre ce cookie au
@@ -37,10 +42,22 @@ export const socketMiddleware: Middleware = (store) => (next) => (action) => {
     socket = io(SOCKET_URL, { withCredentials: true });
 
     socket.on("connect", () => {
-      // C'est ce message qui fait rejoindre les rooms dashboard:<store>,
-      // selon le rôle et le magasin lus depuis le JWT côté serveur.
-      socket?.emit("join_dashboard");
+      // Deux rooms mutuellement exclusives. Le backend refuse de toute façon
+      // join_dashboard à un livreur, mais autant ne pas le demander : ce serait
+      // suggérer que le cloisonnement est une question de politesse côté client.
+      socket?.emit(isDelivery ? "join_delivery" : "join_dashboard");
     });
+
+    if (isDelivery) {
+      // Un livreur n'a qu'un seul écran, et une seule chose à savoir : ce qui
+      // change dans SES courses. Le backend émet un signal seul, le refetch
+      // applique le filtre `deliveryPerson: moi`.
+      socket.on("delivery_updated", () => {
+        store.dispatch(api.util.invalidateTags([MY_DELIVERIES_TAG]));
+      });
+
+      return result;
+    }
 
     // Le socket ne pousse pas les données dans le store : il invalide les tags
     // RTK Query, qui refetche. Une seule source de vérité pour les commandes,

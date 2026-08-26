@@ -15,10 +15,23 @@ import { useAuth } from "@/features/auth/useAuth";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { STORE_LABELS } from "@/types/store";
-import type { User } from "@/types/user";
+import { ROLE_LABELS, type User, type UserRole } from "@/types/user";
 
-// La restriction admin vit désormais dans (dashboard)/utilisateurs/layout.tsx,
-// donc côté serveur : le HTML de cette page n'est jamais envoyé à un employé.
+/**
+ * Couleur du badge par rôle.
+ *
+ * Le livreur a la teinte `primary`, la même que l'icône de scooter du reste de
+ * l'app : c'est le seul rôle qui ne travaille pas dans le restaurant, autant
+ * qu'il se distingue au premier coup d'œil dans la liste.
+ */
+const ROLE_BADGE_CLASSES: Record<UserRole, string> = {
+  admin: "bg-accent-mustard/15 text-accent-mustard",
+  employee: "bg-accent-green/15 text-accent-green",
+  delivery: "bg-primary/15 text-primary",
+};
+
+// La restriction admin vit dans (dashboard)/utilisateurs/layout.tsx, donc côté
+// serveur : le HTML de cette page n'est jamais envoyé à un employé.
 export default function UtilisateursPage() {
   const { user: currentUser } = useAuth();
   const { data: users, isLoading, isError } = useGetUsersQuery();
@@ -58,7 +71,7 @@ export default function UtilisateursPage() {
       <PageHeader
         eyebrow="Administration"
         title="Équipe"
-        description="Gère les accès et les rôles des personnes qui font vivre les restaurants."
+        description="Gère les accès et les rôles des personnes qui font vivre les restaurants, livreurs compris."
         action={
           <Button
             icon="icon-[mdi--account-plus-outline]"
@@ -102,7 +115,9 @@ export default function UtilisateursPage() {
                       )}
                     </span>
                     <span className="truncate text-xs text-foreground/50">
-                      {user.email}
+                      {/* Pour un livreur, le téléphone compte plus que l'email :
+                          c'est par là qu'on le joint pendant le service. */}
+                      {user.role === "delivery" ? user.tel : user.email}
                     </span>
                   </div>
                 </div>
@@ -111,13 +126,9 @@ export default function UtilisateursPage() {
                 <div className="flex items-center justify-between gap-2 sm:justify-end">
                   <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <span
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${
-                        user.role === "admin"
-                          ? "bg-accent-mustard/15 text-accent-mustard"
-                          : "bg-accent-green/15 text-accent-green"
-                      }`}
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${ROLE_BADGE_CLASSES[user.role]}`}
                     >
-                      {user.role === "admin" ? "Admin" : "Employé"}
+                      {ROLE_LABELS[user.role]}
                     </span>
                     {user.store && (
                       <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-foreground/60">
@@ -167,7 +178,11 @@ export default function UtilisateursPage() {
         onClose={() => setDeletingUser(null)}
         onConfirm={handleDelete}
         title={`Supprimer le compte de ${deletingUser?.firstname} ?`}
-        description="Cette action est irréversible."
+        description={
+          deletingUser?.role === "delivery"
+            ? "Ses courses en cours resteront visibles sur le dashboard, où le staff pourra les valider."
+            : "Cette action est irréversible."
+        }
         confirmLabel="Supprimer"
         variant="danger"
         isLoading={isDeleting}

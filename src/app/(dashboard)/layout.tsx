@@ -23,10 +23,16 @@ export default async function DashboardLayout({
 }) {
   const user = await getSession();
 
-  // Filet derrière le middleware : celui-ci ne fait que constater la présence
+  // Filet derrière le proxy : celui-ci ne fait que constater la présence
   // du cookie, il ne peut pas vérifier la signature du JWT sur le runtime Edge.
   // Un cookie forgé ou expiré est arrêté ici.
   if (!user) redirect("/login");
+
+  // Un livreur possède une session parfaitement valide : sans ce garde, il
+  // recevrait le HTML du dashboard. Les données, elles, lui seraient refusées
+  // en 403 par isStaff — il verrait donc une coquille vide et des erreurs
+  // partout, ce qui est pire qu'une redirection franche.
+  if (user.role === "delivery") redirect("/livraison");
 
   return (
     <>

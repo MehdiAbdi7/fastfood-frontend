@@ -10,6 +10,7 @@ import { getApiErrorMessage } from "@/lib/apiError";
 import { getPrimaryAction } from "@/lib/orderTransitions";
 import { formatDA } from "@/lib/format";
 import { ORDER_TYPE_ICONS, ORDER_TYPE_LABELS } from "@/lib/orderLabels";
+import { getDeliveryPerson } from "@/types/order";
 
 interface OrderCardProps {
   order: Order;
@@ -21,19 +22,36 @@ export function OrderCard({ order, onOpenDetail }: OrderCardProps) {
   const toast = useToast();
 
   const primaryAction = getPrimaryAction(order);
+  const deliveryPerson = getDeliveryPerson(order);
   const itemsCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
   const tableLabel =
     order.type === "dine_in" && order.table && typeof order.table === "object"
       ? `Table ${order.table.tableN}`
       : null;
 
+  // L'envoi en livraison demande de choisir un livreur : ça ne tient pas sur
+  // une carte de kanban, donc le bouton ouvre la fiche, où la modale de choix
+  // a la place de s'afficher. Toutes les autres transitions restent en un clic.
+  const opensDetail = primaryAction?.status === "out_for_delivery";
+
   async function handlePrimaryAction(e: React.MouseEvent) {
     e.stopPropagation(); // la carte entière ouvre le détail, le bouton ne doit pas le déclencher aussi
     if (!primaryAction) return;
+
+    if (opensDetail) {
+      onOpenDetail();
+      return;
+    }
+
     try {
-      await updateStatus({ id: order._id, status: primaryAction.status }).unwrap();
+      await updateStatus({
+        id: order._id,
+        status: primaryAction.status,
+      }).unwrap();
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Impossible de mettre à jour la commande"));
+      toast.error(
+        getApiErrorMessage(err, "Impossible de mettre à jour la commande"),
+      );
     }
   }
 
@@ -69,6 +87,18 @@ export function OrderCard({ order, onOpenDetail }: OrderCardProps) {
       <p className="truncate text-sm font-semibold text-foreground/85">
         {order.client.fullName}
       </p>
+
+      {/* Qui porte la course : sans ça, il faut ouvrir la fiche pour savoir
+          qui rappeler quand le client s'impatiente. */}
+      {deliveryPerson && (
+        <p className="flex items-center gap-1.5 truncate text-xs font-semibold text-primary">
+          <span
+            aria-hidden="true"
+            className="icon-[mdi--moped-outline] shrink-0 text-sm"
+          />
+          {deliveryPerson.firstname}
+        </p>
+      )}
 
       <div className="flex items-center justify-between border-t border-border-subtle pt-3">
         <div className="flex flex-col">

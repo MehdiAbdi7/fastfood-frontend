@@ -21,6 +21,12 @@ interface UserFormModalProps {
   user: User | null; // null = création
 }
 
+const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
+  { value: "employee", label: "Employé" },
+  { value: "admin", label: "Administrateur" },
+  { value: "delivery", label: "Livreur" },
+];
+
 // Pas de champ mot de passe en édition : le backend n'expose aucune route de
 // réinitialisation (voir updateUserSchema, qui ne l'accepte pas). Un
 // changement de mot de passe reste à faire directement en base pour l'instant.
@@ -40,6 +46,11 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const toast = useToast();
   const isLoading = isCreating || isUpdating;
+
+  // Seul l'admin est transverse : employé comme livreur appartiennent à un
+  // magasin. Pour un livreur, c'est ce qui l'empêche d'être assigné à une
+  // course de l'autre restaurant (le backend le refuse).
+  const needsStore = role !== "admin";
 
   useEffect(() => {
     if (!isOpen) return;
@@ -67,7 +78,7 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
             email,
             tel,
             role,
-            store: role === "employee" ? store : undefined,
+            store: needsStore ? store : undefined,
           },
         }).unwrap();
         toast.success("Compte mis à jour");
@@ -79,7 +90,7 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
           tel,
           password,
           role,
-          store: role === "employee" ? store : undefined,
+          store: needsStore ? store : undefined,
         }).unwrap();
         toast.success("Compte créé");
       }
@@ -161,12 +172,9 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
             label="Rôle"
             value={role}
             onChange={(e) => setRole(e.target.value as UserRole)}
-            options={[
-              { value: "employee", label: "Employé" },
-              { value: "admin", label: "Administrateur" },
-            ]}
+            options={ROLE_OPTIONS}
           />
-          {role === "employee" && (
+          {needsStore && (
             <Select
               id="store"
               label="Magasin"
@@ -179,6 +187,17 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
             />
           )}
         </div>
+
+        {/* Le livreur se connecte comme tout le monde : email + mot de passe.
+            Son numéro sert au staff pendant le service, pas à l'identifier. */}
+        {role === "delivery" && !isEditing && (
+          <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs leading-relaxed text-foreground/60">
+            Le livreur se connectera avec cet email et ce mot de passe. Il
+            n&apos;aura accès qu&apos;à ses propres courses, jamais au reste du
+            dashboard. Un email interne suffit (ex :{" "}
+            <span className="font-semibold">prenom.livreur@niwafood.dz</span>).
+          </p>
+        )}
 
         {error && <p className="text-sm text-accent-bordeaux">{error}</p>}
       </form>

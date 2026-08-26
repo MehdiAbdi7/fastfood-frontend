@@ -24,6 +24,21 @@ export interface OrdersPage {
   currentPage: number;
 }
 
+/**
+ * Changement de statut, avec assignation de livreur en option.
+ *
+ * `deliveryPerson` n'est accepté par le backend que sur la transition vers
+ * `out_for_delivery`. Trois valeurs distinctes, et la nuance compte :
+ *   - absent  -> l'assignation existante n'est pas touchée
+ *   - null    -> retire le livreur (course reprise par le staff)
+ *   - un id   -> assigne
+ */
+interface UpdateOrderStatusPayload {
+  id: string;
+  status: OrderStatus;
+  deliveryPerson?: string | null;
+}
+
 export const orderApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<OrdersPage, OrdersQueryParams | void>({
@@ -68,14 +83,17 @@ export const orderApi = api.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "Order", id }],
     }),
 
-    updateOrderStatus: builder.mutation<
-      Order,
-      { id: string; status: OrderStatus }
-    >({
-      query: ({ id, status }) => ({
+    updateOrderStatus: builder.mutation<Order, UpdateOrderStatusPayload>({
+      query: ({ id, status, deliveryPerson }) => ({
         url: `/orders/${id}/status`,
         method: "PATCH",
-        body: { status },
+        // La clé n'est envoyée que si elle a été fournie : `undefined`
+        // sérialisé en JSON disparaît, mais `null` est une valeur significative
+        // (retirer le livreur) qu'il faut pouvoir transmettre.
+        body:
+          deliveryPerson === undefined
+            ? { status }
+            : { status, deliveryPerson },
       }),
       transformResponse: (response: ApiEnvelope<Order>) => response.data,
       invalidatesTags: (_r, _e, { id }) => [
@@ -83,6 +101,29 @@ export const orderApi = api.injectEndpoints({
         { type: "Order", id: "LIST" },
         { type: "Table", id: "LIST" }, // "completed" libère la table associée
         { type: "Table", id: "PUBLIC" },
+      ],
+    }),
+
+    /**
+     * Correction d'assignation, hors changement de statut.
+     *
+     * Indispensable parce que le backend interdit la transition
+     * out_for_delivery -> out_for_delivery : sans cette route, une erreur de
+     * livreur serait irrattrapable une fois la commande partie.
+     */
+    setDeliveryPerson: builder.mutation<
+      Order,
+      { id: string; deliveryPerson: string | null }
+    >({
+      query: ({ id, deliveryPerson }) => ({
+        url: `/orders/${id}/delivery-person`,
+        method: "PATCH",
+        body: { deliveryPerson },
+      }),
+      transformResponse: (response: ApiEnvelope<Order>) => response.data,
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Order", id },
+        { type: "Order", id: "LIST" },
       ],
     }),
 
@@ -168,6 +209,7 @@ export const {
   useCreateOrderMutation,
   useGetOrderByIdQuery,
   useUpdateOrderStatusMutation,
+  useSetDeliveryPersonMutation,
   useAddItemsToOrderMutation,
   useSetDeliveryFeeMutation,
   useDeleteOrderMutation,

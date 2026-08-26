@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/features/auth/useAuth";
+import { useAuth, getHomePathForRole } from "@/features/auth/useAuth";
 import { ThemeToggle } from "@/components/public/themeToggle";
 import { getApiErrorMessage } from "@/lib/apiError";
 
@@ -21,13 +21,20 @@ export function LoginForm() {
     setErrorMessage(null);
 
     try {
-      await login(email, password);
+      const loggedUser = await login(email, password);
+
+      const home = getHomePathForRole(loggedUser.role);
 
       // Renvoie là où l'employé voulait aller avant d'être intercepté par le
-      // middleware. On ne garde que les chemins internes : accepter une URL
-      // absolue ouvrirait une redirection ouverte (?from=https://…).
+      // proxy. On ne garde que les chemins internes : accepter une URL absolue
+      // ouvrirait une redirection ouverte (?from=https://…).
+      //
+      // Un LIVREUR ignore `from` : ce paramètre pointe forcément vers une page
+      // du dashboard, où le layout le renverrait aussitôt. Autant lui épargner
+      // l'aller-retour et l'envoyer directement sur ses courses.
       const from = searchParams.get("from");
-      const destination = from?.startsWith("/") ? from : "/dashboard";
+      const destination =
+        loggedUser.role !== "delivery" && from?.startsWith("/") ? from : home;
 
       router.replace(destination);
       // Indispensable : le cookie vient d'être posé, mais les Server Components
@@ -55,7 +62,7 @@ export function LoginForm() {
             Espace équipe
           </h1>
           <p className="text-sm text-foreground/60">
-            Connectez-vous pour accéder au dashboard
+            Connectez-vous pour accéder à votre espace
           </p>
         </div>
 
