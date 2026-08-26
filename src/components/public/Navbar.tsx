@@ -7,22 +7,31 @@ import { usePathname } from "next/navigation";
 import { useNavbar } from "@/features/navbar/useNavbar";
 import { ThemeToggle } from "./themeToggle";
 import { CartButton } from "./CartButton";
+import { TrackOrderButton } from "./TrackOrderButton";
 
-// « À propos » et « Contact » pointent désormais vers de vraies pages et non
-// plus vers des ancres de l'accueil. Les sections restent en place sur la page
-// d'accueil — elles y servent de teaser — mais un client qui clique dans la
-// barre attend une page, pas un saut de 2000 pixels.
+// « Suivi » rejoint la barre : c'est la seule façon, pour un client qui a
+// fermé son onglet ou changé de téléphone, de retrouver sa commande. Le
+// raccourci TrackOrderButton ne couvre que le même appareil, et son TTL est
+// de six heures.
 const NAV_LINKS = [
   { href: "/", label: "Accueil" },
   { href: "/commande", label: "Menu" },
+  { href: "/commande/suivi", label: "Suivi" },
   { href: "/a-propos", label: "À propos" },
   { href: "/contact", label: "Contact" },
 ];
 
 // L'accueil doit être une correspondance EXACTE : startsWith("/") serait vrai
-// pour toutes les routes du site, et les quatre liens s'allumeraient ensemble.
+// pour toutes les routes du site, et les liens s'allumeraient ensemble.
+//
+// « Menu » (/commande) demande le même traitement depuis l'ajout de « Suivi » :
+// /commande/suivi commence par /commande, donc les deux liens s'allumeraient
+// à la fois sur la page de suivi. On sort donc /commande de la règle par
+// préfixe — ses sous-pages (finaliser, suivi) ne sont pas « le menu ».
+const EXACT_MATCH_ONLY = ["/", "/commande"];
+
 function isActiveLink(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
+  if (EXACT_MATCH_ONLY.includes(href)) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -63,8 +72,9 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Liens desktop */}
-        <div className="hidden items-center gap-8 font-heading text-sm font-bold shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 md:flex md:bg-background md:rounded-4xl md:px-6 md:py-2">
+        {/* Liens desktop — gap resserré depuis l'ajout de « Suivi » : à gap-8,
+            cinq entrées débordaient de la pilule au point de bascule md. */}
+        <div className="hidden items-center gap-5 font-heading text-sm font-bold shadow-[0_0_20px_5px_rgba(217,169,77,0.45)] shadow-primary/30 md:flex md:bg-background md:rounded-4xl md:px-5 md:py-2 lg:gap-7 lg:px-6">
           {NAV_LINKS.map((link) => {
             const isActive = isActiveLink(pathname, link.href);
 
@@ -75,7 +85,7 @@ const Navbar = () => {
                 // aria-current plutôt qu'une simple couleur : la page courante
                 // doit être annoncée, pas seulement montrée.
                 aria-current={isActive ? "page" : undefined}
-                className={`group relative py-1 transition-colors duration-300 ease-out ${
+                className={`group relative whitespace-nowrap py-1 transition-colors duration-300 ease-out ${
                   isActive
                     ? "text-accent-mustard"
                     : "text-foreground dark:text-foreground hover:text-accent-mustard"
@@ -87,7 +97,9 @@ const Navbar = () => {
                     deux états, donc rien de nouveau à comprendre. */}
                 <span
                   className={`absolute bottom-0 left-0 h-0.5 w-full origin-left bg-accent-mustard transition-transform duration-500 ease-out ${
-                    isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    isActive
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-100"
                   }`}
                 />
               </Link>
@@ -95,15 +107,20 @@ const Navbar = () => {
           })}
         </div>
 
-        {/* gap resserré sur mobile : le panier vient s'intercaler ici, et à
-            gap-4 le trio panier/thème/hamburger débordait sur les petits
-            écrans. */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        {/* gap resserré sur mobile : panier, suivi, thème et hamburger se
+            partagent la place. Les deux premiers ne s'affichent que lorsqu'ils
+            ont quelque chose à montrer, donc les quatre sont rarement là
+            ensemble. */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Raccourci vers la dernière commande de CET appareil : zéro saisie.
+              Complémentaire du lien « Suivi », qui couvre tous les autres cas
+              (autre téléphone, navigation privée, localStorage vidé). */}
+          <TrackOrderButton />
           <CartButton />
           <ThemeToggle />
           <Link
             href="/commande"
-            className={`hidden rounded-full px-5 py-2 font-bold transition-all duration-200 ease-in-out sm:inline-block ${
+            className={`hidden rounded-full px-5 py-2 font-bold transition-all duration-200 ease-in-out lg:inline-block ${
               isScrolled || isMenuOpen
                 ? "bg-background text-primary dark:text-foreground hover:text-accent-green hover:scale-105"
                 : "bg-primary text-background dark:text-foreground hover:bg-accent-green hover:scale-105"
@@ -205,8 +222,9 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Liens */}
-          <div className="flex flex-1 flex-col gap-8 px-6 pt-6">
+          {/* Liens — gap-6 depuis l'ajout de « Suivi » : à gap-8, cinq entrées
+              plus le bouton du bas dépassaient sur un écran de 640 px. */}
+          <div className="flex flex-1 flex-col gap-6 px-6 pt-6">
             {NAV_LINKS.map((link, index) => {
               const isActive = isActiveLink(pathname, link.href);
 

@@ -32,6 +32,27 @@ export const publicOrderApi = api.injectEndpoints({
       invalidatesTags: [{ type: "Table", id: "PUBLIC" }],
     }),
 
+    /**
+     * Retrouve une commande EN COURS par son numéro du jour.
+     *
+     * Ne renvoie que l'identifiant : le front redirige ensuite vers
+     * /commande/suivi/<id>, la page qui existe déjà. Construire une URL du
+     * type /suivi/kouba/2 serait une erreur — le numéro est recyclé au service
+     * suivant, donc un lien mis en favori pointerait sur la commande de
+     * quelqu'un d'autre le lendemain. L'ObjectId, lui, est stable.
+     *
+     * Volontairement SANS providesTags : c'est une résolution ponctuelle, pas
+     * une donnée à garder fraîche. Le suivi lui-même a son propre cache.
+     */
+    lookupOrder: builder.query<
+      { _id: string },
+      { store: Store; dailyNumber: number }
+    >({
+      query: (params) => ({ url: "/orders/lookup", params }),
+      transformResponse: (response: ApiEnvelope<{ _id: string }>) =>
+        response.data,
+    }),
+
     // Tag propre au suivi ("Order" + l'id) : le socket public l'invalide à
     // chaque événement, ce qui déclenche un refetch. Le document ne transite
     // jamais par le socket, seule cette route applique la bonne projection.
@@ -47,5 +68,6 @@ export const publicOrderApi = api.injectEndpoints({
 export const {
   useGetPublicTablesQuery,
   useCreatePublicOrderMutation,
+  useLazyLookupOrderQuery,
   useGetOrderTrackingQuery,
 } = publicOrderApi;

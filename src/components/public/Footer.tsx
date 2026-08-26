@@ -3,10 +3,12 @@ import Link from "next/link";
 import { SOCIALS, STORE_LOCATIONS } from "@/config/locations";
 
 // Mêmes destinations que la barre du haut : deux listes qui divergent, c'est
-// un visiteur qui atterrit ailleurs selon l'endroit où il a cliqué.
+// un visiteur qui atterrit ailleurs selon l'endroit où il a cliqué. « Suivi »
+// y figure donc aussi.
 const NAV_LINKS = [
   { href: "/", label: "Accueil" },
   { href: "/commande", label: "Menu" },
+  { href: "/commande/suivi", label: "Suivi de commande" },
   { href: "/a-propos", label: "À propos" },
   { href: "/contact", label: "Contact" },
 ];
