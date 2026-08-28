@@ -1,6 +1,7 @@
 import { api } from "@/server/api";
 import type { ApiEnvelope } from "@/types/api";
-import type { CreateOrderPayload, Order, OrderTracking } from "@/types/order";
+import type { CreateOrderPayload, Order, OrderTracking, OrderType } from "@/types/order";
+import type { PromoValidation } from "@/types/promoCode";
 import type { PublicTable } from "@/types/table";
 import type { Store } from "@/types/store";
 
@@ -53,6 +54,27 @@ export const publicOrderApi = api.injectEndpoints({
         response.data,
     }),
 
+    /**
+     * Vérifie un code promo AVANT l'envoi de la commande.
+     *
+     * Rejouée à chaque changement de panier ou de mode de service : un code
+     * réservé à la livraison doit sauter dès que le client bascule sur « à
+     * emporter », et un code à partir de 2 000 DA doit sauter s'il retire un
+     * article. Sans revalidation, il partirait à l'envoi et se ferait rejeter
+     * par le backend, sur un écran où l'erreur est bien moins lisible.
+     *
+     * SANS providesTags : le résultat dépend du panier de l'instant, le mettre
+     * en cache produirait une remise périmée.
+     */
+    validatePromoCode: builder.query<
+      PromoValidation,
+      { code: string; itemsTotal: number; orderType: OrderType }
+    >({
+      query: (params) => ({ url: "/promo-codes/validate", params }),
+      transformResponse: (response: ApiEnvelope<PromoValidation>) =>
+        response.data,
+    }),
+
     // Tag propre au suivi ("Order" + l'id) : le socket public l'invalide à
     // chaque événement, ce qui déclenche un refetch. Le document ne transite
     // jamais par le socket, seule cette route applique la bonne projection.
@@ -69,5 +91,6 @@ export const {
   useGetPublicTablesQuery,
   useCreatePublicOrderMutation,
   useLazyLookupOrderQuery,
+  useLazyValidatePromoCodeQuery,
   useGetOrderTrackingQuery,
 } = publicOrderApi;

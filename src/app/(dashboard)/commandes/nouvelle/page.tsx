@@ -7,6 +7,7 @@ import { MenuBrowser } from "@/components/orders/newOrder/MenuBrowser";
 import { hasOptions } from "@/components/orders/newOrder/ProductGrid";
 import { ProductConfigModal } from "@/components/orders/newOrder/ProductConfigModal";
 import { TicketTotals } from "@/components/orders/newOrder/TicketTotals";
+import { StaffPromoField } from "@/components/orders/newOrder/StaffPromoField";
 import { useItemCart, getLineUnitPrice } from "@/components/orders/useItemCart";
 import type { NewCartLine } from "@/components/orders/useItemCart";
 import { Input } from "@/components/ui/Input";
@@ -16,6 +17,7 @@ import { useCreateOrderMutation } from "@/features/orders/orderApi";
 import { useGetTablesQuery } from "@/features/tables/tableApi";
 import { useActiveStore } from "@/features/store/useActiveStore";
 import { useAuth } from "@/features/auth/useAuth";
+import { usePromoCode } from "@/features/publicOrder/usePromoCode";
 import { useToast } from "@/features/toast/useToast";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { formatDA } from "@/lib/format";
@@ -52,6 +54,20 @@ export default function NewOrderPage() {
     itemsCount,
     total,
   } = useItemCart();
+
+  /**
+   * Code promo au comptoir.
+   *
+   * Le client arrive avec son code sur son téléphone et commande en face de
+   * l'employé : lui refuser la remise parce qu'il n'est pas passé par le site
+   * n'aurait aucun sens. Le hook est EXACTEMENT celui du parcours client —
+   * même vérification, même revalidation quand le panier ou le mode de service
+   * change, donc aucun risque qu'un code passe ici et pas là.
+   */
+  const promo = usePromoCode({ itemsTotal: total, orderType: type });
+
+  const discountAmount = promo.discountAmount;
+  const payableTotal = Math.max(0, total - discountAmount);
 
   const [configuringItem, setConfiguringItem] = useState<MenuItem | null>(null);
 
@@ -135,6 +151,9 @@ export default function NewOrderPage() {
     }
 
     const items = toPayload();
+    // Le CODE seul, jamais le montant : le backend relit le pourcentage en
+    // base et recalcule sur les prix qu'il a lui-même résolus.
+    const promoCode = promo.applied?.code;
     let payload: CreateOrderPayload;
 
     if (type === "dine_in") {
@@ -143,6 +162,7 @@ export default function NewOrderPage() {
         table: tableId,
         client: { fullName },
         remark: remark || undefined,
+        promoCode,
         items,
       };
     } else if (type === "takeaway") {
@@ -151,6 +171,7 @@ export default function NewOrderPage() {
         store: resolvedStore as Store,
         client: { fullName, phone },
         remark: remark || undefined,
+        promoCode,
         items,
       };
     } else {
@@ -159,6 +180,7 @@ export default function NewOrderPage() {
         store: resolvedStore as Store,
         client: { fullName, phone, address },
         remark: remark || undefined,
+        promoCode,
         items,
       };
     }
@@ -170,6 +192,9 @@ export default function NewOrderPage() {
 
       router.push("/commandes");
     } catch (err) {
+      // Couvre aussi le 409 d'une table déjà ouverte avec un code promo : le
+      // backend refuse d'ajouter une remise à une commande en cours, et son
+      // message le dit en clair.
       setError(getApiErrorMessage(err, "Impossible de créer la commande"));
     }
   }
@@ -334,6 +359,25 @@ export default function NewOrderPage() {
                   value={remark}
                   onChange={(e) => setRemark(e.target.value)}
                 />
+
+                {/* Après les coordonnées, avant les lignes : c'est le dernier
+                    élément d'identification du client, et il se saisit une
+                    seule fois pour toute la commande. */}
+                <StaffPromoField promo={promo} />
+
+                {/* La fusion sur une table occupée refuse tout code promo côté
+                    backend (409) : mieux vaut le dire avant l'envoi que de
+                    laisser l'employé rejouer la commande. */}
+                {type === "dine_in" &&
+                  promo.applied &&
+                  tables?.find((t) => t._id === tableId)?.status ===
+                    "occupied" && (
+                    <p className="rounded-lg bg-accent-mustard/10 px-3 py-2 text-xs text-foreground/75">
+                      Cette table a déjà une commande ouverte : les articles y
+                      seront ajoutés, et le code promo sera refusé. Termine
+                      d&apos;abord la commande en cours.
+                    </p>
+                  )}
               </div>
 
               {/* Lignes du ticket */}
@@ -447,12 +491,26 @@ export default function NewOrderPage() {
               la comprimer quand le ticket se remplit — sans lui, le bouton
               s'écraserait progressivement à mesure qu'on ajoute des articles. */}
             <div className="flex shrink-0 flex-col gap-4 pt-4">
-              <TicketTotals itemsTotal={total} itemsCount={itemsCount} />
+              <TicketTotals
+                itemsTotal={total}
+                itemsCount={itemsCount}
+                discount={
+                  promo.applied
+                    ? {
+                        code: promo.applied.code,
+                        percent: promo.applied.discountPercent,
+                        amount: discountAmount,
+                      }
+                    : null
+                }
+              />
 
               {type === "delivery" && (
                 <p className="-mt-2 text-xs text-foreground/45">
                   Les frais de livraison seront ajoutés depuis la fiche
                   commande.
+                  {discountAmount > 0 &&
+                    " La remise ne s'applique pas à la livraison."}
                 </p>
               )}
 
@@ -511,7 +569,9 @@ export default function NewOrderPage() {
           </span>
         </span>
         <span className="flex items-center gap-2 font-heading font-bold">
-          {formatDA(total)}
+          {/* Montant APRÈS remise : c'est ce que l'employé va annoncer au
+              client, la barre repliée ne doit pas afficher autre chose. */}
+          {formatDA(payableTotal)}
           <span className="icon-[mdi--chevron-up] text-xl" />
         </span>
       </button>

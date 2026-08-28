@@ -14,6 +14,7 @@ const PROTECTED_PREFIXES = [
   "/tables",
   "/menu",
   "/historique",
+  "/promotions",
   "/utilisateurs",
   "/parametres",
   "/livraison",

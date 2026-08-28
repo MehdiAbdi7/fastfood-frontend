@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckoutSummary } from "./CheckoutSummary";
+import { PromoCodeField } from "./PromoCodeField";
 import { useCart } from "@/features/publicOrder/useCart";
+import { usePromoCode } from "@/features/publicOrder/usePromoCode";
 import {
   useGetPublicTablesQuery,
   useCreatePublicOrderMutation,
@@ -14,6 +16,7 @@ import { useOrderContext } from "@/features/orders/useOrderContext";
 import { toOrderItemsPayload } from "@/lib/cartLine";
 import { writeLastOrder } from "@/lib/lastOrder";
 import { getApiErrorMessage } from "@/lib/apiError";
+import { formatDA } from "@/lib/format";
 import { ORDER_TYPE_ICONS, ORDER_TYPE_LABELS } from "@/lib/orderLabels";
 import { STORES, STORE_LABELS, type Store } from "@/types/store";
 import type { CreateOrderPayload, OrderType } from "@/types/order";
@@ -124,6 +127,19 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
   const [remark, setRemark] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Code promo.
+   *
+   * Déclaré APRÈS `type` et `total` : le hook les revérifie à chaque
+   * changement, pour qu'un code réservé à la livraison saute dès que le client
+   * bascule sur « à emporter », et qu'un code à partir de 2 000 DA saute s'il
+   * retire un article. Sans ça, le refus n'arriverait qu'à l'envoi.
+   */
+  const promo = usePromoCode({ itemsTotal: total, orderType: type });
+
+  const discountAmount = promo.discountAmount;
+  const payableTotal = Math.max(0, total - discountAmount);
+
   // Sans ce drapeau, le clear() qui suit l'envoi viderait le panier, l'effet
   // ci-dessous verrait lines.length === 0 et renverrait vers /commande avant
   // que la navigation vers le suivi n'aboutisse.
@@ -190,6 +206,10 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
     }
 
     const items = toOrderItemsPayload(lines);
+    // Le CODE seul part au serveur, jamais le montant : c'est resolvePromoCode
+    // qui relit le pourcentage en base et recalcule la remise sur les prix
+    // qu'il a lui-même résolus.
+    const promoCode = promo.applied?.code;
     let payload: CreateOrderPayload;
 
     if (type === "dine_in") {
@@ -200,6 +220,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
         table: tableId,
         client: { fullName: fullName.trim() },
         remark: remark.trim() || undefined,
+        promoCode,
         items,
       };
     } else if (type === "takeaway") {
@@ -208,6 +229,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
         store: store as Store,
         client: { fullName: fullName.trim(), phone: phone.trim() },
         remark: remark.trim() || undefined,
+        promoCode,
         items,
       };
     } else {
@@ -220,6 +242,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
           address: address.trim(),
         },
         remark: remark.trim() || undefined,
+        promoCode,
         items,
       };
     }
@@ -229,6 +252,9 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
       // backend fusionne et renvoie CETTE commande (200, pas 201). L'_id reçu
       // est alors celui de la commande existante — c'est voulu, le client
       // suivra bien le ticket qui sortira en cuisine.
+      //
+      // Un code promo est REFUSÉ dans ce cas de figure (409) : il remiserait
+      // aussi les articles déjà commandés par quelqu'un d'autre à la table.
       const created = await createOrder(payload).unwrap();
 
       hasSubmitted.current = true;
@@ -240,6 +266,12 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
       // Couvre aussi le 503 d'un magasin fermé entre l'affichage et l'envoi :
       // errorResponse renvoie { error }, donc le message du restaurant remonte
       // tel quel, sans traitement particulier à ajouter ici.
+      //
+      // Et le cas de course sur un code à usages limités : deux clients sur le
+      // dernier usage, l'un des deux reçoit un 409. Le code n'est PAS retiré
+      // automatiquement — deviner à quoi se rapporte une erreur à partir de son
+      // texte est fragile. Le client garde la main via le × du champ, et
+      // l'indication ci-dessous le lui rappelle.
       setError(
         getApiErrorMessage(
           err,
@@ -285,7 +317,25 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
       </header>
 
       <div className="flex flex-col gap-6">
-        <CheckoutSummary lines={lines} total={total} count={count} />
+        <CheckoutSummary
+          lines={lines}
+          total={total}
+          count={count}
+          discount={
+            promo.applied
+              ? {
+                  code: promo.applied.code,
+                  percent: promo.applied.discountPercent,
+                  amount: discountAmount,
+                }
+              : null
+          }
+        />
+
+        {/* Juste sous le récapitulatif : c'est là que le client regarde son
+            montant, donc là qu'il pense à son code. Plus bas, entre l'adresse
+            et le bouton, il ne le verrait qu'après avoir tout rempli. */}
+        <PromoCodeField promo={promo} />
 
         {/* Tout est fermé : on le dit une bonne fois en haut du formulaire,
             plutôt que de laisser le client buter sur deux boutons grisés sans
@@ -472,7 +522,8 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                       cours d'une table occupée. C'est le comportement voulu
                       pour un groupe qui commande en deux fois, mais il doit
                       être annoncé — sinon le client croit avoir sa propre
-                      commande et se retrouve sur le ticket d'inconnus. */}
+                      commande et se retrouve sur le ticket d'inconnus.
+                      Et un code promo y est refusé : autant le dire ici. */}
                   {tableId &&
                     tables.find((table) => table._id === tableId)?.status ===
                       "occupied" && (
@@ -481,8 +532,12 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                           aria-hidden="true"
                           className="icon-[mdi--information-outline] mt-0.5 shrink-0 text-sm text-accent-mustard"
                         />
-                        Une commande est déjà en cours sur cette table : vos
-                        articles y seront ajoutés.
+                        <span>
+                          Une commande est déjà en cours sur cette table : vos
+                          articles y seront ajoutés.
+                          {promo.applied &&
+                            " Un code promo ne peut pas être ajouté à une commande déjà ouverte."}
+                        </span>
                       </p>
                     )}
                 </>
@@ -544,8 +599,12 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
               aria-hidden="true"
               className="icon-[mdi--moped-outline] mt-0.5 shrink-0 text-base text-primary"
             />
-            Les frais de livraison dépendent de votre adresse : ils seront
-            ajoutés par l&apos;équipe et visibles sur votre suivi.
+            <span>
+              Les frais de livraison dépendent de votre adresse : ils seront
+              ajoutés par l&apos;équipe et visibles sur votre suivi.
+              {discountAmount > 0 &&
+                " Votre remise porte sur les articles, pas sur la livraison."}
+            </span>
           </p>
         )}
 
@@ -555,12 +614,20 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
             de page doit voir immédiatement ce qui bloque. */}
         <section className="flex flex-col gap-3 border-t border-dashed border-primary/25 pt-6">
           {error && (
-            <p
+            <div
               role="alert"
-              className="rounded-xl bg-accent-bordeaux/10 px-4 py-3 text-sm font-semibold text-accent-bordeaux backdrop-blur-sm"
+              className="flex flex-col gap-1 rounded-xl bg-accent-bordeaux/10 px-4 py-3 backdrop-blur-sm"
             >
-              {error}
-            </p>
+              <p className="text-sm font-semibold text-accent-bordeaux">
+                {error}
+              </p>
+              {promo.applied && (
+                <p className="text-xs text-foreground/60">
+                  Si le blocage vient de votre code promo, retirez-le
+                  ci-dessus : votre commande partira au tarif normal.
+                </p>
+              )}
+            </div>
           )}
 
           <button
@@ -584,9 +651,10 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
             ) : (
               <>
                 Envoyer ma commande
-                <span className="tabular-nums">
-                  · {total.toLocaleString("fr-FR")} DA
-                </span>
+                {/* Le montant affiché est celui APRÈS remise : c'est ce que le
+                    client va payer, et c'est le seul chiffre qui l'intéresse
+                    au moment d'appuyer. */}
+                <span className="tabular-nums">· {formatDA(payableTotal)}</span>
               </>
             )}
           </button>

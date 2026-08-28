@@ -46,6 +46,23 @@ export function printOrderTicket(order: Order): void {
     ? `<div class="remark">Remarque : ${order.remark}</div>`
     : "";
 
+  /**
+   * Ligne de remise, avec le code.
+   *
+   * OBLIGATOIRE sur le papier : le ticket est ce que le client emporte, et un
+   * total inférieur à la somme des lignes sans explication est exactement ce
+   * qui déclenche un appel le lendemain. `?? 0` couvre les commandes
+   * antérieures à la fonctionnalité, qui n'ont pas ce champ.
+   */
+  const discountAmount = order.discountAmount ?? 0;
+  const discountHtml =
+    discountAmount > 0
+      ? `<div class="item-row discount">
+           <span>Remise${order.appliedPromo ? ` ${order.appliedPromo.code} (-${order.appliedPromo.discountPercent}%)` : ""}</span>
+           <span>-${formatDA(discountAmount)}</span>
+         </div>`
+      : "";
+
   const ticketHtml = `
     <html>
       <head>
@@ -58,6 +75,7 @@ export function printOrderTicket(order: Order): void {
           hr { border: none; border-top: 1px dashed #000; margin: 8px 0; }
           .item-row { display: flex; justify-content: space-between; font-weight: bold; }
           .sub { font-size: 11px; padding-left: 12px; color: #333; }
+          .discount { margin-top: 4px; }
           .remark { margin-top: 8px; font-style: italic; font-size: 12px; }
           .total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; margin-top: 8px; }
         </style>
@@ -71,6 +89,7 @@ export function printOrderTicket(order: Order): void {
         </div>
         <hr/>
         ${itemsHtml}
+        ${discountHtml}
         ${order.deliveryFee ? `<div class="item-row"><span>Livraison</span><span>${formatDA(order.deliveryFee)}</span></div>` : ""}
         ${remarkHtml}
         <hr/>

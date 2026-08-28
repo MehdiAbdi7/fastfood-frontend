@@ -212,7 +212,16 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
   const steps = STEPS_BY_TYPE[order.type];
   const currentIndex = steps.findIndex((step) => step.status === order.status);
   const currentStep = steps[Math.max(0, currentIndex)];
-  const itemsTotal = order.totalPrice - (order.deliveryFee ?? 0);
+
+  // `?? 0` obligatoire : les commandes antérieures au code promo n'ont pas ce
+  // champ, et `undefined` dans une soustraction donne NaN — donc un total
+  // affiché « NaN DA » sur d'anciennes commandes encore en cours.
+  const discountAmount = order.discountAmount ?? 0;
+
+  // Reconstitué à l'envers depuis le total, et non recalculé depuis les items :
+  // totalPrice fait foi, c'est lui qui a été encaissé. Repartir des lignes
+  // rouvrirait la porte à un écart d'arrondi entre l'écran et la caisse.
+  const itemsTotal = order.totalPrice + discountAmount - (order.deliveryFee ?? 0);
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-28">
@@ -303,6 +312,26 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
               {formatDA(itemsTotal)}
             </span>
           </div>
+
+          {/* Le code est nommé, pas seulement le montant : un « −250 DA » sans
+              étiquette ressemble à une erreur de caisse, ce qui est exactement
+              l'inverse de l'effet recherché par une promotion. */}
+          {discountAmount > 0 && (
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="flex items-center gap-1.5 text-accent-green">
+                <span
+                  aria-hidden="true"
+                  className="icon-[mdi--ticket-percent-outline] text-base"
+                />
+                {order.appliedPromo?.code ?? "Remise"}
+                {order.appliedPromo &&
+                  ` · −${order.appliedPromo.discountPercent}%`}
+              </span>
+              <span className="tabular-nums font-bold text-accent-green">
+                −{formatDA(discountAmount)}
+              </span>
+            </div>
+          )}
 
           {order.type === "delivery" && (
             <div className="flex items-baseline justify-between text-sm">

@@ -20,6 +20,12 @@ interface CheckoutSummaryProps {
   lines: CartLine[];
   total: number;
   count: number;
+  /**
+   * Remise appliquée, ou null. Le code est affiché À CÔTÉ du montant : sans
+   * lui, une ligne « −250 DA » ressemble à une erreur de caisse plutôt qu'à
+   * une promotion que le client a lui-même déclenchée.
+   */
+  discount?: { code: string; percent: number; amount: number } | null;
 }
 
 /**
@@ -37,7 +43,15 @@ interface CheckoutSummaryProps {
  * carte, pas comme un ticket déchiré. Le vocabulaire ticket est porté par les
  * pointillés et la chasse fixe, qui suffisent.
  */
-export function CheckoutSummary({ lines, total, count }: CheckoutSummaryProps) {
+export function CheckoutSummary({
+  lines,
+  total,
+  count,
+  discount = null,
+}: CheckoutSummaryProps) {
+  const hasDiscount = discount !== null && discount.amount > 0;
+  const payable = Math.max(0, total - (discount?.amount ?? 0));
+
   return (
     <section className="relative flex flex-col rounded-3xl border border-primary/25 bg-background/70 pb-6 backdrop-blur-sm dark:bg-primary/10">
       <header className="flex items-center justify-between border-b border-dashed border-primary/25 px-5 py-4">
@@ -92,13 +106,46 @@ export function CheckoutSummary({ lines, total, count }: CheckoutSummaryProps) {
         ))}
       </ul>
 
-      <div className="mt-1 flex items-baseline justify-between border-t border-dashed border-primary/25 px-5 pt-4">
-        <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
-          Sous-total
-        </span>
-        <span className="tabular-nums font-heading text-2xl font-bold text-accent-green">
-          {formatDA(total)}
-        </span>
+      <div className="mt-1 flex flex-col gap-2 border-t border-dashed border-primary/25 px-5 pt-4">
+        {/* La ligne « Articles » n'apparaît qu'en présence d'une remise : sans
+            elle, le sous-total et le total seraient deux fois le même chiffre,
+            et deux lignes identiques font douter de la troisième. */}
+        {hasDiscount && (
+          <>
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="text-foreground/60">Articles</span>
+              <span className="tabular-nums font-semibold text-foreground/80">
+                {formatDA(total)}
+              </span>
+            </div>
+
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="flex items-center gap-1.5 text-accent-green">
+                <span
+                  aria-hidden="true"
+                  className="icon-[mdi--ticket-percent-outline] text-base"
+                />
+                {discount.code} · −{discount.percent}%
+              </span>
+              <span className="tabular-nums font-bold text-accent-green">
+                −{formatDA(discount.amount)}
+              </span>
+            </div>
+          </>
+        )}
+
+        <div
+          className={`flex items-baseline justify-between ${
+            hasDiscount ? "border-t border-primary/20 pt-3" : ""
+          }`}
+        >
+          <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
+            Sous-total
+          </span>
+          <span className="tabular-nums font-heading text-2xl font-bold text-accent-green">
+            {formatDA(payable)}
+          </span>
+        </div>
       </div>
     </section>
   );

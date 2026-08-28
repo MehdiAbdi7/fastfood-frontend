@@ -9,22 +9,36 @@ interface TicketTotalsProps {
   // fixés depuis la fiche commande une fois l'adresse connue, donc souvent
   // absents au moment de la saisie.
   deliveryFee?: number;
+  /**
+   * Remise appliquée, ou null.
+   *
+   * Le code est affiché à côté du montant : une ligne « −250 DA » sans
+   * étiquette ressemble à une erreur de saisie, et c'est l'employé au comptoir
+   * qui devra l'expliquer au client.
+   */
+  discount?: { code: string; percent: number; amount: number } | null;
 }
 
 /**
- * Récapitulatif chiffré du ticket : sous-total, frais, total.
+ * Récapitulatif chiffré du ticket : articles, remise, frais, total.
  *
- * Le visuel de référence affiche aussi une ligne « remise » et un choix de
- * moyen de paiement. Ni l'un ni l'autre n'existe dans le modèle Order du
- * backend — les afficher donnerait des contrôles décoratifs, sans effet sur
- * la commande enregistrée. À ajouter côté serveur d'abord si le besoin est réel.
+ * L'ORDRE DES LIGNES REFLÈTE LE CALCUL DU BACKEND, et ce n'est pas cosmétique :
+ * la remise s'applique aux articles SEULS, les frais de livraison sont ajoutés
+ * après. Intervertir les deux lignes ici laisserait croire que la livraison est
+ * remisée elle aussi.
+ *
+ * Le visuel de référence affiche aussi un choix de moyen de paiement. Il
+ * n'existe pas dans le modèle Order du backend — l'afficher donnerait un
+ * contrôle décoratif, sans effet sur la commande enregistrée.
  */
 export function TicketTotals({
   itemsTotal,
   itemsCount,
   deliveryFee,
+  discount = null,
 }: TicketTotalsProps) {
-  const total = itemsTotal + (deliveryFee ?? 0);
+  const discountAmount = discount?.amount ?? 0;
+  const total = Math.max(0, itemsTotal - discountAmount) + (deliveryFee ?? 0);
 
   return (
     <div className="flex flex-col gap-2 border-t border-dashed border-border-subtle pt-4">
@@ -39,6 +53,23 @@ export function TicketTotals({
           {formatDA(itemsTotal)}
         </span>
       </div>
+
+      {discountAmount > 0 && discount && (
+        <div className="flex items-baseline justify-between text-sm">
+          <span className="flex min-w-0 items-center gap-1.5 text-accent-green">
+            <span
+              aria-hidden="true"
+              className="icon-[mdi--ticket-percent-outline] shrink-0 text-base"
+            />
+            <span className="truncate">
+              {discount.code} · −{discount.percent}%
+            </span>
+          </span>
+          <span className="tabular-nums shrink-0 font-bold text-accent-green">
+            −{formatDA(discountAmount)}
+          </span>
+        </div>
+      )}
 
       {deliveryFee !== undefined && (
         <div className="flex items-baseline justify-between text-sm">

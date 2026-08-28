@@ -50,16 +50,18 @@ export interface OrderClient {
 }
 
 /**
- * Livreur tel que populé par le backend sur getOrders / getOrderById.
+ * INSTANTANÉ du code promo appliqué.
  *
- * Projection volontairement courte (firstname lastname tel) : la fiche
- * commande n'a besoin que de savoir QUI porte la course et comment le joindre.
+ * Le code peut avoir été modifié ou supprimé depuis : c'est cette copie qui
+ * fait foi, jamais le document PromoCode. Sur la route publique de suivi, seuls
+ * `code` et `discountPercent` sont projetés (voir TRACKING_FIELDS), d'où les
+ * champs optionnels.
  */
-export interface OrderDeliveryPerson {
-  _id: string;
-  firstname: string;
-  lastname: string;
-  tel?: string;
+export interface OrderPromo {
+  promoCodeId?: string;
+  code: string;
+  discountPercent: number;
+  maxDiscountAmount?: number;
 }
 
 export interface Order {
@@ -86,10 +88,33 @@ export interface Order {
   items: OrderItem[];
   remark?: string;
   deliveryFee?: number;
+  /** Code promo figé. Absent = commande au tarif plein. */
+  appliedPromo?: OrderPromo;
+  /**
+   * Remise en DA, recalculée par le backend à chaque save().
+   *
+   * Optionnel côté type : les commandes antérieures à la fonctionnalité n'ont
+   * pas ce champ. Toujours lire `order.discountAmount ?? 0`.
+   */
+  discountAmount?: number;
+  /** Articles − remise + livraison. */
   totalPrice: number;
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * Livreur tel que populé par le backend sur getOrders / getOrderById.
+ *
+ * Projection volontairement courte (firstname lastname tel) : la fiche
+ * commande n'a besoin que de savoir QUI porte la course et comment le joindre.
+ */
+export interface OrderDeliveryPerson {
+  _id: string;
+  firstname: string;
+  lastname: string;
+  tel?: string;
 }
 
 /**
@@ -117,6 +142,8 @@ export interface OrderTracking {
   items: OrderItem[];
   remark?: string;
   deliveryFee?: number;
+  appliedPromo?: OrderPromo;
+  discountAmount?: number;
   totalPrice: number;
   completedAt: string | null;
   createdAt: string;
@@ -133,12 +160,20 @@ export interface CreateOrderItemPayload {
   formula?: { formulaId: string; choices: Record<string, string> };
 }
 
+/**
+ * `promoCode` est une CHAÎNE et rien d'autre.
+ *
+ * Ni pourcentage ni montant : le serveur les résout depuis la base, exactement
+ * comme il le fait pour les prix d'articles. Envoyer un montant depuis le
+ * navigateur reviendrait à laisser le client décider de sa remise.
+ */
 export type CreateOrderPayload =
   | {
       type: "dine_in";
       table: string;
       client: { fullName: string };
       remark?: string;
+      promoCode?: string;
       items: CreateOrderItemPayload[];
     }
   | {
@@ -146,6 +181,7 @@ export type CreateOrderPayload =
       store: Store;
       client: { fullName: string; phone: string };
       remark?: string;
+      promoCode?: string;
       items: CreateOrderItemPayload[];
     }
   | {
@@ -153,6 +189,7 @@ export type CreateOrderPayload =
       store: Store;
       client: { fullName: string; phone: string; address: string };
       remark?: string;
+      promoCode?: string;
       items: CreateOrderItemPayload[];
     };
 
@@ -182,6 +219,8 @@ export interface ServiceStats {
   orders: number;
   completed: number;
   revenue: number;
+  /** Total des remises accordées sur le service. Informatif : `revenue` est déjà net. */
+  discounts?: number;
   averageBasket: number;
   byStatus: Partial<Record<OrderStatus, number>>;
   byType: { _id: OrderType; count: number; revenue: number }[];

@@ -176,6 +176,10 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
       ? `Table ${order.table.tableN}`
       : null;
 
+  // `?? 0` obligatoire : les commandes antérieures au code promo n'ont pas ce
+  // champ, et undefined dans une soustraction donnerait « NaN DA ».
+  const discountAmount = order?.discountAmount ?? 0;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -281,6 +285,27 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
             </div>
           </div>
 
+          {/* Code promo — en haut, avec le contexte de la commande et non
+              enterré dans les totaux : quand un client conteste son montant,
+              c'est la première chose que le staff doit pouvoir lire. */}
+          {order.appliedPromo && (
+            <div className="flex items-center gap-2.5 rounded-xl bg-accent-green/10 px-3 py-2.5">
+              <span
+                aria-hidden="true"
+                className="icon-[mdi--ticket-percent] shrink-0 text-xl text-accent-green"
+              />
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate font-heading text-sm font-bold uppercase tracking-wider text-foreground">
+                  {order.appliedPromo.code}
+                </span>
+                <span className="tabular-nums text-xs text-foreground/55">
+                  −{order.appliedPromo.discountPercent}% sur les articles ·{" "}
+                  {formatDA(discountAmount)} de remise
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Livreur — affiché dès que la commande est partie, pour que
               n'importe quel poste sache qui appeler si le client s'impatiente. */}
           {order.type === "delivery" &&
@@ -374,6 +399,23 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
             })}
           </div>
 
+          {/* Remise — ligne chiffrée, juste avant la livraison. Cet ordre
+              reproduit le calcul du backend : la remise porte sur les articles
+              seuls, les frais de livraison sont ajoutés après et ne sont
+              jamais réduits. */}
+          {discountAmount > 0 && (
+            <div className="flex items-center justify-between rounded-xl bg-accent-green/10 px-3 py-2">
+              <span className="text-sm font-semibold text-accent-green">
+                Remise
+                {order.appliedPromo &&
+                  ` (${order.appliedPromo.code}, −${order.appliedPromo.discountPercent}%)`}
+              </span>
+              <span className="tabular-nums text-sm font-bold text-accent-green">
+                −{formatDA(discountAmount)}
+              </span>
+            </div>
+          )}
+
           {/* Livraison */}
           {order.type === "delivery" && (
             <div className="flex items-center justify-between rounded-xl bg-surface-2 px-3 py-2">
@@ -440,6 +482,12 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               >
                 Ajouter des articles
               </Button>
+              {order.appliedPromo && (
+                <p className="mt-2 text-xs text-foreground/45">
+                  La remise de {order.appliedPromo.code} sera recalculée sur le
+                  nouveau total des articles.
+                </p>
+              )}
             </div>
           )}
         </div>

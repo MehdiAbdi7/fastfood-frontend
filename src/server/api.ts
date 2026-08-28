@@ -32,6 +32,10 @@ const TAG_TYPES = [
   // dashboard ET par l'événement socket "store_status_changed", pour que tous
   // les postes voient l'interrupteur basculer.
   "StoreStatus",
+  // Codes promo. La vérification publique (GET /promo-codes/validate) n'y est
+  // volontairement PAS rattachée : c'est une résolution ponctuelle, dépendante
+  // du panier du moment, qui n'a aucun intérêt à être mise en cache.
+  "PromoCode",
 ] as const;
 
 export const api = createApi({
