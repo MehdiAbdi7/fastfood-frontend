@@ -40,7 +40,7 @@ export default async function DashboardLayout({
 
       {/* .dashboard-shell rétablit le curseur système (voir globals.css) —
           la précision prime ici, contrairement au site public. */}
-      <div className="dashboard-shell flex min-h-screen bg-background">
+      <div className="dashboard-shell flex min-h-screen background">
         <Sidebar />
 
         <div className="flex min-w-0 flex-1 flex-col">
