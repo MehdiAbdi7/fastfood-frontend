@@ -7,10 +7,13 @@ import { UserMenu } from "./UserMenu";
 
 export function Topbar() {
   return (
-    // z-30 et non z-20 : le panneau du UserMenu s'ancre dans ce header, donc
-    // toute la barre doit passer au-dessus du contenu de la page, sinon une
-    // carte en z-20 viendrait recouvrir le menu déroulé.
-    <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-border-subtle bg-background/95 px-4 py-3 shadow-[0_4px_18px_-14px_rgba(61,39,22,0.45)] backdrop-blur-md sm:px-6 lg:px-8">
+    // z-40, au-dessus de TOUT le contenu de page (échelle du projet : contenu
+    // collant z-20, superpositions de page z-30, cette barre z-40, panneaux
+    // mobiles z-50). Le backdrop-blur ci-dessous crée un contexte
+    // d'empilement : le z-50 du panneau UserMenu ne vaut qu'À L'INTÉRIEUR de
+    // ce header, il ne peut jamais dépasser le z-index de la barre elle-même.
+    // C'est pourquoi c'est ici qu'on monte la valeur, et pas dans UserMenu.
+    <header className="sticky top-0 z-40 flex min-h-16 items-center justify-between gap-3 border-b border-border-subtle bg-background/95 px-4 py-3 shadow-[0_4px_18px_-14px_rgba(61,39,22,0.45)] backdrop-blur-md sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-2.5">
         <div className="flex items-center gap-2 sm:hidden">
           <Image

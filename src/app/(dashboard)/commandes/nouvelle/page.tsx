@@ -236,9 +236,12 @@ export default function NewOrderPage() {
           il fallait donc descendre jusqu'au bout de la grille produits pour
           atteindre « Envoyer en cuisine ». On plafonne la hauteur, seule la
           zone centrale défile, et le bouton reste toujours à l'écran.
-          calc : 5rem = topbar sticky (top-20) + 1.5rem de respiration en bas. */}
+          calc : 5rem = topbar sticky (top-20) + 1.5rem de respiration en bas.
+          z-40 en mobile (feuille par-dessus la barre basse), mais lg:z-20 en
+          desktop : sans ça le ticket recouvrait le menu déroulé de la topbar,
+          le z-40 s'appliquant à toutes les tailles d'écran. */}
         <aside
-          className={`${isMobileTicketOpen ? "flex" : "hidden"} fixed inset-x-0 bottom-0 z-40 max-h-[88dvh] w-full flex-col overflow-y-auto lg:sticky lg:top-20 lg:flex lg:max-h-[calc(100vh-5.5rem)] lg:w-88 lg:overflow-visible`}
+          className={`${isMobileTicketOpen ? "flex" : "hidden"} fixed inset-x-0 bottom-0 z-40 max-h-[88dvh] w-full flex-col overflow-y-auto lg:sticky lg:top-20 lg:z-20 lg:flex lg:max-h-[calc(100vh-5.5rem)] lg:w-88 lg:overflow-visible`}
         >
           <div className="ticket-notch surface-card relative flex flex-col p-5 pb-7 lg:max-h-[calc(100vh-5.5rem)]">
             <button

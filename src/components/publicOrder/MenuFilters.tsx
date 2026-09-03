@@ -116,8 +116,7 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
     // la page n'est jamais touchée.
     if (rail.scrollWidth <= rail.clientWidth) return; // en colonne (lg) : rien à faire
 
-    const target =
-      chip.offsetLeft - (rail.clientWidth - chip.offsetWidth) / 2;
+    const target = chip.offsetLeft - (rail.clientWidth - chip.offsetWidth) / 2;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -130,7 +129,13 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
   }, [activeGroup]);
 
   return (
-    <aside className="sticky top-20 z-30 mb-6 flex flex-col gap-2.5 rounded-3xl border border-primary/20 bg-background/70 p-2.5 shadow-[0_10px_35px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-3 lg:top-24 lg:mb-0 lg:max-h-[calc(100vh-8rem)] lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:p-4 dark:bg-primary/10">
+    // dvh et non vh : sur mobile le vh se fige sur la hauteur barres masquées,
+    // ce qui fait dépasser la colonne dès que la barre d'adresse réapparaît.
+    // overflow-hidden ici + zone défilante à l'intérieur : la recherche et le
+    // compteur restent toujours visibles, seule la liste des catégories
+    // défile. Faire défiler l'aside entier escamotait le champ de recherche
+    // exactement quand on en avait besoin.
+    <aside className="sticky top-20 z-30 mb-6 flex flex-col gap-2.5 rounded-3xl border border-primary/20 bg-background/70 p-2.5 shadow-[0_10px_35px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-3 lg:top-24 lg:mb-0 lg:max-h-[calc(100dvh-8rem)] lg:w-64 lg:shrink-0 lg:overflow-hidden lg:p-4 dark:bg-primary/10">
       <label className="relative block">
         <span className="sr-only">Rechercher un plat</span>
         <span
@@ -169,80 +174,85 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
         </span>
       </p>
 
-      <div
-        ref={railRef}
-        className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5 lg:flex-col lg:gap-1 lg:overflow-x-visible lg:pb-0"
-      >
-        {nav.map((group) => {
-          const isActive = activeGroup === group.label;
+      {/* Zone défilante. En colonne (lg), min-h-0 est indispensable : sans
+          lui un enfant de flex refuse de passer sous la hauteur de son
+          contenu, et overflow-y-auto n'a jamais rien à faire défiler. */}
+      <div className="flex flex-col gap-2.5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+        <div
+          ref={railRef}
+          className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5 lg:flex-col lg:gap-1 lg:overflow-x-visible lg:pb-0"
+        >
+          {nav.map((group) => {
+            const isActive = activeGroup === group.label;
 
-          return (
-            <button
-              key={group.label}
-              ref={(element) => {
-                if (element) chipRefs.current.set(group.label, element);
-                else chipRefs.current.delete(group.label);
-              }}
-              type="button"
-              onClick={() => scrollToAnchor(sectionAnchorId(group.label))}
-              aria-current={isActive ? "true" : undefined}
-              className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2.5 font-heading text-sm font-bold transition-colors lg:w-full lg:justify-start lg:rounded-xl lg:px-3 lg:py-2.5 ${
-                isActive
-                  ? "border-primary bg-primary text-on-primary shadow-sm"
-                  : "border-primary/25 bg-background/50 text-foreground hover:border-primary hover:bg-background/80"
-              }`}
-            >
-              <span
-                aria-hidden="true"
-                className={`${iconFor(group.label)} shrink-0 text-lg ${
-                  isActive ? "" : "text-primary"
-                }`}
-              />
-              {group.label}
-              <span
-                className={`tabular-nums text-xs lg:ml-auto ${
-                  isActive ? "opacity-70" : "opacity-50"
+            return (
+              <button
+                key={group.label}
+                ref={(element) => {
+                  if (element) chipRefs.current.set(group.label, element);
+                  else chipRefs.current.delete(group.label);
+                }}
+                type="button"
+                onClick={() => scrollToAnchor(sectionAnchorId(group.label))}
+                aria-current={isActive ? "true" : undefined}
+                className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2.5 font-heading text-sm font-bold transition-colors lg:w-full lg:justify-start lg:rounded-xl lg:px-3 lg:py-2.5 ${
+                  isActive
+                    ? "border-primary bg-primary text-on-primary shadow-sm"
+                    : "border-primary/25 bg-background/50 text-foreground hover:border-primary hover:bg-background/80"
                 }`}
               >
-                {group.count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Second niveau, seulement si la section ouverte se subdivise. Forme
-          volontairement différente du premier — souligné plutôt que rempli —
-          pour qu'on lise une subdivision, pas un pair. */}
-      {subChips.length > 1 && (
-        <div className="flex flex-col gap-1 rounded-2xl bg-primary/5 px-2 py-2 lg:ml-2 lg:rounded-xl lg:px-1.5 lg:py-1.5">
-          <span className="px-2 pb-0.5 text-xs font-bold uppercase tracking-wide text-foreground/40">
-            {currentGroup?.label}
-          </span>
-          <div className="scrollbar-hide flex items-center gap-1 overflow-x-auto lg:flex-col lg:items-stretch lg:gap-0.5 lg:overflow-x-visible">
-            {subChips.map((sub) => {
-              const isActive = activeSubKey === sub.key;
-
-              return (
-                <button
-                  key={sub.key}
-                  type="button"
-                  onClick={() => scrollToAnchor(subAnchorId(sub.key))}
-                  aria-current={isActive ? "true" : undefined}
-                  className={`flex shrink-0 items-center gap-1.5 rounded-lg border-b-2 px-3 py-1.5 text-xs font-bold transition-colors lg:w-full lg:justify-between lg:border-b-0 lg:border-l-2 ${
-                    isActive
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-transparent text-foreground/60 hover:text-foreground"
+                <span
+                  aria-hidden="true"
+                  className={`${iconFor(group.label)} shrink-0 text-lg ${
+                    isActive ? "" : "text-primary"
+                  }`}
+                />
+                {group.label}
+                <span
+                  className={`tabular-nums text-xs lg:ml-auto ${
+                    isActive ? "opacity-70" : "opacity-50"
                   }`}
                 >
-                  {sub.label}
-                  <span className="tabular-nums opacity-55">{sub.count}</span>
-                </button>
-              );
-            })}
-          </div>
+                  {group.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
-      )}
+
+        {/* Second niveau, seulement si la section ouverte se subdivise. Forme
+          volontairement différente du premier — souligné plutôt que rempli —
+          pour qu'on lise une subdivision, pas un pair. */}
+        {subChips.length > 1 && (
+          <div className="flex flex-col gap-1 rounded-2xl bg-primary/5 px-2 py-2 lg:ml-2 lg:rounded-xl lg:px-1.5 lg:py-1.5">
+            <span className="px-2 pb-0.5 text-xs font-bold uppercase tracking-wide text-foreground/40">
+              {currentGroup?.label}
+            </span>
+            <div className="scrollbar-hide flex items-center gap-1 overflow-x-auto lg:flex-col lg:items-stretch lg:gap-0.5 lg:overflow-x-visible">
+              {subChips.map((sub) => {
+                const isActive = activeSubKey === sub.key;
+
+                return (
+                  <button
+                    key={sub.key}
+                    type="button"
+                    onClick={() => scrollToAnchor(subAnchorId(sub.key))}
+                    aria-current={isActive ? "true" : undefined}
+                    className={`flex shrink-0 items-center gap-1.5 rounded-lg border-b-2 px-3 py-1.5 text-xs font-bold transition-colors lg:w-full lg:justify-between lg:border-b-0 lg:border-l-2 ${
+                      isActive
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-transparent text-foreground/60 hover:text-foreground"
+                    }`}
+                  >
+                    {sub.label}
+                    <span className="tabular-nums opacity-55">{sub.count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

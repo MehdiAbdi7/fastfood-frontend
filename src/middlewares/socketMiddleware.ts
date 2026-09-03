@@ -32,7 +32,13 @@ export const socketMiddleware: Middleware = (store) => (next) => (action) => {
       return result;
     }
 
-    if (socket?.connected) return result;
+    // `socket` et non `socket?.connected` : pendant le handshake, `connected`
+    // vaut encore false. Un second sessionLoaded qui tombait dans cette
+    // fenêtre créait un DEUXIÈME io() et écrasait la référence du premier,
+    // qui restait ouvert sans que personne ne puisse plus le fermer.
+    // disconnect() remet la variable à null, donc tester sa simple présence
+    // suffit et n'empêche pas une reconnexion après déconnexion.
+    if (socket) return result;
 
     const isDelivery = user.role === "delivery";
 

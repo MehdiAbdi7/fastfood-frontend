@@ -14,16 +14,25 @@ import type { User } from "@/types/user";
  * celui-ci n'a pas fini de se rendre — ce que React signale par
  * « Cannot update a component while rendering a different component ».
  *
- * Contrairement à l'ancien AuthHydrator, ça ne réintroduit pas d'écran de
- * chargement : le user arrive du serveur, déjà résolu. Il n'y a aucune lecture
- * asynchrone à attendre, juste un aller-retour de rendu imperceptible.
+ * DÉPENDANCE : la signature, pas l'objet.
+ * Le layout serveur reconstruit un objet `user` neuf à CHAQUE rendu (chaque
+ * router.refresh(), chaque navigation, chaque revalidation). Sa référence
+ * change donc même quand la session est rigoureusement identique. Avec `user`
+ * en dépendance, l'effet se redéclenchait à chaque fois et re-dispatchait
+ * sessionLoaded — ce qui, via socketMiddleware, refermait et rouvrait le
+ * socket en boucle.
+ *
+ * JSON.stringify donne une dépendance stable PAR VALEUR, et JSON.parse rend un
+ * objet équivalent sans avoir à référencer `user` dans l'effet (donc sans
+ * closure périmée et sans avertissement du linter).
  */
 export function SessionSync({ user }: { user: User | null }) {
   const dispatch = useAppDispatch();
+  const signature = JSON.stringify(user ?? null);
 
   useEffect(() => {
-    dispatch(sessionLoaded(user));
-  }, [dispatch, user]);
+    dispatch(sessionLoaded(JSON.parse(signature) as User | null));
+  }, [dispatch, signature]);
 
   return null;
 }

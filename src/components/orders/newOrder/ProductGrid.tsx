@@ -58,7 +58,11 @@ export function ProductGrid({
           <button
             key={item._id}
             onClick={() => onSelect(item)}
-            className="surface-card group relative flex flex-col overflow-hidden text-left transition-all hover:-translate-y-0.5 hover:shadow-food-sm"
+            // isolate : `relative` seul ne crée PAS de contexte d'empilement,
+            // donc le z-10 du badge ci-dessous concourait au niveau du parent
+            // et pouvait recouvrir la barre de filtres collante. isolate
+            // enferme tout ce qui est à l'intérieur de la carte.
+            className="surface-card group relative isolate flex flex-col overflow-hidden text-left transition-all hover:-translate-y-0.5 hover:shadow-food-sm"
           >
             {inCart > 0 && (
               <span className="tabular-nums absolute left-3 top-3 z-10 flex h-7 min-w-7 items-center justify-center rounded-full bg-accent-green px-2 text-sm font-bold text-on-primary shadow-md">

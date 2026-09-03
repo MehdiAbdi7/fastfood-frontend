@@ -195,7 +195,7 @@ export function ProductConfigModal({
       isOpen={item !== null}
       onClose={onClose}
       title={item.name}
-      size="lg"
+      size="sheet"
       hideHeader
       footer={
         <div className="flex w-full items-center justify-between gap-3">
@@ -239,7 +239,10 @@ export function ProductConfigModal({
           >
             <span className="icon-[mdi--close] text-xl" />
           </button>
-          <div className="relative h-64 w-full sm:h-72">
+          {/* h-72 / sm:h-80 : mêmes hauteurs que la fiche publique
+                (ProductSheet). Combinées à la largeur "sheet", le visuel
+                occupe la même surface relative que côté client. */}
+          <div className="relative h-72 w-full sm:h-80">
             <div
               aria-hidden="true"
               className="absolute inset-0 bg-radial-[at_50%_38%] from-primary/12 via-primary/4 to-transparent"
@@ -277,7 +280,9 @@ export function ProductConfigModal({
         {/* Formules */}
         {eligibleFormulas.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-foreground">Formule</p>
+            <p className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
+              Formule
+            </p>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => selectFormula(null)}
@@ -288,6 +293,12 @@ export function ProductConfigModal({
                 }`}
               >
                 Seul
+                {/* Le prix nu, comme sur la fiche publique : sans lui, « Seul »
+                    est la seule option de la rangée sans chiffre, et l'écart
+                    avec une formule ne se lit plus d'un coup d'œil. */}
+                <span className="tabular-nums ml-2 font-normal">
+                  {formatDA(variant.price)}
+                </span>
               </button>
               {eligibleFormulas.map((formula) => (
                 <button
@@ -324,7 +335,7 @@ export function ProductConfigModal({
 
           return (
             <div key={choice.label} className="flex flex-col gap-2">
-              <p className="text-sm font-semibold text-foreground">
+              <p className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
                 {choice.label}
                 <span className="ml-2 text-xs font-normal text-accent-bordeaux">
                   obligatoire
@@ -366,7 +377,9 @@ export function ProductConfigModal({
         {/* Variantes — masquées quand la formule impose un format unique */}
         {!isFixed && item.variants.length > 1 && (
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-foreground">Choix</p>
+            <p className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
+              Choix
+            </p>
             <div className="flex flex-wrap gap-2">
               {item.variants.map((v, i) => (
                 <button
@@ -397,7 +410,7 @@ export function ProductConfigModal({
         {/* Extras, groupés selon la configuration du produit */}
         {extraGroups.map((group, groupIndex) => (
           <div key={group.label} className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-foreground">
+            <p className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
               {group.label}
               {group.singleChoice && (
                 <span className="ml-2 text-xs font-normal text-foreground/50">
@@ -438,7 +451,9 @@ export function ProductConfigModal({
         {/* Ingrédients à retirer */}
         {item.removableIngredients && item.removableIngredients.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-foreground">Retirer</p>
+            <p className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
+              Retirer
+            </p>
             <div className="flex flex-wrap gap-2">
               {item.removableIngredients.map((ingredient) => {
                 const isExcluded = excluded.includes(ingredient);

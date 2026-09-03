@@ -86,22 +86,18 @@ export default async function CommandePage() {
             lire au premier coup d'œil, pas après avoir scrollé la carte. */}
         <StoreClosedNotice />
 
-        <header className="mb-6 flex flex-col gap-1.5">
-          <span className="font-heading text-sm font-bold uppercase tracking-wide text-accent-green">
-            Notre carte
-          </span>
-          <h1 className="font-heading text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-            Composez votre commande
-          </h1>
-          <p className="text-sm text-foreground/60">
-            Sur place, à emporter ou en livraison. Vous choisirez à la fin.
-          </p>
-        </header>
-
         {/* items-start est ce qui rend le sticky de la colonne opérant : sans
             lui, align-items:stretch étire l'aside sur toute la hauteur de la
             rangée, et un élément déjà aussi haut que son conteneur n'a plus
             aucune marge pour coller. */}
+        {/* L'en-tête est DANS la colonne de droite, et non au-dessus de la
+            rangée. C'est ce qui rend la colonne de navigation utilisable au
+            chargement : `sticky` ne s'active qu'une fois qu'on a scrollé, donc
+            tant qu'on est en haut de page la colonne occupe sa position
+            naturelle. Placé au-dessus, le titre la poussait ~290px plus bas,
+            alors que son max-height se calcule depuis le haut du viewport —
+            elle dépassait donc de l'écran d'exactement la hauteur du titre.
+            Ici elle démarre en haut de la zone de contenu et tient toujours. */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
           <MenuFilters nav={nav} />
 
@@ -109,6 +105,18 @@ export default async function CommandePage() {
               largeur de son contenu, et une longue description de plat
               élargirait la grille au-delà de la colonne. */}
           <div className="min-w-0 flex-1">
+            <header className="mb-6 flex flex-col gap-1.5">
+              <span className="font-heading text-sm font-bold uppercase tracking-wide text-accent-green">
+                Notre carte
+              </span>
+              <h1 className="font-heading text-3xl font-bold leading-tight text-foreground sm:text-4xl">
+                Composez votre commande
+              </h1>
+              <p className="text-sm text-foreground/60">
+                Sur place, à emporter ou en livraison. Vous choisirez à la fin.
+              </p>
+            </header>
+
             <DishList items={availableItems} nav={nav} />
           </div>
         </div>
