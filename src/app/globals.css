@@ -4,9 +4,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Chargées via <link> dans layout.tsx (voir le commentaire là-bas) */
+  /* Chargées via les imports Fontsource de layout.tsx (voir le commentaire
+     là-bas). Le paquet @fontsource-variable déclare la famille sous le nom
+     "DM Sans Variable" : avec "DM Sans" seul, rien ne correspondait et tout
+     le texte courant retombait sur la police système. */
   --font-heading: "Baloo 2", system-ui, sans-serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-body: "DM Sans Variable", system-ui, sans-serif;
 
   --background: #fbf5ef;
   --foreground: #3d2716;
@@ -131,13 +134,15 @@ button,
     pointer;
 }
 
+/* Glissement seul, sans fondu depuis opacity: 0. Avec le fondu (et le mode
+   `both` des délais en cascade), le titre restait invisible jusqu'à 1 s
+   après le premier affichage, ce qui pénalisait le Speed Index. Le texte est
+   maintenant lisible dès la première frame, le mouvement reste. */
 @keyframes slideInLeft {
   0% {
-    opacity: 0;
     transform: translateX(-40px);
   }
   100% {
-    opacity: 1;
     transform: translateX(0);
   }
 }

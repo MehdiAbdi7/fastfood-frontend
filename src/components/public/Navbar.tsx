@@ -57,13 +57,18 @@ const Navbar = () => {
         >
           {/* Hauteur fixée en CSS, largeur en auto : le rapport d'aspect réel
               du fichier est respecté, et Next n'a plus de divergence à
-              signaler entre les dimensions déclarées et le rendu. */}
+              signaler entre les dimensions déclarées et le rendu.
+              alt vide : le texte « NIWA FOOD » juste à côté nomme déjà le
+              lien, un alt le ferait lire deux fois par les lecteurs d'écran.
+              loading="eager" sans preload : le logo est au-dessus de la
+              ligne de flottaison, mais la priorité réseau revient à la photo
+              du hero, qui est l'élément LCP. */}
           <Image
             src="/logo-niwa.png"
-            alt="Niwa Food"
+            alt=""
             width={55}
             height={55}
-            priority
+            loading="eager"
             className="h-14 w-auto shrink-0"
           />
           <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
@@ -190,7 +195,7 @@ const Navbar = () => {
             >
               <Image
                 src="/logo-niwa.png"
-                alt="Niwa Food"
+                alt=""
                 width={48}
                 height={48}
                 className="h-12 w-auto shrink-0"

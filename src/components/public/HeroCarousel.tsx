@@ -99,7 +99,11 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
           sizes={HERO_IMAGE_SIZES}
           // La première slide est l'élément LCP de l'accueil : on la précharge
           // au lieu de la laisser en lazy. Les suivantes restent en lazy.
+          // fetchPriority="high" en plus : preload la découvre tôt, mais sans
+          // ce signal le navigateur la télécharge en priorité "Low", comme
+          // n'importe quelle image.
           preload={index === 0}
+          fetchPriority={index === 0 ? "high" : undefined}
           className={`${SHARED_IMAGE_CLASSNAME} ${
             index === currentIndex ? "opacity-100" : "opacity-0"
           }`}
