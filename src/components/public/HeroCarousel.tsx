@@ -15,6 +15,10 @@ const AUTOPLAY_INTERVAL_MS = 6000;
 const SLIDE_START_OFFSET = "7rem";
 const SWIPE_THRESHOLD_PX = 40;
 
+// Largeur réellement affichée : 85 % du cercle (20rem en mobile, 30rem max
+// au-delà). Sans `sizes`, Next.js sert une image de 828px pour ~272px affichés.
+const HERO_IMAGE_SIZES = "(min-width: 640px) 26rem, 17rem";
+
 export interface HeroSlide {
   src: string;
   alt: string;
@@ -92,6 +96,10 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
           alt={slide.alt}
           width={400}
           height={400}
+          sizes={HERO_IMAGE_SIZES}
+          // La première slide est l'élément LCP de l'accueil : on la précharge
+          // au lieu de la laisser en lazy. Les suivantes restent en lazy.
+          preload={index === 0}
           className={`${SHARED_IMAGE_CLASSNAME} ${
             index === currentIndex ? "opacity-100" : "opacity-0"
           }`}

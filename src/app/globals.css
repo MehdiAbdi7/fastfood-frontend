@@ -19,7 +19,7 @@
   --color-accent-green: #1e7f4e;
   --color-accent-slate: #0e5f2d;
 
-  --hero-bg-image: url("/bg-white.png");
+  --hero-bg-image: url("/bg-white.webp");
 
   /* --- Dashboard : mêmes teintes, grammaire plus dense --- */
   /* Surfaces empilables (carte sur fond, carte sur carte) sans dépendre du glow */
@@ -47,7 +47,7 @@
   --color-accent-green: #248957;
   --color-accent-slate: #3cb972;
 
-  --hero-bg-image: url("/bg-dark.png");
+  --hero-bg-image: url("/bg-dark.webp");
 
   --color-surface: #1c1815;
   --color-surface-2: #24201c;

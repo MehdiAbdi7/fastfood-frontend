@@ -100,6 +100,7 @@ export default function AProposPage() {
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
             <video
               src="/niwa-video.mp4"
+              poster="/niwa-video-poster.webp"
               autoPlay
               loop
               muted

@@ -65,6 +65,27 @@ export function About() {
     };
   }, []);
 
+  // La vidéo ne se télécharge qu'à l'approche de la section (preload="none"
+  // + lecture déclenchée ici) : avec autoPlay, elle pesait sur le premier
+  // chargement de l'accueil alors qu'elle est sous la ligne de flottaison.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => setIsPlaying(false));
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
   const togglePlay = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -143,7 +164,8 @@ export function About() {
           <video
             ref={videoRef}
             src="/niwa-video.mp4"
-            autoPlay
+            poster="/niwa-video-poster.webp"
+            preload="none"
             loop
             muted
             playsInline
