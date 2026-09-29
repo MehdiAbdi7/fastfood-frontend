@@ -72,7 +72,7 @@ export function HistoryToolbar({
             className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-colors ${
               type === tab.value
                 ? "bg-primary text-on-primary"
-                : "bg-surface-2 text-foreground/60 hover:text-foreground"
+                : "bg-surface-2 text-foreground/75 hover:text-foreground"
             }`}
           >
             <span aria-hidden="true" className={`${tab.icon} text-base`} />

@@ -23,7 +23,7 @@ export function AppearanceCard() {
             className={`flex flex-1 flex-col items-center gap-1.5 rounded-xl border py-3 text-xs font-semibold transition-colors ${
               mode === option.value
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border-subtle text-foreground/60"
+                : "border-border-subtle text-foreground/75"
             }`}
           >
             <span className={`${option.icon} text-xl`} />

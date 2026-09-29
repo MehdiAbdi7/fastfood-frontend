@@ -39,7 +39,7 @@ export function ServiceManagementCard() {
   return (
     <section className="surface-card flex flex-col gap-4 p-5">
       <h2 className="font-heading text-base font-bold text-foreground">Service</h2>
-      <p className="text-sm text-foreground/60">
+      <p className="text-sm text-foreground/75">
         Ouvrir un nouveau service remet la numérotation des commandes à zéro pour
         le magasin choisi, et rouvre les commandes en ligne. Bloqué s&apos;il
         reste des commandes en cours.
@@ -55,7 +55,7 @@ export function ServiceManagementCard() {
               <span className="font-semibold text-foreground">
                 {STORE_LABELS[counter.store]}
               </span>
-              <span className="text-xs text-foreground/50">
+              <span className="text-xs text-foreground/75">
                 {counter.lastResetAt
                   ? `Service depuis ${formatTime(counter.lastResetAt)} · #${counter.value}`
                   : "Aucun service ouvert"}

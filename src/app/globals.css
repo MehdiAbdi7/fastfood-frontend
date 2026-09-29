@@ -14,12 +14,19 @@
   --background: #fbf5ef;
   --foreground: #3d2716;
 
-  --color-primary: #b17865;
-  --color-primary-dark: #b17865;
+  /* Contrastes WCAG AA (4,5:1 pour le texte courant). primary et green ont
+     été assombris juste assez pour passer, teinte conservée : le terracotta
+     d'origine (#b17865) plafonnait à 3,4:1 sous un texte clair. */
+  --color-primary: #965e4c;
+  --color-primary-dark: #965e4c;
   --color-on-primary: #faf6f0;
   --color-accent-mustard: #e8a020;
+  /* La moutarde reste la couleur de marque des fonds et des pastilles, mais
+     comme couleur de TEXTE sur fond clair elle tombe à 1,9:1. Cette variante
+     est réservée au texte. */
+  --color-accent-mustard-text: #92630f;
   --color-accent-bordeaux: #8b2e3a;
-  --color-accent-green: #1e7f4e;
+  --color-accent-green: #1d7b4b;
   --color-accent-slate: #0e5f2d;
 
   --hero-bg-image: url("/bg-white.webp");
@@ -42,12 +49,17 @@
   --background: #171412;
   --foreground: #ebe8b8;
 
-  --color-primary: #8a6107;
+  /* primary éclairci (#8a6107 → #b47f09) : sous le texte foncé on-primary il
+     plafonnait à 3,3:1. Conséquence : sur un fond bg-primary plein, le texte
+     doit rester foncé en sombre (text-background ou text-on-primary), jamais
+     text-foreground. primary-dark garde le texte clair. */
+  --color-primary: #b47f09;
   --color-primary-dark: #775305;
   --color-on-primary: #1a1310;
   --color-accent-mustard: #e6b856;
+  --color-accent-mustard-text: #e6b856;
   --color-accent-bordeaux: #d1495c;
-  --color-accent-green: #248957;
+  --color-accent-green: #2aa166;
   --color-accent-slate: #3cb972;
 
   --hero-bg-image: url("/bg-dark.webp");
@@ -70,6 +82,7 @@
   --color-primary-dark: var(--color-primary-dark);
   --color-on-primary: var(--color-on-primary);
   --color-accent-mustard: var(--color-accent-mustard);
+  --color-accent-mustard-text: var(--color-accent-mustard-text);
   --color-accent-bordeaux: var(--color-accent-bordeaux);
   --color-accent-green: var(--color-accent-green);
   --color-accent-slate: var(--color-accent-slate);

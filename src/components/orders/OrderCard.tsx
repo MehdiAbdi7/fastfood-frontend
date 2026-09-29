@@ -79,7 +79,7 @@ export function OrderCard({ order, onOpenDetail }: OrderCardProps) {
         <ElapsedTimer since={order.createdAt} />
       </div>
 
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/60">
+      <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/75">
         <span className={`${ORDER_TYPE_ICONS[order.type]} text-sm`} />
         {tableLabel ?? ORDER_TYPE_LABELS[order.type]}
       </div>
@@ -102,7 +102,7 @@ export function OrderCard({ order, onOpenDetail }: OrderCardProps) {
 
       <div className="flex items-center justify-between border-t border-border-subtle pt-3">
         <div className="flex flex-col">
-          <span className="text-xs text-foreground/50">
+          <span className="text-xs text-foreground/75">
             {itemsCount} article{itemsCount > 1 ? "s" : ""}
           </span>
           <span className="font-heading text-base font-bold text-accent-green">

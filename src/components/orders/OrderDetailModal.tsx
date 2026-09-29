@@ -260,12 +260,12 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               <p className="font-semibold text-foreground">
                 {order.client.fullName}
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-foreground/75">
                 {tableLabel ?? ORDER_TYPE_LABELS[order.type]}
                 {order.client.phone && ` · ${order.client.phone}`}
               </p>
               {order.client.address && (
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-foreground/75">
                   {order.client.address}
                 </p>
               )}
@@ -277,7 +277,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               <StatusBadge status={order.status} />
               <button
                 onClick={() => printOrderTicket(order)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-foreground/60 hover:text-primary"
+                className="flex items-center gap-1.5 text-xs font-semibold text-foreground/75 hover:text-primary"
               >
                 <span className="icon-[mdi--printer-outline] text-base" />
                 Imprimer le ticket
@@ -298,7 +298,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                 <span className="truncate font-heading text-sm font-bold uppercase tracking-wider text-foreground">
                   {order.appliedPromo.code}
                 </span>
-                <span className="tabular-nums text-xs text-foreground/55">
+                <span className="tabular-nums text-xs text-foreground/75">
                   −{order.appliedPromo.discountPercent}% sur les articles ·{" "}
                   {formatDA(discountAmount)} de remise
                 </span>
@@ -322,7 +322,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                         ? `${deliveryPerson.firstname} ${deliveryPerson.lastname}`
                         : "Sans livreur assigné"}
                     </span>
-                    <span className="tabular-nums text-xs text-foreground/50">
+                    <span className="tabular-nums text-xs text-foreground/75">
                       {deliveryPerson?.tel ??
                         "Vous validerez la livraison ici"}
                     </span>
@@ -367,7 +367,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                     <span className="font-semibold text-foreground">
                       {item.quantity}x {item.name}
                       {variantLabel !== "Standard" && (
-                        <span className="text-foreground/50">
+                        <span className="text-foreground/75">
                           {" "}
                           ({variantLabel})
                         </span>
@@ -378,7 +378,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                     </span>
                   </div>
                   {selectedExtras.length > 0 && (
-                    <p className="mt-1 text-xs text-foreground/60">
+                    <p className="mt-1 text-xs text-foreground/75">
                       + {selectedExtras.map((e) => e.name).join(", ")}
                     </p>
                   )}

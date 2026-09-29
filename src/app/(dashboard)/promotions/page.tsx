@@ -108,7 +108,7 @@ export default function PromotionsPage() {
 
       {/* Deux règles qui ne se devinent pas depuis l'interface, et sur
           lesquelles on se fait rattraper une fois chacune. */}
-      <div className="flex flex-col gap-2 rounded-xl bg-surface-2/60 px-4 py-3 text-xs leading-relaxed text-foreground/60">
+      <div className="flex flex-col gap-2 rounded-xl bg-surface-2/60 px-4 py-3 text-xs leading-relaxed text-foreground/75">
         <p className="flex items-start gap-2">
           <span
             aria-hidden="true"

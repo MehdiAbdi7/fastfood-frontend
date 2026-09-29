@@ -105,7 +105,7 @@ export function Modal({
             <button
               onClick={onClose}
               aria-label="Fermer"
-              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-surface-2 hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/75 transition-colors hover:bg-surface-2 hover:text-foreground"
             >
               <span className="icon-[mdi--close] text-xl" />
             </button>

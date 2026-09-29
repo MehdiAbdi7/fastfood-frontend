@@ -38,7 +38,7 @@ function GroupChip({
       {label}
       <span
         className={`tabular-nums rounded-full px-1.5 text-xs ${
-          isActive ? "bg-on-primary/20" : "bg-surface-2 text-foreground/50"
+          isActive ? "bg-on-primary/20" : "bg-surface-2 text-foreground/75"
         }`}
       >
         {count}

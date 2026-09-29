@@ -313,7 +313,7 @@ export function ProductSheet({
                 aria-label="Fermer"
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors ${
                   isScrolled
-                    ? "text-foreground/60 hover:bg-surface-2 hover:text-foreground"
+                    ? "text-foreground/75 hover:bg-surface-2 hover:text-foreground"
                     : "bg-black/45 text-white backdrop-blur-sm hover:bg-black/70"
                 }`}
               >
@@ -394,7 +394,7 @@ export function ProductSheet({
                   {item.name}
                 </h2>
                 {item.description && (
-                  <p className="text-sm leading-relaxed text-foreground/65">
+                  <p className="text-sm leading-relaxed text-foreground/75">
                     {item.description}
                   </p>
                 )}
@@ -504,7 +504,7 @@ export function ProductSheet({
                 )}
 
                 {isFixed && item.variants.length > 1 && (
-                  <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs text-foreground/60">
+                  <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs text-foreground/75">
                     Format unique en {selectedFormula!.name} — pas de taille à
                     choisir.
                   </p>

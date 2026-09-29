@@ -74,7 +74,7 @@ export function MenuItemCard({
         {/* La description existait en base sans jamais être affichée ici —
             c'est pourtant elle qui distingue deux burgers au nom proche. */}
         {item.description && (
-          <p className="line-clamp-2 text-xs leading-relaxed text-foreground/55">
+          <p className="line-clamp-2 text-xs leading-relaxed text-foreground/75">
             {item.description}
           </p>
         )}

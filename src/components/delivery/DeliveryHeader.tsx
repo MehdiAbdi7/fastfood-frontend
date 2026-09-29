@@ -38,7 +38,7 @@ export function DeliveryHeader() {
           <p className="truncate font-heading text-sm font-bold text-foreground">
             {user?.firstname}
             {user?.store && (
-              <span className="font-normal text-foreground/50">
+              <span className="font-normal text-foreground/75">
                 {" · "}
                 {STORE_LABELS[user.store]}
               </span>
@@ -52,7 +52,7 @@ export function DeliveryHeader() {
           type="button"
           onClick={toggleTheme}
           aria-label="Basculer le thème clair/sombre"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle text-foreground/60 transition-colors hover:border-primary hover:text-foreground"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle text-foreground/75 transition-colors hover:border-primary hover:text-foreground"
         >
           <span
             aria-hidden="true"

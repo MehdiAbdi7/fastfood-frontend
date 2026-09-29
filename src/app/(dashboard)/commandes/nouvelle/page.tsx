@@ -208,7 +208,7 @@ export default function NewOrderPage() {
             <Link
               href="/commandes"
               aria-label="Retour aux commandes"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/60 transition-colors hover:border-primary hover:text-foreground"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/75 transition-colors hover:border-primary hover:text-foreground"
             >
               <span className="icon-[mdi--arrow-left] text-xl" />
             </Link>
@@ -218,7 +218,7 @@ export default function NewOrderPage() {
                 Prise de commande
               </h1>
 
-              <p className="text-sm text-foreground/55">
+              <p className="text-sm text-foreground/75">
                 Pour un client au comptoir ou au téléphone
               </p>
             </div>
@@ -248,7 +248,7 @@ export default function NewOrderPage() {
               type="button"
               onClick={() => setIsMobileTicketOpen(false)}
               aria-label="Fermer le ticket"
-              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/60 hover:text-foreground lg:hidden"
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/75 hover:text-foreground lg:hidden"
             >
               <span className="icon-[mdi--close] text-lg" />
             </button>
@@ -259,7 +259,7 @@ export default function NewOrderPage() {
                   Ticket
                 </h2>
 
-                <span className="tabular-nums text-xs font-semibold text-foreground/50">
+                <span className="tabular-nums text-xs font-semibold text-foreground/75">
                   {itemsCount} article
                   {itemsCount > 1 ? "s" : ""}
                 </span>
@@ -274,7 +274,7 @@ export default function NewOrderPage() {
                     className={`flex flex-col items-center gap-1 rounded-xl border py-2.5 text-[11px] font-bold transition-colors ${
                       type === t
                         ? "border-primary bg-primary/10 text-primary"
-                        : "border-border-subtle text-foreground/55 hover:text-foreground"
+                        : "border-border-subtle text-foreground/75 hover:text-foreground"
                     }`}
                   >
                     <span className={`${ORDER_TYPE_ICONS[t]} text-lg`} />
@@ -389,7 +389,7 @@ export default function NewOrderPage() {
                   <div className="flex flex-col items-center gap-1.5 py-6 text-center">
                     <span className="icon-[mdi--receipt-text-plus-outline] text-2xl text-foreground/25" />
 
-                    <p className="text-sm font-semibold text-foreground/60">
+                    <p className="text-sm font-semibold text-foreground/75">
                       Ticket vide
                     </p>
 
@@ -425,7 +425,7 @@ export default function NewOrderPage() {
                             {line.name}
                           </p>
 
-                          <p className="tabular-nums text-xs text-foreground/50">
+                          <p className="tabular-nums text-xs text-foreground/75">
                             {variantLabel !== "Standard"
                               ? `${variantLabel} · `
                               : ""}
@@ -456,7 +456,7 @@ export default function NewOrderPage() {
                               setQuantity(line.key, line.quantity - 1)
                             }
                             aria-label={`Retirer un ${line.name}`}
-                            className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-bordeaux"
+                            className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/75 hover:bg-surface hover:text-accent-bordeaux"
                           >
                             <span className="icon-[mdi--minus] text-sm" />
                           </button>
@@ -470,7 +470,7 @@ export default function NewOrderPage() {
                               setQuantity(line.key, line.quantity + 1)
                             }
                             aria-label={`Ajouter un ${line.name}`}
-                            className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-green"
+                            className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/75 hover:bg-surface hover:text-accent-green"
                           >
                             <span className="icon-[mdi--plus] text-sm" />
                           </button>

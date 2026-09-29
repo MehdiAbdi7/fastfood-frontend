@@ -40,16 +40,18 @@ const Navbar = () => {
   const pathname = usePathname();
 
   return (
+    // Au défilement, le header prend la couleur du fond et non plus
+    // bg-primary : sur un fond primary plein, ni « NIWA » ni la moutarde de
+    // « FOOD » n'atteignaient 4,5:1. Les textes gardent ainsi les mêmes
+    // couleurs dans les deux états, seuls le fond et l'ombre apparaissent.
     <header
       className={`fixed z-40 w-full transition-all duration-300 ease-in ${
-        isScrolled || isMenuOpen ? "bg-primary shadow-md" : "bg-transparent"
+        isScrolled || isMenuOpen
+          ? "bg-background shadow-md shadow-primary/20"
+          : "bg-transparent"
       }`}
     >
-      <nav
-        className={`mx-auto max-w-5xl flex w-full items-center justify-between border-b border-primary lg:border-none px-2 py-2 transition-colors duration-300 ease-in-out sm:justify-between ${
-          isScrolled || isMenuOpen ? "text-background" : "text-primary "
-        }`}
-      >
+      <nav className="mx-auto max-w-5xl flex w-full items-center justify-between border-b border-primary lg:border-none px-2 py-2 text-primary transition-colors duration-300 ease-in-out sm:justify-between">
         <Link
           href="/"
           className="flex items-center justify-center gap-0.5 sm:gap-1 "
@@ -71,7 +73,7 @@ const Navbar = () => {
             loading="eager"
             className="h-14 w-auto shrink-0"
           />
-          <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
+          <span className="font-heading text-sm text-accent-mustard-text font-semibold  sm:text-xl hover:scale-110">
             <span className="text-lg text-foreground sm:text-xl">NIWA</span>{" "}
             FOOD
           </span>
@@ -92,8 +94,8 @@ const Navbar = () => {
                 aria-current={isActive ? "page" : undefined}
                 className={`group relative whitespace-nowrap py-1 transition-colors duration-300 ease-out ${
                   isActive
-                    ? "text-accent-mustard"
-                    : "text-foreground dark:text-foreground hover:text-accent-mustard"
+                    ? "text-accent-mustard-text"
+                    : "text-foreground dark:text-foreground hover:text-accent-mustard-text"
                 }`}
               >
                 {link.label}
@@ -125,11 +127,7 @@ const Navbar = () => {
           <ThemeToggle />
           <Link
             href="/commande"
-            className={`hidden rounded-full px-5 py-2 font-bold transition-all duration-200 ease-in-out lg:inline-block ${
-              isScrolled || isMenuOpen
-                ? "bg-background text-primary dark:text-foreground hover:text-accent-green hover:scale-105"
-                : "bg-primary text-background dark:text-foreground hover:bg-accent-green hover:scale-105"
-            }`}
+            className="hidden rounded-full bg-primary px-5 py-2 font-bold text-background transition-all duration-200 ease-in-out hover:scale-105 hover:bg-accent-green lg:inline-block"
           >
             Commander
           </Link>
@@ -200,7 +198,7 @@ const Navbar = () => {
                 height={48}
                 className="h-12 w-auto shrink-0"
               />
-              <span className="font-heading text-sm text-accent-mustard font-semibold  sm:text-xl hover:scale-110">
+              <span className="font-heading text-sm text-accent-mustard-text font-semibold  sm:text-xl hover:scale-110">
                 <span className="text-lg text-foreground sm:text-xl">NIWA</span>{" "}
                 FOOD
               </span>
@@ -248,7 +246,7 @@ const Navbar = () => {
                   }}
                   className={`flex items-center justify-between rounded-2xl border-b px-4 py-3 font-heading text-lg font-semibold transition-all duration-300 ease-out ${
                     isActive
-                      ? "border-accent-mustard bg-primary/10 text-accent-mustard"
+                      ? "border-accent-mustard bg-primary/10 text-accent-mustard-text"
                       : "border-primary text-foreground"
                   } ${
                     isMenuOpen

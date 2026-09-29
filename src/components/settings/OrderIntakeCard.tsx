@@ -140,7 +140,7 @@ export function OrderIntakeCard() {
         <h2 className="font-heading text-base font-bold text-foreground">
           Commandes en ligne
         </h2>
-        <p className="text-sm text-foreground/60">
+        <p className="text-sm text-foreground/75">
           Coupe la prise de commande côté clients (QR code et site). Les
           commandes en cours restent traitables, et vous pouvez continuer à
           saisir au comptoir. Ouvrir un nouveau service les rouvre

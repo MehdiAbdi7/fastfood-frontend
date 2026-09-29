@@ -71,7 +71,7 @@ export function StoreCard({ location }: { location: StoreLocation }) {
         </a>
 
         <div className="flex flex-col gap-2 rounded-2xl bg-primary/5 px-4 py-3">
-          <p className="flex items-center gap-1.5 font-heading text-xs font-bold uppercase tracking-wide text-foreground/50">
+          <p className="flex items-center gap-1.5 font-heading text-xs font-bold uppercase tracking-wide text-foreground/75">
             <span aria-hidden="true" className="icon-[mdi--clock-outline] text-sm" />
             Horaires
           </p>
@@ -94,8 +94,8 @@ export function StoreCard({ location }: { location: StoreLocation }) {
           href={location.mapUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`Itinéraire vers Niwa Food ${location.name} sur Google Maps`}
-          className="mt-auto flex h-12 items-center justify-center gap-2 rounded-full border border-primary font-heading text-sm font-bold text-foreground transition-all duration-300 hover:bg-primary hover:text-background dark:hover:text-foreground"
+          aria-label={`Voir l'itinéraire vers Niwa Food ${location.name} sur Google Maps`}
+          className="mt-auto flex h-12 items-center justify-center gap-2 rounded-full border border-primary font-heading text-sm font-bold text-foreground transition-all duration-300 hover:bg-primary hover:text-background"
         >
           <span aria-hidden="true" className="icon-[mdi--directions] text-base" />
           Voir l&apos;itinéraire

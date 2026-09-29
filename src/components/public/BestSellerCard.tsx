@@ -97,7 +97,7 @@ export function BestSellerCard({
 
         {/* min-h : une carte sans description laisserait un creux là où ses
             voisines ont deux lignes. On réserve la place même à vide. */}
-        <p className="min-h-8 line-clamp-2 text-xs leading-snug text-foreground/60">
+        <p className="min-h-8 line-clamp-2 text-xs leading-snug text-foreground/75">
           {item.description}
         </p>
       </div>

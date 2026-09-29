@@ -31,7 +31,7 @@ export function HistoryDrillList({ rows, onSelect, emptyLabel }: HistoryDrillLis
             {row.label}
           </span>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-foreground/60">
+            <span className="text-sm text-foreground/75">
               {row.count} commande{row.count > 1 ? "s" : ""}
             </span>
             <span className="text-sm font-bold text-accent-green">

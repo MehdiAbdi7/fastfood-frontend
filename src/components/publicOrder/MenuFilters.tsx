@@ -241,7 +241,7 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
                     className={`flex shrink-0 items-center gap-1.5 rounded-lg border-b-2 px-3 py-1.5 text-xs font-bold transition-colors lg:w-full lg:justify-between lg:border-b-0 lg:border-l-2 ${
                       isActive
                         ? "border-primary bg-primary/10 text-primary"
-                        : "border-transparent text-foreground/60 hover:text-foreground"
+                        : "border-transparent text-foreground/75 hover:text-foreground"
                     }`}
                   >
                     {sub.label}

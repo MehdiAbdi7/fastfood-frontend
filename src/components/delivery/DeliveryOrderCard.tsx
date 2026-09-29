@@ -44,7 +44,7 @@ function DeliveryLine({ item }: { item: OrderItem }) {
         </div>
 
         {variantLabel !== "Standard" && (
-          <p className="text-xs text-foreground/50">{variantLabel}</p>
+          <p className="text-xs text-foreground/75">{variantLabel}</p>
         )}
 
         {item.formula && (
@@ -170,7 +170,7 @@ export function DeliveryOrderCard({ order }: { order: Order }) {
 
         {/* ---------- Le sac ---------- */}
         <details className="group">
-          <summary className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-foreground/60 marker:content-none">
+          <summary className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-foreground/75 marker:content-none">
             <span
               aria-hidden="true"
               className="icon-[mdi--chevron-right] text-lg transition-transform group-open:rotate-90"
@@ -191,14 +191,14 @@ export function DeliveryOrderCard({ order }: { order: Order }) {
         {/* ---------- Ce qu'il encaisse ---------- */}
         <div className="flex flex-col gap-1.5 border-t border-border-subtle pt-3">
           <div className="flex items-baseline justify-between text-sm">
-            <span className="text-foreground/60">Articles</span>
+            <span className="text-foreground/75">Articles</span>
             <span className="tabular-nums font-semibold text-foreground/80">
               {formatDA(itemsTotal)}
             </span>
           </div>
 
           <div className="flex items-baseline justify-between text-sm">
-            <span className="text-foreground/60">Livraison</span>
+            <span className="text-foreground/75">Livraison</span>
             <span className="tabular-nums font-semibold text-foreground/80">
               {/* deliveryFee est fixé par le staff : tant qu'il est absent,
                   afficher 0 DA ferait encaisser le mauvais montant. */}

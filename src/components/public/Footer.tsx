@@ -31,7 +31,7 @@ const Footer = () => {
               height={48}
               className="h-12 w-auto shrink-0"
             />
-            <span className="font-heading text-lg font-semibold text-accent-mustard sm:text-xl">
+            <span className="font-heading text-lg font-semibold text-accent-mustard-text sm:text-xl">
               <span className="text-foreground">Niwa</span> Food
             </span>
           </Link>
@@ -135,7 +135,7 @@ const Footer = () => {
       </div>
 
       {/* Barre du bas */}
-      <div className="mx-auto mt-12 flex max-w-6xl flex-col items-center gap-3 border-t border-primary/20 pt-6 text-center text-xs text-foreground/60 sm:flex-row sm:justify-between sm:text-left">
+      <div className="mx-auto mt-12 flex max-w-6xl flex-col items-center gap-3 border-t border-primary/20 pt-6 text-center text-xs text-foreground/75 sm:flex-row sm:justify-between sm:text-left">
         <p>© {new Date().getFullYear()} Niwa Food — Tous droits réservés</p>
         <p>Développé par Mehdi Abdi</p>
       </div>

@@ -42,7 +42,7 @@ export function PromoCodeField({ promo }: { promo: UsePromoCodeResult }) {
           <p className="font-heading text-sm font-bold text-foreground">
             Code {applied.code} appliqué
           </p>
-          <p className="tabular-nums text-xs text-foreground/60">
+          <p className="tabular-nums text-xs text-foreground/75">
             −{applied.discountPercent}% sur vos articles ·{" "}
             <span className="font-bold text-accent-green">
               {formatDA(applied.discountAmount)} économisés

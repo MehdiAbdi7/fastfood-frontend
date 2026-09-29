@@ -103,7 +103,7 @@ export default function TablesPage() {
 
       {Object.entries(groups).map(([store, storeTables]) => (
         <section key={store} className="flex flex-col gap-3">
-          <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/50">
+          <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/75">
             {STORE_LABELS[store as Store]} · {storeTables.length} table
             {storeTables.length > 1 ? "s" : ""}
           </h2>

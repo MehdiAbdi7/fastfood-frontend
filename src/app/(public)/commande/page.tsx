@@ -49,7 +49,7 @@ export default async function CommandePage() {
           <h1 className="font-heading text-xl font-bold text-foreground">
             Le menu est momentanément indisponible
           </h1>
-          <p className="text-sm text-foreground/60">
+          <p className="text-sm text-foreground/75">
             Rechargez la page dans un instant, ou appelez-nous directement.
           </p>
           {/* <a> natif : cette page peut s'afficher avant même le chargement du JS */}
@@ -112,7 +112,7 @@ export default async function CommandePage() {
               <h1 className="font-heading text-3xl font-bold leading-tight text-foreground sm:text-4xl">
                 Composez votre commande
               </h1>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-foreground/75">
                 Sur place, à emporter ou en livraison. Vous choisirez à la fin.
               </p>
             </header>

@@ -87,7 +87,7 @@ export function BottomNav() {
             key={item.href}
             href={item.href}
             className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold ${
-              isActive(item.href) ? "text-primary" : "text-foreground/50"
+              isActive(item.href) ? "text-primary" : "text-foreground/75"
             }`}
           >
             <span className={`${item.icon} text-2xl`} />
@@ -97,7 +97,7 @@ export function BottomNav() {
 
         <button
           onClick={() => setIsMoreOpen(true)}
-          className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold text-foreground/50"
+          className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold text-foreground/75"
         >
           <span className="icon-[mdi--dots-horizontal-circle-outline] text-2xl" />
           Plus

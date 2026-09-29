@@ -102,7 +102,7 @@ export function VariantEditor({ variants, onChange }: VariantEditorProps) {
         Variantes / prix
       </label>
 
-      <p className="text-xs text-foreground/50">
+      <p className="text-xs text-foreground/75">
         Attribut et valeur sont optionnels : laisse-les vides pour un produit à
         format unique (canette, salade...). Seul le prix est requis.
       </p>

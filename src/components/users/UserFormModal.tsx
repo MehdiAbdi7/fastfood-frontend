@@ -191,7 +191,7 @@ export function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
         {/* Le livreur se connecte comme tout le monde : email + mot de passe.
             Son numéro sert au staff pendant le service, pas à l'identifier. */}
         {role === "delivery" && !isEditing && (
-          <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs leading-relaxed text-foreground/60">
+          <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs leading-relaxed text-foreground/75">
             Le livreur se connectera avec cet email et ce mot de passe. Il
             n&apos;aura accès qu&apos;à ses propres courses, jamais au reste du
             dashboard. Un email interne suffit (ex :{" "}

@@ -9,7 +9,7 @@ import {
 } from "@/lib/elapsedTime";
 
 const LEVEL_CLASSES: Record<ElapsedLevel, string> = {
-  normal: "text-foreground/50",
+  normal: "text-foreground/75",
   warning: "text-accent-mustard",
   critical: "text-accent-bordeaux",
 };

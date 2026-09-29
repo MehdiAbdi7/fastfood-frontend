@@ -144,7 +144,7 @@ export function HistoryOrderList({
           {isLoading || !summary ? (
             <Skeleton className="mt-1 h-4 w-40" />
           ) : (
-            <span className="tabular-nums text-xs text-foreground/60">
+            <span className="tabular-nums text-xs text-foreground/75">
               {summary.count} commande{summary.count > 1 ? "s" : ""} ·{" "}
               <span className="font-semibold text-accent-green">
                 {formatDA(summary.revenue)}

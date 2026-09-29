@@ -168,7 +168,7 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
               className={`flex-1 rounded-xl border py-2.5 text-sm font-bold transition-colors ${
                 type === t
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-border-subtle text-foreground/60 hover:text-foreground"
+                  : "border-border-subtle text-foreground/75 hover:text-foreground"
               }`}
             >
               {ORDER_TYPE_LABELS[t]}

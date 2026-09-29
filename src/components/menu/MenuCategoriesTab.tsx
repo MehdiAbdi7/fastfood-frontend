@@ -86,14 +86,14 @@ export function MenuCategoriesTab() {
                     <button
                       onClick={() => setEditingCategory(category)}
                       aria-label="Modifier"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-surface-2 hover:text-foreground"
                     >
                       <span className="icon-[mdi--pencil-outline] text-base" />
                     </button>
                     <button
                       onClick={() => setDeletingCategory(category)}
                       aria-label="Supprimer"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
                     >
                       <span className="icon-[mdi--trash-can-outline] text-base" />
                     </button>

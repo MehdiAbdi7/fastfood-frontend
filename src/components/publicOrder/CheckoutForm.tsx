@@ -301,7 +301,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
         <Link
           href="/commande"
           aria-label="Retour à la carte"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-background/60 text-foreground/60 backdrop-blur-sm transition-colors hover:border-primary hover:text-foreground"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-background/60 text-foreground/75 backdrop-blur-sm transition-colors hover:border-primary hover:text-foreground"
         >
           <span aria-hidden="true" className="icon-[mdi--arrow-left] text-xl" />
         </Link>
@@ -455,7 +455,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
             ))}
           </div>
 
-          <p className="text-xs text-foreground/55">{TYPE_HINTS[type]}</p>
+          <p className="text-xs text-foreground/75">{TYPE_HINTS[type]}</p>
         </section>
 
         {/* ---------- Coordonnées ---------- */}
@@ -485,11 +485,11 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
               <Label htmlFor="table">Votre table</Label>
 
               {!store ? (
-                <p className="rounded-xl bg-background/70 px-4 py-3 text-sm text-foreground/55 backdrop-blur-sm">
+                <p className="rounded-xl bg-background/70 px-4 py-3 text-sm text-foreground/75 backdrop-blur-sm">
                   Choisissez d&apos;abord un restaurant.
                 </p>
               ) : isLoadingTables ? (
-                <p className="rounded-xl bg-background/70 px-4 py-3 text-sm text-foreground/55 backdrop-blur-sm">
+                <p className="rounded-xl bg-background/70 px-4 py-3 text-sm text-foreground/75 backdrop-blur-sm">
                   Chargement des tables…
                 </p>
               ) : !tables || tables.length === 0 ? (
@@ -594,7 +594,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
         </section>
 
         {type === "delivery" && (
-          <p className="flex items-start gap-2 rounded-xl bg-background/70 px-4 py-3 text-xs text-foreground/65 backdrop-blur-sm">
+          <p className="flex items-start gap-2 rounded-xl bg-background/70 px-4 py-3 text-xs text-foreground/75 backdrop-blur-sm">
             <span
               aria-hidden="true"
               className="icon-[mdi--moped-outline] mt-0.5 shrink-0 text-base text-primary"
@@ -622,7 +622,7 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
                 {error}
               </p>
               {promo.applied && (
-                <p className="text-xs text-foreground/60">
+                <p className="text-xs text-foreground/75">
                   Si le blocage vient de votre code promo, retirez-le
                   ci-dessus : votre commande partira au tarif normal.
                 </p>

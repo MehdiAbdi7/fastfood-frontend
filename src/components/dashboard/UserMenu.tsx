@@ -176,7 +176,7 @@ export function UserMenu() {
           aria-hidden="true"
           className={`${
             isOpen ? "icon-[mdi--close]" : "icon-[mdi--menu]"
-          } text-lg text-foreground/60`}
+          } text-lg text-foreground/75`}
         />
       </button>
 
@@ -196,10 +196,10 @@ export function UserMenu() {
               <p className="truncate font-heading text-sm font-bold text-foreground">
                 {user.firstname} {user.lastname}
               </p>
-              <p className="truncate text-xs text-foreground/50">
+              <p className="truncate text-xs text-foreground/75">
                 {user.email}
               </p>
-              <p className="mt-0.5 text-xs font-semibold text-foreground/60">
+              <p className="mt-0.5 text-xs font-semibold text-foreground/75">
                 {isAdmin ? "Administrateur" : "Employé"}
                 {user.store && ` · ${STORE_LABELS[user.store]}`}
               </p>
@@ -241,7 +241,7 @@ export function UserMenu() {
                   className={`flex flex-1 flex-col items-center gap-1 rounded-xl border py-2 text-xs font-semibold transition-colors ${
                     mode === option.value
                       ? "border-primary bg-primary/10 text-primary"
-                      : "border-border-subtle text-foreground/60 hover:text-foreground"
+                      : "border-border-subtle text-foreground/75 hover:text-foreground"
                   }`}
                 >
                   <span

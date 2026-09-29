@@ -18,7 +18,7 @@ const ORDER_PATH = "/commande";
 const CHECKOUT_PATH = "/commande/finaliser";
 
 const DETAIL_CLASSES: Record<LineDetailTone, string> = {
-  neutral: "text-foreground/50",
+  neutral: "text-foreground/75",
   formula: "text-accent-mustard font-semibold",
   extra: "text-accent-green",
   removed: "text-accent-bordeaux",
@@ -77,7 +77,7 @@ export function CartSheet() {
               >
                 Votre commande
               </h2>
-              <span className="tabular-nums text-xs font-semibold text-foreground/50">
+              <span className="tabular-nums text-xs font-semibold text-foreground/75">
                 {count} article{count > 1 ? "s" : ""}
               </span>
             </div>
@@ -86,7 +86,7 @@ export function CartSheet() {
               type="button"
               onClick={close}
               aria-label="Fermer"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-foreground/50 transition-colors hover:bg-surface-2 hover:text-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-foreground/75 transition-colors hover:bg-surface-2 hover:text-foreground"
             >
               <span className="icon-[mdi--close] text-xl" />
             </button>
@@ -99,7 +99,7 @@ export function CartSheet() {
                 <p className="font-heading text-base font-bold text-foreground">
                   Votre panier est vide
                 </p>
-                <p className="max-w-xs text-sm text-foreground/55">
+                <p className="max-w-xs text-sm text-foreground/75">
                   Touchez un plat pour commencer.
                 </p>
               </div>
@@ -149,7 +149,7 @@ export function CartSheet() {
                               setQuantity(line.key, line.quantity - 1)
                             }
                             aria-label={`Retirer un ${line.name}`}
-                            className="flex h-8 w-8 items-center justify-center rounded-md text-foreground/60 transition-colors hover:bg-background hover:text-accent-bordeaux"
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-foreground/75 transition-colors hover:bg-background hover:text-accent-bordeaux"
                           >
                             <span
                               className={`${
@@ -168,7 +168,7 @@ export function CartSheet() {
                               setQuantity(line.key, line.quantity + 1)
                             }
                             aria-label={`Ajouter un ${line.name}`}
-                            className="flex h-8 w-8 items-center justify-center rounded-md text-foreground/60 transition-colors hover:bg-background hover:text-accent-green"
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-foreground/75 transition-colors hover:bg-background hover:text-accent-green"
                           >
                             <span className="icon-[mdi--plus] text-sm" />
                           </button>
@@ -179,7 +179,7 @@ export function CartSheet() {
                         <button
                           type="button"
                           onClick={() => handleEdit(line)}
-                          className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-foreground/50 transition-colors hover:bg-surface-2 hover:text-primary"
+                          className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-foreground/75 transition-colors hover:bg-surface-2 hover:text-primary"
                         >
                           <span className="icon-[mdi--pencil-outline] text-sm" />
                           Modifier

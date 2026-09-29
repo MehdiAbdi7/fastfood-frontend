@@ -77,7 +77,7 @@ export default function LivraisonPage() {
         </div>
 
         <div className="flex flex-col items-end">
-          <span className="text-xs font-semibold text-foreground/50">
+          <span className="text-xs font-semibold text-foreground/75">
             Total à encaisser
           </span>
           <span className="tabular-nums font-heading text-xl font-bold text-accent-green">

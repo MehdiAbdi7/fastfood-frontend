@@ -85,7 +85,7 @@ export function TableCard({ table, isAdmin, onEdit }: TableCardProps) {
               <button
                 onClick={onEdit}
                 aria-label="Modifier la table"
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2 text-foreground/60 hover:text-foreground"
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2 text-foreground/75 hover:text-foreground"
               >
                 <span className="icon-[mdi--pencil-outline] text-base" />
               </button>
@@ -93,7 +93,7 @@ export function TableCard({ table, isAdmin, onEdit }: TableCardProps) {
                 <button
                   onClick={() => setIsDeleteConfirmOpen(true)}
                   aria-label="Supprimer la table"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2 text-foreground/60 hover:text-accent-bordeaux"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2 text-foreground/75 hover:text-accent-bordeaux"
                 >
                   <span className="icon-[mdi--trash-can-outline] text-base" />
                 </button>

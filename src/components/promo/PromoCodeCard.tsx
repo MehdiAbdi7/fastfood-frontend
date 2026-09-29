@@ -106,13 +106,13 @@ const STATE_BADGES: Record<
   },
   expired: {
     label: "Expiré",
-    className: "bg-foreground/10 text-foreground/50",
+    className: "bg-foreground/10 text-foreground/75",
   },
   exhausted: {
     label: "Épuisé",
     className: "bg-accent-bordeaux/15 text-accent-bordeaux",
   },
-  off: { label: "Désactivé", className: "bg-foreground/10 text-foreground/50" },
+  off: { label: "Désactivé", className: "bg-foreground/10 text-foreground/75" },
 };
 
 interface PromoCodeCardProps {
@@ -164,7 +164,7 @@ export function PromoCodeCard({ promo, onEdit, onDelete }: PromoCodeCardProps) {
           </span>
 
           {promo.description && (
-            <span className="truncate text-xs text-foreground/50">
+            <span className="truncate text-xs text-foreground/75">
               {promo.description}
             </span>
           )}
@@ -194,7 +194,7 @@ export function PromoCodeCard({ promo, onEdit, onDelete }: PromoCodeCardProps) {
             type="button"
             onClick={onEdit}
             aria-label={`Modifier ${promo.code}`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground/50 transition-colors hover:bg-surface-2 hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground/75 transition-colors hover:bg-surface-2 hover:text-foreground"
           >
             <span aria-hidden="true" className="icon-[mdi--pencil-outline] text-base" />
           </button>
@@ -202,7 +202,7 @@ export function PromoCodeCard({ promo, onEdit, onDelete }: PromoCodeCardProps) {
             type="button"
             onClick={onDelete}
             aria-label={`Supprimer ${promo.code}`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground/50 transition-colors hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground/75 transition-colors hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
           >
             <span
               aria-hidden="true"

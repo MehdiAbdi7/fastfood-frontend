@@ -252,7 +252,7 @@ export function ExtraGroupsEditor({
         <label className="text-sm font-semibold text-foreground">
           Groupes d&apos;extras
         </label>
-        <p className="text-xs text-foreground/50">
+        <p className="text-xs text-foreground/75">
           Le libellé et la règle de choix appartiennent au produit : « Gratinage
           » sur un tacos, « Suppléments » sur une pizza, avec le même fromage en
           base.
@@ -261,7 +261,7 @@ export function ExtraGroupsEditor({
 
       {groups.length === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border-subtle px-4 py-6 text-center">
-          <p className="text-sm text-foreground/60">
+          <p className="text-sm text-foreground/75">
             Aucun groupe — ce produit ne proposera aucun extra.
           </p>
           {legacyExtraIds.length > 0 && (
@@ -312,7 +312,7 @@ export function ExtraGroupsEditor({
                 <span className="truncate font-semibold text-foreground">
                   {group.label || "Sans libellé"}
                 </span>
-                <span className="tabular-nums shrink-0 rounded-full bg-surface px-2 py-0.5 text-xs font-bold text-foreground/50">
+                <span className="tabular-nums shrink-0 rounded-full bg-surface px-2 py-0.5 text-xs font-bold text-foreground/75">
                   {group.options.length}
                 </span>
                 {group.singleChoice && (
@@ -356,7 +356,7 @@ export function ExtraGroupsEditor({
                 {/* Les extras retenus remontent en tête : sans ce tri, les
                     huit cochés sont noyés au milieu des vingt autres. */}
                 <div className="flex flex-col gap-1.5">
-                  <p className="text-xs font-semibold text-foreground/60">
+                  <p className="text-xs font-semibold text-foreground/75">
                     Extras de ce groupe
                   </p>
                   <div className="flex max-h-44 flex-wrap gap-1.5 overflow-y-auto">
@@ -390,7 +390,7 @@ export function ExtraGroupsEditor({
                                 ? "border-primary bg-primary/10 text-primary"
                                 : isTakenElsewhere
                                   ? "cursor-not-allowed border-border-subtle text-foreground/25"
-                                  : "border-border-subtle text-foreground/60 hover:border-primary/50"
+                                  : "border-border-subtle text-foreground/75 hover:border-primary/50"
                             }`}
                           >
                             {extra.name}
@@ -405,7 +405,7 @@ export function ExtraGroupsEditor({
                     sert qu'aux extras facturés différemment selon le produit. */}
                 {group.options.length > 0 && (
                   <div className="flex flex-col gap-2 border-t border-border-subtle pt-2.5">
-                    <p className="text-xs font-semibold text-foreground/60">
+                    <p className="text-xs font-semibold text-foreground/75">
                       Prix dans ce groupe
                     </p>
 

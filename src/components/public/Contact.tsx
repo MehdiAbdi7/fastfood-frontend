@@ -149,7 +149,7 @@ export function Contact() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Itinéraire vers Niwa Food ${location.name} sur Google Maps`}
-                  className="mt-1 flex h-11 items-center justify-center gap-2 rounded-full border border-primary font-heading text-sm font-bold text-foreground transition-all duration-300 ease-in-out hover:bg-primary hover:text-background dark:hover:text-foreground"
+                  className="mt-1 flex h-11 items-center justify-center gap-2 rounded-full border border-primary font-heading text-sm font-bold text-foreground transition-all duration-300 ease-in-out hover:bg-primary hover:text-background"
                 >
                   <span
                     aria-hidden="true"

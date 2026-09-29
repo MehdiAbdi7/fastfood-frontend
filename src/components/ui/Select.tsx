@@ -45,7 +45,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          <span className="icon-[mdi--chevron-down] pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-lg text-foreground/50" />
+          <span className="icon-[mdi--chevron-down] pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-lg text-foreground/75" />
         </div>
         {error && <p className="text-xs text-accent-bordeaux">{error}</p>}
       </div>

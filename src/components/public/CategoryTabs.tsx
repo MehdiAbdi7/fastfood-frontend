@@ -22,7 +22,7 @@ export function CategoryTabs({
           onClick={() => onSelect(null)}
           className={`shrink-0 snap-start rounded-full px-5 py-4 font-heading text-sm font-bold whitespace-nowrap transition-all duration-200 ease-in-out ${
             selectedLabel === null
-              ? "bg-primary text-background dark:text-foreground shadow-food-sm"
+              ? "bg-primary text-background shadow-food-sm"
               : "border border-primary text-foreground hover:bg-primary/10"
           }`}
         >
@@ -36,7 +36,7 @@ export function CategoryTabs({
             onClick={() => onSelect(group.label)}
             className={`shrink-0 snap-start rounded-full px-5 py-2.5 font-heading text-sm font-bold whitespace-nowrap transition-all duration-200 ease-in-out ${
               selectedLabel === group.label
-                ? "bg-primary text-background dark:text-foreground shadow-food-sm"
+                ? "bg-primary text-background shadow-food-sm"
                 : "border border-primary text-foreground hover:bg-primary/10"
             }`}
           >

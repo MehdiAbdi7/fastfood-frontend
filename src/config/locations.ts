@@ -77,6 +77,7 @@ export const SOCIALS = [
     icon: "icon-[line-md--instagram]",
     bg: "bg-rose-500/20",
     fg: "bg-rose-600",
+    text: "text-foreground",
   },
   {
     href: "https://www.facebook.com/niwafood",
@@ -85,6 +86,7 @@ export const SOCIALS = [
     icon: "icon-[mdi--facebook]",
     bg: "bg-blue-700/30",
     fg: "bg-blue-700",
+    text: "text-foreground",
   },
   {
     href: "https://www.tiktok.com/@niwafood",
@@ -93,6 +95,9 @@ export const SOCIALS = [
     icon: "icon-[line-md--tiktok]",
     bg: "bg-black/80",
     fg: "bg-white",
+    // Fond sombre dans les deux thèmes : texte blanc, contrairement aux
+    // deux fonds pâles ci-dessus qui prennent la couleur du thème.
+    text: "text-white",
   },
 ];
 

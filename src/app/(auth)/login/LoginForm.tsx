@@ -61,7 +61,7 @@ export function LoginForm() {
           <h1 className="font-heading text-xl font-bold text-foreground">
             Espace équipe
           </h1>
-          <p className="text-sm text-foreground/60">
+          <p className="text-sm text-foreground/75">
             Connectez-vous pour accéder à votre espace
           </p>
         </div>

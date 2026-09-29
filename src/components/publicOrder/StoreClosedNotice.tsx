@@ -66,7 +66,7 @@ export function StoreClosedNotice() {
           prend
           {closed.length > 1 ? "nent" : ""} plus de commandes
         </p>
-        <p className="text-sm text-foreground/65">
+        <p className="text-sm text-foreground/75">
           {closed[0]?.closedMessage ??
             "Vous pouvez commander sur notre autre adresse."}
         </p>

@@ -20,7 +20,7 @@ export function PageHeader({
         <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
           {title}
         </h2>
-        <p className="mt-1 max-w-2xl text-sm text-foreground/60">
+        <p className="mt-1 max-w-2xl text-sm text-foreground/75">
           {description}
         </p>
       </div>

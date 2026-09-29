@@ -29,7 +29,7 @@ export function StatCard({
         <p className="truncate font-heading text-xl font-bold text-foreground">
           {value}
         </p>
-        <p className="truncate text-xs text-foreground/60">{label}</p>
+        <p className="truncate text-xs text-foreground/75">{label}</p>
       </div>
     </div>
   );

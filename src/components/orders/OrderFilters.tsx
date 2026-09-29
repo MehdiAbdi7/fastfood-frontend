@@ -34,7 +34,7 @@ export function OrderFilters({
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
               typeFilter === filter.value
                 ? "bg-primary text-on-primary"
-                : "bg-surface-2 text-foreground/60 hover:text-foreground"
+                : "bg-surface-2 text-foreground/75 hover:text-foreground"
             }`}
           >
             {filter.label}

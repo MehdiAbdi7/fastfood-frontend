@@ -32,7 +32,7 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
             <h2 className="font-heading text-lg font-bold text-foreground">
               {STORE_LABELS[stats.store]}
             </h2>
-            <p className="flex items-center gap-1.5 text-xs text-foreground/50">
+            <p className="flex items-center gap-1.5 text-xs text-foreground/75">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-green" />
               {stats.serviceStartedAt
                 ? `Service depuis ${formatTime(stats.serviceStartedAt)}`
@@ -92,7 +92,7 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {stats.byType.length > 0 && (
             <div className="rounded-2xl bg-surface-2/45 p-4">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground/50">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground/75">
                 Répartition par type
               </p>
               <div className="flex flex-col gap-1.5">
@@ -115,7 +115,7 @@ function StoreServicePanel({ stats }: { stats: ServiceStats }) {
 
           {stats.topItems.length > 0 && (
             <div className="rounded-2xl bg-surface-2/45 p-4">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground/50">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground/75">
                 Top produits
               </p>
               <div className="flex flex-col gap-1.5">
@@ -163,11 +163,11 @@ export default function DashboardHomePage() {
           <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Bonjour {user?.firstname}
           </h2>
-          <p className="mt-1 text-sm text-foreground/60">
+          <p className="mt-1 text-sm text-foreground/75">
             Voici l&apos;activité de ton service en cours.
           </p>
         </div>
-        <div className="flex w-fit items-center gap-2 rounded-full border border-border-subtle bg-surface px-3 py-2 text-xs font-semibold text-foreground/60">
+        <div className="flex w-fit items-center gap-2 rounded-full border border-border-subtle bg-surface px-3 py-2 text-xs font-semibold text-foreground/75">
           <span className="icon-[mdi--pulse] text-base text-accent-green" />
           Suivi en temps réel
         </div>

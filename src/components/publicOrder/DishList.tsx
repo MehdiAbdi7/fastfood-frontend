@@ -233,7 +233,7 @@ export function DishList({ items, nav }: DishListProps) {
                 ? "Des articles ne sont plus disponibles"
                 : "Un article n'est plus disponible"}
             </p>
-            <p className="text-sm text-foreground/65">
+            <p className="text-sm text-foreground/75">
               {unavailableNotice.join(", ")} — retiré
               {unavailableNotice.length > 1 ? "s" : ""} de votre panier.
             </p>
@@ -259,7 +259,7 @@ export function DishList({ items, nav }: DishListProps) {
             <p className="font-heading text-lg font-bold text-foreground">
               Rien ne correspond
             </p>
-            <p className="max-w-xs text-sm text-foreground/60">
+            <p className="max-w-xs text-sm text-foreground/75">
               Essayez un autre ingrédient, ou effacez la recherche pour
               parcourir toute la carte.
             </p>
@@ -273,7 +273,7 @@ export function DishList({ items, nav }: DishListProps) {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-foreground/75">
               <span className="tabular-nums font-bold text-foreground">
                 {results.length}
               </span>{" "}

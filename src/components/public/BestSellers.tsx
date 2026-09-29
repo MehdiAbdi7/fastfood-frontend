@@ -74,7 +74,7 @@ export function BestSellers() {
         </div>
 
         {isLoading && (
-          <p className="text-center text-sm text-foreground/60">
+          <p className="text-center text-sm text-foreground/75">
             Chargement des best-sellers...
           </p>
         )}

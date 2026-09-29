@@ -114,7 +114,7 @@ export default function AddItemsPage() {
           <Link
             href="/commandes"
             aria-label="Retour aux commandes"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/60 transition-colors hover:border-primary hover:text-foreground"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-subtle bg-surface text-foreground/75 transition-colors hover:border-primary hover:text-foreground"
           >
             <span className="icon-[mdi--arrow-left] text-xl" />
           </Link>
@@ -122,7 +122,7 @@ export default function AddItemsPage() {
             <h1 className="font-heading text-xl font-bold leading-tight text-foreground">
               Ajouter à la commande #{order.dailyNumber}
             </h1>
-            <p className="text-sm text-foreground/55">
+            <p className="text-sm text-foreground/75">
               {order.client.fullName} · {tableLabel}
             </p>
           </div>
@@ -148,7 +148,7 @@ export default function AddItemsPage() {
                 key={i}
                 className="flex items-center justify-between text-xs"
               >
-                <span className="truncate text-foreground/55">
+                <span className="truncate text-foreground/75">
                   {item.quantity}x {item.name}
                 </span>
                 <span className="tabular-nums shrink-0 text-foreground/45">
@@ -166,7 +166,7 @@ export default function AddItemsPage() {
             {cart.length === 0 ? (
               <div className="flex flex-col items-center gap-1.5 py-6 text-center">
                 <span className="icon-[mdi--plus-box-outline] text-2xl text-foreground/25" />
-                <p className="text-sm font-semibold text-foreground/60">
+                <p className="text-sm font-semibold text-foreground/75">
                   Rien à ajouter
                 </p>
                 <p className="text-xs text-foreground/40">
@@ -184,7 +184,7 @@ export default function AddItemsPage() {
                       <p className="truncate text-xs font-bold text-foreground">
                         {line.name}
                       </p>
-                      <p className="tabular-nums text-xs text-foreground/50">
+                      <p className="tabular-nums text-xs text-foreground/75">
                         {line.formula?.pricingMode === "fixed"
                           ? `${line.formula.name} · `
                           : variantLabel !== "Standard"
@@ -212,7 +212,7 @@ export default function AddItemsPage() {
                       <button
                         onClick={() => setQuantity(line.key, line.quantity - 1)}
                         aria-label={`Retirer un ${line.name}`}
-                        className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-bordeaux"
+                        className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/75 hover:bg-surface hover:text-accent-bordeaux"
                       >
                         <span className="icon-[mdi--minus] text-sm" />
                       </button>
@@ -222,7 +222,7 @@ export default function AddItemsPage() {
                       <button
                         onClick={() => setQuantity(line.key, line.quantity + 1)}
                         aria-label={`Ajouter un ${line.name}`}
-                        className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/60 hover:bg-surface hover:text-accent-green"
+                        className="flex h-6 w-6 items-center justify-center rounded-md text-foreground/75 hover:bg-surface hover:text-accent-green"
                       >
                         <span className="icon-[mdi--plus] text-sm" />
                       </button>

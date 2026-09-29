@@ -114,7 +114,7 @@ export default function UtilisateursPage() {
                         </span>
                       )}
                     </span>
-                    <span className="truncate text-xs text-foreground/50">
+                    <span className="truncate text-xs text-foreground/75">
                       {/* Pour un livreur, le téléphone compte plus que l'email :
                           c'est par là qu'on le joint pendant le service. */}
                       {user.role === "delivery" ? user.tel : user.email}
@@ -131,7 +131,7 @@ export default function UtilisateursPage() {
                       {ROLE_LABELS[user.role]}
                     </span>
                     {user.store && (
-                      <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-foreground/60">
+                      <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-foreground/75">
                         {STORE_LABELS[user.store]}
                       </span>
                     )}
@@ -142,7 +142,7 @@ export default function UtilisateursPage() {
                     <button
                       onClick={() => setEditingUser(user)}
                       aria-label="Modifier"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-surface-2 hover:text-foreground"
                     >
                       <span className="icon-[mdi--pencil-outline] text-base" />
                     </button>
@@ -150,7 +150,7 @@ export default function UtilisateursPage() {
                       <button
                         onClick={() => setDeletingUser(user)}
                         aria-label="Supprimer"
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
                       >
                         <span className="icon-[mdi--trash-can-outline] text-base" />
                       </button>

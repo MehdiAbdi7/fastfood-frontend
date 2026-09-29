@@ -40,7 +40,7 @@ export function Sidebar() {
               className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
                 isActive
                   ? "bg-primary/10 text-primary shadow-sm"
-                  : "text-foreground/65 hover:bg-surface-2/70 hover:text-foreground"
+                  : "text-foreground/75 hover:bg-surface-2/70 hover:text-foreground"
               }`}
             >
               <span

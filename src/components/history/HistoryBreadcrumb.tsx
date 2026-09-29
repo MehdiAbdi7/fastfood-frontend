@@ -15,7 +15,7 @@ export function HistoryBreadcrumb({ year, month, day, onNavigate }: HistoryBread
     <div className="flex items-center gap-1.5 text-sm">
       <button
         onClick={() => onNavigate("root")}
-        className={`font-semibold ${year === null ? "text-foreground" : "text-foreground/50 hover:text-primary"}`}
+        className={`font-semibold ${year === null ? "text-foreground" : "text-foreground/75 hover:text-primary"}`}
       >
         Années
       </button>
@@ -25,7 +25,7 @@ export function HistoryBreadcrumb({ year, month, day, onNavigate }: HistoryBread
           <span className="text-foreground/30">/</span>
           <button
             onClick={() => onNavigate("year")}
-            className={`font-semibold ${month === null ? "text-foreground" : "text-foreground/50 hover:text-primary"}`}
+            className={`font-semibold ${month === null ? "text-foreground" : "text-foreground/75 hover:text-primary"}`}
           >
             {year}
           </button>
@@ -37,7 +37,7 @@ export function HistoryBreadcrumb({ year, month, day, onNavigate }: HistoryBread
           <span className="text-foreground/30">/</span>
           <button
             onClick={() => onNavigate("month")}
-            className={`font-semibold ${day === null ? "text-foreground" : "text-foreground/50 hover:text-primary"}`}
+            className={`font-semibold ${day === null ? "text-foreground" : "text-foreground/75 hover:text-primary"}`}
           >
             {MONTH_NAMES[month - 1]}
           </button>

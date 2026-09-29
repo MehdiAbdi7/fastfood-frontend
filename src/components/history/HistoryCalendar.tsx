@@ -189,7 +189,7 @@ export function HistoryCalendar({
         <p className="font-heading text-sm font-bold text-foreground">
           Aucune vente enregistrée
         </p>
-        <p className="text-sm text-foreground/55">
+        <p className="text-sm text-foreground/75">
           Les commandes terminées apparaîtront ici, service après service.
         </p>
       </section>

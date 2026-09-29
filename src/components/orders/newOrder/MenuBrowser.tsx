@@ -187,7 +187,7 @@ export function MenuBrowser({ quantityByItem, onSelect }: MenuBrowserProps) {
             <p className="font-heading text-lg font-bold text-foreground">
               Rien ne correspond
             </p>
-            <p className="max-w-xs text-sm text-foreground/60">
+            <p className="max-w-xs text-sm text-foreground/75">
               Essayez un autre ingrédient, ou effacez la recherche pour
               parcourir toute la carte.
             </p>
@@ -201,7 +201,7 @@ export function MenuBrowser({ quantityByItem, onSelect }: MenuBrowserProps) {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-foreground/75">
               <span className="tabular-nums font-bold text-foreground">
                 {results.length}
               </span>{" "}

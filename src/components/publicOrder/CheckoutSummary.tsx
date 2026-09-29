@@ -10,7 +10,7 @@ import {
 } from "@/lib/cartLine";
 
 const DETAIL_CLASSES: Record<LineDetailTone, string> = {
-  neutral: "text-foreground/50",
+  neutral: "text-foreground/75",
   formula: "text-accent-mustard font-semibold",
   extra: "text-accent-green",
   removed: "text-accent-bordeaux",
@@ -59,14 +59,14 @@ export function CheckoutSummary({
           <h2 className="font-heading text-base font-bold text-foreground">
             Votre commande
           </h2>
-          <span className="tabular-nums text-xs font-semibold text-foreground/50">
+          <span className="tabular-nums text-xs font-semibold text-foreground/75">
             {count} article{count > 1 ? "s" : ""}
           </span>
         </div>
 
         <Link
           href="/commande"
-          className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-foreground/55 transition-colors hover:bg-primary/10 hover:text-primary"
+          className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-foreground/75 transition-colors hover:bg-primary/10 hover:text-primary"
         >
           <span
             aria-hidden="true"
@@ -113,7 +113,7 @@ export function CheckoutSummary({
         {hasDiscount && (
           <>
             <div className="flex items-baseline justify-between text-sm">
-              <span className="text-foreground/60">Articles</span>
+              <span className="text-foreground/75">Articles</span>
               <span className="tabular-nums font-semibold text-foreground/80">
                 {formatDA(total)}
               </span>

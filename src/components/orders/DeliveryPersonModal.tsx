@@ -76,7 +76,7 @@ export function DeliveryPersonModal({
       }
     >
       <div className="flex flex-col gap-2">
-        <p className="text-sm text-foreground/60">
+        <p className="text-sm text-foreground/75">
           Qui prend cette course ? Vous pourrez corriger ensuite depuis cette
           même fiche.
         </p>
@@ -93,11 +93,11 @@ export function DeliveryPersonModal({
         >
           <span
             aria-hidden="true"
-            className="icon-[mdi--account-off-outline] shrink-0 text-xl text-foreground/50"
+            className="icon-[mdi--account-off-outline] shrink-0 text-xl text-foreground/75"
           />
           <span className="flex min-w-0 flex-col">
             <span className="font-semibold text-foreground">Sans livreur</span>
-            <span className="text-xs text-foreground/50">
+            <span className="text-xs text-foreground/75">
               Vous validerez la livraison depuis le dashboard
             </span>
           </span>
@@ -126,7 +126,7 @@ export function DeliveryPersonModal({
                 <span className="truncate font-semibold text-foreground">
                   {person.firstname} {person.lastname}
                 </span>
-                <span className="tabular-nums text-xs text-foreground/50">
+                <span className="tabular-nums text-xs text-foreground/75">
                   {person.tel}
                 </span>
               </span>
@@ -134,7 +134,7 @@ export function DeliveryPersonModal({
           ))}
 
         {!isLoading && available.length === 0 && (
-          <p className="rounded-xl bg-surface-2 px-4 py-3 text-sm text-foreground/60">
+          <p className="rounded-xl bg-surface-2 px-4 py-3 text-sm text-foreground/75">
             Aucun compte livreur sur ce magasin. Envoyez sans livreur, ou
             demandez à un admin d&apos;en créer un.
           </p>

@@ -126,7 +126,7 @@ function OrderLine({ item }: { item: OrderItem }) {
         </div>
 
         {variantLabel !== "Standard" && (
-          <p className="text-xs text-foreground/50">{variantLabel}</p>
+          <p className="text-xs text-foreground/75">{variantLabel}</p>
         )}
 
         {item.formula && (
@@ -178,7 +178,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
         <h1 className="font-heading text-xl font-bold text-foreground">
           Commande introuvable
         </h1>
-        <p className="text-sm text-foreground/60">
+        <p className="text-sm text-foreground/75">
           Elle a peut-être été supprimée, ou le lien est incomplet.
         </p>
         <button
@@ -233,7 +233,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
         </span>
 
         <div className="flex items-baseline gap-2">
-          <span className="font-heading text-sm font-bold text-foreground/50">
+          <span className="font-heading text-sm font-bold text-foreground/75">
             Commande
           </span>
           <span className="tabular-nums font-heading text-5xl font-bold leading-none text-primary">
@@ -241,7 +241,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
           </span>
         </div>
 
-        <p className="text-sm text-foreground/60">
+        <p className="text-sm text-foreground/75">
           {order.client.fullName} · passée à {formatTime(order.createdAt)}
         </p>
 
@@ -263,7 +263,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
           <p className="font-heading text-lg font-bold text-foreground">
             Commande annulée
           </p>
-          <p className="max-w-xs text-sm text-foreground/65">
+          <p className="max-w-xs text-sm text-foreground/75">
             Contactez le restaurant si vous pensez qu&apos;il s&apos;agit
             d&apos;une erreur.
           </p>
@@ -280,7 +280,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
           <p className="font-heading text-xl font-bold text-foreground">
             {currentStep.label}
           </p>
-          <p className="text-sm text-foreground/60">{currentStep.hint}</p>
+          <p className="text-sm text-foreground/75">{currentStep.hint}</p>
         </div>
       )}
 
@@ -307,7 +307,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
 
         <div className="mt-2 flex flex-col gap-1.5 border-t border-dashed border-primary/25 px-5 pt-4">
           <div className="flex items-baseline justify-between text-sm">
-            <span className="text-foreground/60">Articles</span>
+            <span className="text-foreground/75">Articles</span>
             <span className="tabular-nums font-semibold text-foreground/80">
               {formatDA(itemsTotal)}
             </span>
@@ -335,7 +335,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
 
           {order.type === "delivery" && (
             <div className="flex items-baseline justify-between text-sm">
-              <span className="text-foreground/60">Livraison</span>
+              <span className="text-foreground/75">Livraison</span>
               <span className="tabular-nums font-semibold text-foreground/80">
                 {/* deliveryFee est fixé par le staff après réception : tant
                     qu'il est absent, annoncer 0 DA serait un mensonge. */}
@@ -399,7 +399,7 @@ export function OrderTrackingView({ orderId }: { orderId: string }) {
                 <div className={`flex flex-col ${isLast ? "pb-0" : "pb-5"}`}>
                   <p
                     className={`font-heading text-sm font-bold ${
-                      isCurrent ? "text-foreground" : "text-foreground/50"
+                      isCurrent ? "text-foreground" : "text-foreground/75"
                     }`}
                   >
                     {step.label}

@@ -43,7 +43,7 @@ export function TicketTotals({
   return (
     <div className="flex flex-col gap-2 border-t border-dashed border-border-subtle pt-4">
       <div className="flex items-baseline justify-between text-sm">
-        <span className="text-foreground/60">
+        <span className="text-foreground/75">
           Articles
           <span className="tabular-nums ml-1.5 text-foreground/40">
             ({itemsCount})
@@ -73,7 +73,7 @@ export function TicketTotals({
 
       {deliveryFee !== undefined && (
         <div className="flex items-baseline justify-between text-sm">
-          <span className="text-foreground/60">Livraison</span>
+          <span className="text-foreground/75">Livraison</span>
           <span className="tabular-nums font-semibold text-foreground/80">
             {formatDA(deliveryFee)}
           </span>

@@ -57,7 +57,7 @@ function CategoryChip({
       {label}
       <span
         className={`tabular-nums rounded-full px-1.5 text-xs ${
-          isSelected ? "bg-on-primary/20" : "bg-surface-2 text-foreground/50"
+          isSelected ? "bg-on-primary/20" : "bg-surface-2 text-foreground/75"
         }`}
       >
         {count}

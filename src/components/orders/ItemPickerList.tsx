@@ -48,7 +48,7 @@ export function ItemPickerList({ cart, onAdd, onRemove }: ItemPickerListProps) {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {isLoading && <p className="text-sm text-foreground/50">Chargement du menu...</p>}
+      {isLoading && <p className="text-sm text-foreground/75">Chargement du menu...</p>}
 
       <div className="flex max-h-56 flex-col gap-1.5 overflow-y-auto">
         {filteredItems.map((item) => (
@@ -79,7 +79,7 @@ export function ItemPickerList({ cart, onAdd, onRemove }: ItemPickerListProps) {
 
       {cart.length > 0 && (
         <div className="flex flex-col gap-2 rounded-xl bg-surface-2 p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">À ajouter</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-foreground/75">À ajouter</p>
           {cart.map((line) => {
             const variantLabel = formatVariantLabel(line.variant.combination);
             return (

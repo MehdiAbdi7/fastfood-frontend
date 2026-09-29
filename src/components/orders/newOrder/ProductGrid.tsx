@@ -38,7 +38,7 @@ export function ProductGrid({
         <p className="font-heading text-base font-bold text-foreground">
           Aucun produit ici
         </p>
-        <p className="text-sm text-foreground/50">
+        <p className="text-sm text-foreground/75">
           Change de catégorie ou vide la recherche.
         </p>
       </div>
@@ -98,14 +98,14 @@ export function ProductGrid({
                     tronquée oblige à ouvrir la fiche pour trancher entre deux
                     produits proches. */}
                 {item.description && (
-                  <p className="text-xs leading-relaxed text-foreground/55">
+                  <p className="text-xs leading-relaxed text-foreground/75">
                     {item.description}
                   </p>
                 )}
 
                 {/* Le libellé de variante n'a de sens que s'il y a un choix à faire */}
                 {item.variants.length > 1 && (
-                  <p className="truncate text-xs text-foreground/50">
+                  <p className="truncate text-xs text-foreground/75">
                     {item.variants
                       .map((v) => formatVariantLabel(v.combination))
                       .join(" · ")}

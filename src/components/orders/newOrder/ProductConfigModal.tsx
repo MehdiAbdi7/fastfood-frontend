@@ -203,7 +203,7 @@ export function ProductConfigModal({
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               aria-label="Diminuer la quantité"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/60 hover:bg-surface hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-surface hover:text-foreground"
             >
               <span className="icon-[mdi--minus] text-base" />
             </button>
@@ -213,7 +213,7 @@ export function ProductConfigModal({
             <button
               onClick={() => setQuantity((q) => q + 1)}
               aria-label="Augmenter la quantité"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/60 hover:bg-surface hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-surface hover:text-foreground"
             >
               <span className="icon-[mdi--plus] text-base" />
             </button>
@@ -235,7 +235,7 @@ export function ProductConfigModal({
             type="button"
             onClick={onClose}
             aria-label="Fermer la fiche produit"
-            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/85 text-foreground/60 shadow-sm backdrop-blur-sm hover:text-foreground"
+            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/85 text-foreground/75 shadow-sm backdrop-blur-sm hover:text-foreground"
           >
             <span className="icon-[mdi--close] text-xl" />
           </button>
@@ -272,7 +272,7 @@ export function ProductConfigModal({
         </div>
 
         {item.description && (
-          <p className="text-sm leading-relaxed text-foreground/65">
+          <p className="text-sm leading-relaxed text-foreground/75">
             {item.description}
           </p>
         )}
@@ -289,7 +289,7 @@ export function ProductConfigModal({
                 className={`rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
                   formulaId === null
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-border-subtle text-foreground/60 hover:text-foreground"
+                    : "border-border-subtle text-foreground/75 hover:text-foreground"
                 }`}
               >
                 Seul
@@ -307,7 +307,7 @@ export function ProductConfigModal({
                   className={`rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
                     formulaId === formula.id
                       ? "border-accent-mustard bg-accent-mustard/10 text-accent-mustard"
-                      : "border-border-subtle text-foreground/60 hover:text-foreground"
+                      : "border-border-subtle text-foreground/75 hover:text-foreground"
                   }`}
                 >
                   {formula.name}
@@ -388,7 +388,7 @@ export function ProductConfigModal({
                   className={`rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
                     variantIndex === i
                       ? "border-primary bg-primary/10 text-primary"
-                      : "border-border-subtle text-foreground/60 hover:text-foreground"
+                      : "border-border-subtle text-foreground/75 hover:text-foreground"
                   }`}
                 >
                   {formatVariantLabel(v.combination)}
@@ -402,7 +402,7 @@ export function ProductConfigModal({
         )}
 
         {isFixed && item.variants.length > 1 && (
-          <p className="text-xs text-foreground/50">
+          <p className="text-xs text-foreground/75">
             Format unique en {selectedFormula!.name} — pas de taille à choisir.
           </p>
         )}
@@ -413,7 +413,7 @@ export function ProductConfigModal({
             <p className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/70">
               {group.label}
               {group.singleChoice && (
-                <span className="ml-2 text-xs font-normal text-foreground/50">
+                <span className="ml-2 text-xs font-normal text-foreground/75">
                   un seul choix
                 </span>
               )}

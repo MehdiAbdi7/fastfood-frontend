@@ -78,7 +78,7 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
         {/* Entière, jamais tronquée : c'est la liste d'ingrédients, donc la
             seule information qui permet de trancher entre deux burgers. */}
         {item.description && (
-          <p className="text-sm leading-relaxed text-foreground/65">
+          <p className="text-sm leading-relaxed text-foreground/75">
             {item.description}
           </p>
         )}

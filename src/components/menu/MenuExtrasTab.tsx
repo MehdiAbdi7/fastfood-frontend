@@ -83,7 +83,7 @@ export function MenuExtrasTab() {
                       </span>
                     )}
                   </span>
-                  <span className="text-xs text-foreground/50">
+                  <span className="text-xs text-foreground/75">
                     {typeName} · {formatExtraPrice(extra)}
                   </span>
                 </div>
@@ -92,14 +92,14 @@ export function MenuExtrasTab() {
                     <button
                       onClick={() => setEditingExtra(extra)}
                       aria-label="Modifier"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-surface-2 hover:text-foreground"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-surface-2 hover:text-foreground"
                     >
                       <span className="icon-[mdi--pencil-outline] text-base" />
                     </button>
                     <button
                       onClick={() => setDeletingExtra(extra)}
                       aria-label="Supprimer"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/75 hover:bg-accent-bordeaux/10 hover:text-accent-bordeaux"
                     >
                       <span className="icon-[mdi--trash-can-outline] text-base" />
                     </button>

@@ -90,7 +90,7 @@ export function OrderLookupForm() {
         <h1 className="font-heading text-2xl font-bold leading-tight text-foreground sm:text-3xl">
           Où en est ma commande ?
         </h1>
-        <p className="text-sm leading-relaxed text-foreground/65">
+        <p className="text-sm leading-relaxed text-foreground/75">
           Entrez le numéro affiché au moment de votre commande, on vous montre
           où elle en est.
         </p>
@@ -112,7 +112,7 @@ export function OrderLookupForm() {
             <span className="font-heading text-sm font-bold text-foreground">
               Votre dernière commande
             </span>
-            <span className="tabular-nums text-xs text-foreground/60">
+            <span className="tabular-nums text-xs text-foreground/75">
               N° {lastOrder.dailyNumber}
             </span>
           </span>
@@ -225,7 +225,7 @@ export function OrderLookupForm() {
           donc quelqu'un qui cherche une commande d'hier n'a rien à faire ici.
           Autant lui dire où appeler plutôt que de le laisser retaper un
           numéro qui ne donnera jamais rien. */}
-      <p className="mt-5 text-center text-xs leading-relaxed text-foreground/50">
+      <p className="mt-5 text-center text-xs leading-relaxed text-foreground/75">
         Seules les commandes en cours de préparation ou de livraison sont
         consultables ici.{" "}
         <Link href="/contact" className="font-semibold text-primary underline">

@@ -75,7 +75,7 @@ export default function ContactPage() {
               <h2 className="font-heading text-lg font-bold text-foreground">
                 Horaires d&apos;ouverture
               </h2>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-foreground/75">
                 Identiques sur les deux adresses.
               </p>
             </div>
@@ -150,7 +150,7 @@ export default function ContactPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className={`flex h-12 items-center gap-2 rounded-full px-5 font-heading text-sm font-bold text-white transition-transform duration-300 motion-safe:hover:scale-105 ${social.bg}`}
+                className={`flex h-12 items-center gap-2 rounded-full px-5 font-heading text-sm font-bold transition-transform duration-300 motion-safe:hover:scale-105 ${social.bg} ${social.text}`}
               >
                 <span
                   aria-hidden="true"

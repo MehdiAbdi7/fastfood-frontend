@@ -19,7 +19,7 @@ export function OrderColumn({ title, status, orders, onOpenDetail }: OrderColumn
           aria-hidden="true"
         />
         <h2 className="font-heading text-sm font-bold text-foreground/80">{title}</h2>
-        <span className="ml-auto rounded-full bg-surface px-2 py-0.5 text-xs font-bold text-foreground/50">
+        <span className="ml-auto rounded-full bg-surface px-2 py-0.5 text-xs font-bold text-foreground/75">
           {orders.length}
         </span>
       </div>

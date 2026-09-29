@@ -237,7 +237,7 @@ export function PromoCodeFormModal({
             <p className="font-heading text-sm font-bold text-foreground">
               Conditions
             </p>
-            <p className="text-xs text-foreground/50">
+            <p className="text-xs text-foreground/75">
               Toutes facultatives. Un champ laissé vide signifie « aucune
               limite ».
             </p>
@@ -330,7 +330,7 @@ export function PromoCodeFormModal({
                     className={`flex min-h-11 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${
                       isSelected
                         ? "border-primary bg-primary/10 text-primary"
-                        : "border-border-subtle text-foreground/60 hover:border-primary/50"
+                        : "border-border-subtle text-foreground/75 hover:border-primary/50"
                     }`}
                   >
                     <span

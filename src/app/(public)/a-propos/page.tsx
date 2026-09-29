@@ -139,7 +139,7 @@ export default function AProposPage() {
             <h2 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
               D&apos;où viennent les noms
             </h2>
-            <p className="max-w-2xl text-sm leading-relaxed text-foreground/65">
+            <p className="max-w-2xl text-sm leading-relaxed text-foreground/75">
               Chaque plat rend hommage à une référence de l&apos;univers du
               scooter et de la moto. Voici la traduction.
             </p>
@@ -158,7 +158,7 @@ export default function AProposPage() {
                 <span className="font-heading text-base font-bold tracking-wider text-primary">
                   {entry.name}
                 </span>
-                <span className="text-xs leading-snug text-foreground/60">
+                <span className="text-xs leading-snug text-foreground/75">
                   {entry.meaning}
                 </span>
               </li>
@@ -210,7 +210,7 @@ export default function AProposPage() {
               <p className="font-heading text-2xl font-bold text-accent-green sm:text-3xl">
                 {figure.value}
               </p>
-              <p className="text-xs font-semibold leading-tight text-foreground/65">
+              <p className="text-xs font-semibold leading-tight text-foreground/75">
                 {figure.label}
               </p>
             </div>
