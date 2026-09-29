@@ -26,7 +26,7 @@ const Footer = () => {
                 rendu. shrink-0 empêche le parent flex de comprimer le logo. */}
             <Image
               src="/logo-niwa.png"
-              alt="Niwa Food"
+              alt=""
               width={48}
               height={48}
               className="h-12 w-auto shrink-0"

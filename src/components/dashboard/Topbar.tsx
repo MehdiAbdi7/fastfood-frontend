@@ -18,7 +18,7 @@ export function Topbar() {
         <div className="flex items-center gap-2 sm:hidden">
           <Image
             src="/logo-niwa.png"
-            alt="Niwa Food"
+            alt=""
             width={30}
             height={30}
             className="h-8 w-8 shrink-0"

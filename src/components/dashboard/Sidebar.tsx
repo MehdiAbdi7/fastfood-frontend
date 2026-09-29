@@ -18,7 +18,7 @@ export function Sidebar() {
         href="/dashboard"
         className="flex items-center gap-3 border-b border-border-subtle px-6 py-5"
       >
-        <Image src="/logo-niwa.png" alt="Niwa Food" width={36} height={36} />
+        <Image src="/logo-niwa.png" alt="" width={36} height={36} />
         <span className="font-heading text-lg font-bold tracking-tight text-foreground">
           NIWA <span className="text-accent-mustard">FOOD</span>
         </span>

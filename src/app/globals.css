@@ -131,13 +131,15 @@ button,
     pointer;
 }
 
+/* Glissement seul, sans fondu depuis opacity: 0. Avec le fondu (et le mode
+   `both` des délais en cascade), le titre restait invisible jusqu'à 1 s
+   après le premier affichage, ce qui pénalisait le Speed Index. Le texte est
+   maintenant lisible dès la première frame, le mouvement reste. */
 @keyframes slideInLeft {
   0% {
-    opacity: 0;
     transform: translateX(-40px);
   }
   100% {
-    opacity: 1;
     transform: translateX(0);
   }
 }
