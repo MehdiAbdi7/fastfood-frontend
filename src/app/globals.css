@@ -4,9 +4,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Chargées via <link> dans layout.tsx (voir le commentaire là-bas) */
+  /* Chargées via les imports Fontsource de layout.tsx (voir le commentaire
+     là-bas). Le paquet @fontsource-variable déclare la famille sous le nom
+     "DM Sans Variable" : avec "DM Sans" seul, rien ne correspondait et tout
+     le texte courant retombait sur la police système. */
   --font-heading: "Baloo 2", system-ui, sans-serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-body: "DM Sans Variable", system-ui, sans-serif;
 
   --background: #fbf5ef;
   --foreground: #3d2716;
