@@ -123,7 +123,7 @@ const Footer = () => {
 
           <Link
             href="/commande"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-bold text-background dark:text-foreground transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-bold text-background dark:bg-primary-dark dark:text-foreground transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate"
           >
             Commander
             <span

@@ -61,7 +61,7 @@ export function Hero() {
 
             <Link
               href="/commande"
-              className="animate-[slideInLeft_0.6s_ease-out_0.4s_both] my-4 inline-flex w-fit items-center gap-3 rounded-full bg-primary px-5 py-3 font-bold text-background transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate dark:text-foreground"
+              className="animate-[slideInLeft_0.6s_ease-out_0.4s_both] my-4 inline-flex w-fit items-center gap-3 rounded-full bg-primary px-5 py-3 font-bold text-background transition-all duration-300 ease-in-out hover:scale-105 hover:bg-accent-slate dark:bg-primary-dark dark:text-foreground"
             >
               Passer votre commande
               <span className="icon-[line-md--arrow-right-circle-twotone] text-2xl" />
