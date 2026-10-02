@@ -6,6 +6,7 @@ import { Contact } from "@/components/public/Contact";
 import { Hero } from "@/components/public/Hero";
 import { HowItWorks } from "@/components/public/HowItWorks";
 import { Reveal } from "@/components/public/Reveal";
+import { RestaurantJsonLd } from "@/components/public/RestaurantJsonLd";
 import { Testimonials } from "@/components/public/Testimonials";
 import Image from "next/image";
 
@@ -23,6 +24,8 @@ const REVEAL_DELAY_MS = 450;
 export default function Home() {
   return (
     <>
+      <RestaurantJsonLd />
+
       {/* Le Hero garde ses propres animations au chargement (slideInLeft en
           cascade) : il est visible d'emblée, il n'a rien à révéler au scroll. */}
       <Hero />

@@ -20,10 +20,34 @@ import "@fontsource/baloo-2/700.css";
 
 import "./globals.css";
 import { Providers } from "./providers";
+import { DEMO_MODE, SITE_URL } from "@/config/site";
 
+const DEFAULT_TITLE =
+  "Niwa Food — Burgers, tacos et pizzas faits maison à Kouba et Chéraga";
+const DEFAULT_DESCRIPTION =
+  "Fast-food fait maison à Alger : burgers, tacos et pizzas préparés minute. Sur place, à emporter ou en livraison à Kouba et Chéraga.";
+
+// Valeurs par défaut de tout le site. Chaque page peut remplacer son titre et
+// sa description ; l'image d'aperçu, elle, vient du fichier
+// app/opengraph-image.jpg, que Next applique à toutes les routes.
 export const metadata: Metadata = {
-  title: "Niwa Food",
-  description: "Fast-food fait maison burger, pizza, tacos à Kouba et Chéraga",
+  // Base des URL absolues : sans elle, l'image d'aperçu resterait un chemin
+  // relatif, que WhatsApp et Facebook ignorent.
+  metadataBase: new URL(SITE_URL),
+  title: DEFAULT_TITLE,
+  description: DEFAULT_DESCRIPTION,
+  openGraph: {
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: "/",
+    siteName: "Niwa Food",
+    locale: "fr_DZ",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
+  // En démo, rien n'est indexé : un moteur de recherche ne doit pas présenter
+  // ce site comme celui du restaurant. Voir config/site.ts.
+  robots: DEMO_MODE ? { index: false, follow: false } : undefined,
 };
 
 const themeInitScript = `
