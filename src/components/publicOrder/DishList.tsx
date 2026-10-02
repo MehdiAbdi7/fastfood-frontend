@@ -62,7 +62,9 @@ function SectionTitle({
           <h2 className="font-heading text-lg font-bold text-foreground">
             {label}
           </h2>
-          <span className="tabular-nums rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
+          {/* accent-mustard-text et non primary : en sombre, le doré primary
+              sur sa propre teinte (bg-primary/15) plafonnait à 3,5:1. */}
+          <span className="tabular-nums rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-accent-mustard-text">
             {count}
           </span>
           {/* Filet doré qui s'éteint vers la droite : reprend la lumière des

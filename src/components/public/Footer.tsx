@@ -67,12 +67,15 @@ const Footer = () => {
             Navigation
           </span>
 
-          <div className="flex flex-col items-center gap-2 md:items-start">
+          {/* Plus de gap, un py-1 sur chaque lien à la place : même rythme
+              visuel, mais des cibles de 28 px de haut au lieu de 20, au-dessus
+              du minimum de 24 px que demande le WCAG 2.2 au doigt. */}
+          <div className="flex flex-col items-center md:items-start">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-foreground/70 transition-colors hover:text-accent-green"
+                className="inline-block py-1 text-sm text-foreground/70 transition-colors hover:text-accent-green"
               >
                 {link.label}
               </Link>
@@ -90,7 +93,7 @@ const Footer = () => {
             {STORE_LOCATIONS.map((location) => (
               <div
                 key={location.slug}
-                className="flex flex-col items-center gap-1 md:items-start"
+                className="flex flex-col items-center md:items-start"
               >
                 <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
                   <span
@@ -102,7 +105,7 @@ const Footer = () => {
 
                 <a
                   href={location.phoneHref}
-                  className="text-sm text-foreground/70 transition-colors hover:text-accent-green"
+                  className="inline-block py-1 text-sm text-foreground/70 transition-colors hover:text-accent-green"
                 >
                   {location.phone}
                 </a>
