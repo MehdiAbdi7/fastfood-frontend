@@ -16,10 +16,16 @@
  * Le compteur gère l'imbrication : le ticket peut ouvrir une fiche produit,
  * et fermer la fiche ne doit pas déverrouiller la page pendant que le ticket
  * est encore là.
+ *
+ * La position n'est restaurée que sur la page où le verrou a été posé. Le
+ * ticket se ferme parfois PARCE QU'on change de page (« Finaliser ma
+ * commande ») : restaurer alors la position de la carte, 1 500 px plus bas,
+ * ouvrait la page de finalisation directement sur son pied de page.
  */
 
 let lockCount = 0;
 let savedScrollY = 0;
+let savedPathname = "";
 
 export function lockScroll(): void {
   if (typeof document === "undefined") return;
@@ -28,6 +34,7 @@ export function lockScroll(): void {
   if (lockCount > 1) return; // déjà verrouillé par une surface parente
 
   savedScrollY = window.scrollY;
+  savedPathname = window.location.pathname;
 
   const { style } = document.body;
 
@@ -63,7 +70,10 @@ export function unlockScroll(): void {
   style.overflow = "";
   style.paddingRight = "";
 
+  // Nouvelle page : on la commence en haut, comme toute navigation.
+  const isSamePage = window.location.pathname === savedPathname;
+
   // instant et non smooth : le client doit retrouver sa place immédiatement,
   // pas voir la page remonter en glissant après avoir fermé une fiche.
-  window.scrollTo({ top: savedScrollY, behavior: "instant" });
+  window.scrollTo({ top: isSamePage ? savedScrollY : 0, behavior: "instant" });
 }
