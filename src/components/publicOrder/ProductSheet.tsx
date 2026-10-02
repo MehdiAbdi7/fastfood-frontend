@@ -422,10 +422,16 @@ export function ProductSheet({
                           onClick={() => selectFormula(formula.id)}
                         >
                           {formula.name}
+                          {/* Toujours le prix TOTAL, comme sur « Seul » : à
+                              côté de « Menu Kids 500 DA », un « Menu +250 DA »
+                              obligeait le client à additionner pour comparer
+                              deux formules qui ne se lisent pas pareil. */}
                           <span className="tabular-nums text-xs font-normal opacity-70">
-                            {formula.pricingMode === "fixed"
-                              ? formatDA(formula.price)
-                              : `+${formatDA(formula.price)}`}
+                            {formatDA(
+                              formula.pricingMode === "fixed"
+                                ? formula.price
+                                : variant.price + formula.price,
+                            )}
                           </span>
                         </Choice>
                       ))}

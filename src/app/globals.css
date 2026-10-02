@@ -27,6 +27,9 @@
   --color-accent-mustard-text: #92630f;
   --color-accent-bordeaux: #8b2e3a;
   --color-accent-green: #1d7b4b;
+  /* Vert réservé au TEXTE posé sur une teinte verte (pastilles de prix). En
+     clair, le vert normal suffit ; la différence se joue en sombre. */
+  --color-accent-green-text: #1d7b4b;
   --color-accent-slate: #0e5f2d;
 
   --hero-bg-image: url("/bg-white.webp");
@@ -60,6 +63,9 @@
   --color-accent-mustard-text: #e6b856;
   --color-accent-bordeaux: #d1495c;
   --color-accent-green: #2aa166;
+  /* Le vert normal tombe à 4,37:1 sur le fond teinté des pastilles de prix
+     (seuil AA : 4,5:1). Un cran plus clair, réservé au texte : 5,5:1. */
+  --color-accent-green-text: #30b574;
   --color-accent-slate: #3cb972;
 
   --hero-bg-image: url("/bg-dark.webp");
@@ -85,6 +91,7 @@
   --color-accent-mustard-text: var(--color-accent-mustard-text);
   --color-accent-bordeaux: var(--color-accent-bordeaux);
   --color-accent-green: var(--color-accent-green);
+  --color-accent-green-text: var(--color-accent-green-text);
   --color-accent-slate: var(--color-accent-slate);
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);

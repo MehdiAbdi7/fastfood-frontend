@@ -158,7 +158,7 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
             type="button"
             onClick={() => dispatch(searchChanged(""))}
             aria-label="Effacer la recherche"
-            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-foreground/45 transition-colors hover:bg-primary/10 hover:text-foreground"
+            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-primary/10 hover:text-foreground"
           >
             <span aria-hidden="true" className="icon-[mdi--close] text-lg" />
           </button>
@@ -166,10 +166,10 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
       </label>
 
       <p className="hidden items-baseline justify-between px-1 lg:mt-1 lg:flex">
-        <span className="font-heading text-xs font-bold uppercase tracking-wide text-foreground/45">
+        <span className="font-heading text-xs font-bold uppercase tracking-wide text-foreground/70">
           La carte
         </span>
-        <span className="tabular-nums text-xs font-semibold text-foreground/40">
+        <span className="tabular-nums text-xs font-semibold text-foreground/70">
           {totalCount} plats
         </span>
       </p>
@@ -208,9 +208,11 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
                   }`}
                 />
                 {group.label}
+                {/* Plus d'opacité sur le compteur : à 70 % sur la puce dorée
+                    active, il tombait à 3,4:1, sous le seuil AA de 4,5:1. */}
                 <span
                   className={`tabular-nums text-xs lg:ml-auto ${
-                    isActive ? "opacity-70" : "opacity-50"
+                    isActive ? "" : "text-foreground/70"
                   }`}
                 >
                   {group.count}
@@ -225,7 +227,7 @@ export function MenuFilters({ nav }: MenuFiltersProps) {
           pour qu'on lise une subdivision, pas un pair. */}
         {subChips.length > 1 && (
           <div className="flex flex-col gap-1 rounded-2xl bg-primary/5 px-2 py-2 lg:ml-2 lg:rounded-xl lg:px-1.5 lg:py-1.5">
-            <span className="px-2 pb-0.5 text-xs font-bold uppercase tracking-wide text-foreground/40">
+            <span className="px-2 pb-0.5 text-xs font-bold uppercase tracking-wide text-foreground/70">
               {currentGroup?.label}
             </span>
             <div className="scrollbar-hide flex items-center gap-1 overflow-x-auto lg:flex-col lg:items-stretch lg:gap-0.5 lg:overflow-x-visible">

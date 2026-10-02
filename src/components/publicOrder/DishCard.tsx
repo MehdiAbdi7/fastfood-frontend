@@ -92,7 +92,7 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
                 key={attribute}
                 className="inline-flex items-baseline gap-1 rounded-md bg-foreground/5 px-2 py-1 text-xs text-foreground/70"
               >
-                <span className="font-semibold capitalize text-foreground/45">
+                <span className="font-semibold capitalize text-foreground/70">
                   {attribute}
                 </span>
                 {values.join(" · ")}
@@ -106,9 +106,9 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
             // Pastille et non texte nu : sur une grille de 35 cartes, c'est le
             // repère qu'on cherche en premier, il doit se détacher sans avoir
             // à être relu.
-            <span className="tabular-nums inline-flex items-baseline gap-1 whitespace-nowrap rounded-full bg-accent-green/10 px-2.5 py-1 font-heading text-sm font-bold text-accent-green ring-1 ring-inset ring-accent-green/25">
+            <span className="tabular-nums inline-flex items-baseline gap-1 whitespace-nowrap rounded-full bg-accent-green/10 px-2.5 py-1 font-heading text-sm font-bold text-accent-green-text ring-1 ring-inset ring-accent-green/25">
               {item.variants.length > 1 && (
-                <span className="text-xs font-semibold opacity-70">dès</span>
+                <span className="text-xs font-semibold">dès</span>
               )}
               {formatDA(minPrice)}
             </span>
@@ -117,7 +117,7 @@ export function DishCard({ item, inCart, onSelect }: DishCardProps) {
           {/* Dit ce que fait l'icône de la pastille d'action, plutôt que de
               laisser le client la découvrir en tapant dessus. */}
           {configurable && (
-            <span className="hidden items-center gap-1 text-xs font-semibold text-foreground/45 sm:inline-flex">
+            <span className="hidden items-center gap-1 text-xs font-semibold text-foreground/70 sm:inline-flex">
               <span aria-hidden="true" className="icon-[mdi--tune-variant] text-sm" />
               à composer
             </span>

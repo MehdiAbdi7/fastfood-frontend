@@ -28,8 +28,8 @@ export const metadata: Metadata = {
  * change de nom ou sort de la carte.
  */
 const GARAGE_NAMES = [
-  { name: "T-MAX", meaning: "Le maxi-scooter Yamaha" },
-  { name: "N-MAX", meaning: "Son petit frère, plus nerveux" },
+  { name: "TMAX", meaning: "Le maxi-scooter Yamaha" },
+  { name: "NMAX", meaning: "Son petit frère, plus nerveux" },
   { name: "VESPA", meaning: "L'italien qui a tout commencé" },
   { name: "GILERA", meaning: "Constructeur italien de motos" },
   { name: "POLINI", meaning: "Préparateur moteur italien" },
@@ -64,7 +64,7 @@ const METHOD = [
 
 const FIGURES = [
   { value: "2", label: "adresses à Alger" },
-  { value: "13h30", label: "de service par jour" },
+  { value: "7j/7", label: "ouvert, le vendredi dès 18h" },
   { value: `${INSTAGRAM_FOLLOWERS}+`, label: "abonnés sur Instagram" },
   { value: "100%", label: "fait maison" },
 ];
@@ -122,7 +122,7 @@ export default function AProposPage() {
             </p>
             <p className="leading-relaxed text-foreground/75">
               Le reste, c&apos;est une question de tempérament. On aime les
-              deux-roues, alors nos plats en portent les noms. Un T-MAX, un
+              deux-roues, alors nos plats en portent les noms. Un TMAX, un
               MALOSSI, une VESPA — pas pour faire joli, mais parce que
               c&apos;est le vocabulaire de la maison, et que nos habitués
               commandent désormais par plaque plutôt que par ingrédient.
