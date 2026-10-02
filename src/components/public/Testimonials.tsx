@@ -8,6 +8,7 @@ import {
   nextTestimonial,
   prevTestimonial,
 } from "@/features/testimonials/testimonialsSlice";
+import { DEMO_MODE } from "@/config/site";
 
 const AUTOPLAY_INTERVAL_MS = 5000;
 const SWIPE_THRESHOLD_PX = 40;
@@ -134,9 +135,19 @@ export function Testimonials() {
           <h2 className="font-heading text-3xl font-bold text-accent-green sm:text-4xl">
             Ce que disent nos clients
           </h2>
-          <p className="max-w-md text-sm text-foreground/80">
-            Des expériences partagées après un passage chez Niwa Food.
-          </p>
+          {/* Ces avis sont des exemples rédigés pour la démo : les présenter
+              comme de vrais clients serait trompeur. Le jour où le restaurant
+              valide le site, ils sont remplacés par de vrais avis (Google, par
+              exemple) et la mention disparaît avec le mode démo. */}
+          {DEMO_MODE ? (
+            <p className="max-w-md rounded-full border border-primary/40 px-3 py-1 text-xs font-semibold text-foreground/80">
+              Avis d&apos;exemple pour la démonstration, pas de vrais clients
+            </p>
+          ) : (
+            <p className="max-w-md text-sm text-foreground/80">
+              Des expériences partagées après un passage chez Niwa Food.
+            </p>
+          )}
         </div>
 
         {/* aria-live="polite" : le contenu change tout seul toutes les cinq

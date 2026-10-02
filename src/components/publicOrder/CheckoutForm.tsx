@@ -17,6 +17,7 @@ import { toOrderItemsPayload } from "@/lib/cartLine";
 import { writeLastOrder } from "@/lib/lastOrder";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { formatDA } from "@/lib/format";
+import { DEMO_MODE } from "@/config/site";
 import { ORDER_TYPE_ICONS, ORDER_TYPE_LABELS } from "@/lib/orderLabels";
 import { STORES, STORE_LABELS, type Store } from "@/types/store";
 import type { CreateOrderPayload, OrderType } from "@/types/order";
@@ -659,9 +660,19 @@ export function CheckoutForm({ availableItemIds }: CheckoutFormProps) {
             )}
           </button>
 
-          <p className="text-center text-xs text-foreground/45">
-            En envoyant, votre commande part directement en cuisine.
-          </p>
+          {/* En démo, la promesse « part en cuisine » serait fausse : la
+              commande arrive dans le back-office de démonstration, personne
+              ne la prépare. Le client doit le lire AVANT d'appuyer. */}
+          {DEMO_MODE ? (
+            <p className="text-center text-xs font-semibold text-foreground/75">
+              Site de démonstration : votre commande apparaîtra dans le
+              back-office de démo, mais elle ne sera ni préparée ni livrée.
+            </p>
+          ) : (
+            <p className="text-center text-xs text-foreground/45">
+              En envoyant, votre commande part directement en cuisine.
+            </p>
+          )}
         </section>
       </div>
     </div>

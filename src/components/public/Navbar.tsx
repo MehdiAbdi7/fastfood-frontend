@@ -8,6 +8,7 @@ import { useNavbar } from "@/features/navbar/useNavbar";
 import { ThemeToggle } from "./themeToggle";
 import { CartButton } from "./CartButton";
 import { TrackOrderButton } from "./TrackOrderButton";
+import { DemoBanner } from "./DemoBanner";
 
 // « Suivi » rejoint la barre : c'est la seule façon, pour un client qui a
 // fermé son onglet ou changé de téléphone, de retrouver sa commande. Le
@@ -51,6 +52,7 @@ const Navbar = () => {
           : "bg-transparent"
       }`}
     >
+      <DemoBanner />
       <nav className="mx-auto max-w-5xl flex w-full items-center justify-between border-b border-primary lg:border-none px-2 py-2 text-primary transition-colors duration-300 ease-in-out sm:justify-between">
         <Link
           href="/"
