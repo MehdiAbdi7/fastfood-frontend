@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 const FINAL_STATS = { addresses: 2, homemade: 100, days: 7 };
 const ZERO_STATS = { addresses: 0, homemade: 0, days: 0 };
 
+const VIDEO_POSTER = "/niwa-video-poster.webp";
+
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -76,6 +78,10 @@ export function About() {
   // La vidéo ne se télécharge qu'à l'approche de la section (preload="none"
   // + lecture déclenchée ici) : avec autoPlay, elle pesait sur le premier
   // chargement de l'accueil alors qu'elle est sous la ligne de flottaison.
+  //
+  // Même règle pour l'affiche : un attribut poster se télécharge dès
+  // l'ouverture de la page, preload="none" ou pas. Posée ici, au même moment
+  // que la lecture, elle ne prend plus de débit à la photo du hero.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -83,6 +89,7 @@ export function About() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          video.poster = VIDEO_POSTER;
           video.play().catch(() => setIsPlaying(false));
           observer.disconnect();
         }
@@ -172,7 +179,6 @@ export function About() {
           <video
             ref={videoRef}
             src="/niwa-video.mp4"
-            poster="/niwa-video-poster.webp"
             preload="none"
             loop
             muted

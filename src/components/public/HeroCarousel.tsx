@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
@@ -36,6 +36,41 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
   const dispatch = useAppDispatch();
   const touchStartX = useRef<number | null>(null);
 
+  // Les slides 2 à 5 ne sont rendues qu'après le chargement de la page.
+  // Invisibles (opacité 0) mais présentes dans le DOM, elles étaient
+  // téléchargées tout de suite : 155 Ko qui se partageaient le réseau avec la
+  // première photo, l'élément LCP, et la retardaient sur mobile. Elles ne
+  // servent qu'au premier changement de slide, six secondes plus tard.
+  const [areOtherSlidesReady, setAreOtherSlidesReady] = useState(false);
+
+  useEffect(() => {
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    // Après l'événement load, quand le navigateur souffle : la page a fini
+    // son travail utile. requestIdleCallback n'existe pas sur Safari, d'où le
+    // repli sur un simple délai.
+    const reveal = () => {
+      if ("requestIdleCallback" in window) {
+        idleId = window.requestIdleCallback(
+          () => setAreOtherSlidesReady(true),
+          { timeout: 2000 },
+        );
+      } else {
+        timeoutId = setTimeout(() => setAreOtherSlidesReady(true), 500);
+      }
+    };
+
+    if (document.readyState === "complete") reveal();
+    else window.addEventListener("load", reveal, { once: true });
+
+    return () => {
+      window.removeEventListener("load", reveal);
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, []);
+
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -50,11 +85,15 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
     return () => clearInterval(interval);
   }, [dispatch, slides.length]);
 
+  // Un clic avant la fin du chargement doit montrer une photo, pas un cercle
+  // vide : toutes les slides sont alors rendues sans attendre.
   const goToNextSlide = () => {
+    setAreOtherSlidesReady(true);
     dispatch(nextHeroSlide(slides.length));
   };
 
   const goToPrevSlide = () => {
+    setAreOtherSlidesReady(true);
     dispatch(prevHeroSlide(slides.length));
   };
 
@@ -89,7 +128,13 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
         aria-hidden="true"
       />
 
-      {slides.map((slide, index) => (
+      {slides.map((slide, index) =>
+        // Slides 2 à 5 absentes du DOM tant que la page n'a pas fini de
+        // charger (voir areOtherSlidesReady). La slide courante est toujours
+        // rendue, par sécurité.
+        index !== 0 &&
+        index !== currentIndex &&
+        !areOtherSlidesReady ? null : (
         <Image
           key={slide.src}
           src={slide.src}
