@@ -1,59 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
-
-const LOCATIONS = [
-  {
-    name: "Kouba",
-    phone: "0552 52 00 76",
-    address: "Kouba, Alger",
-    image: "/kouba.png",
-    // L'enseigne est à mi-hauteur : un crop centré la garde entière.
-    imagePosition: "object-center",
-    // Lien court officiel Google Maps : il survit à un changement d'adresse
-    // ou de nom de la fiche, contrairement à une URL construite à partir de
-    // coordonnées, qui pointerait sur un point du sol.
-    mapUrl: "https://maps.app.goo.gl/s9XATgxV4YgfKnva8",
-  },
-  {
-    name: "Chéraga",
-    phone: "0549 18 97 27",
-    address: "Chéraga, Alger",
-    image: "/cheraga.png",
-    // Photo en portrait, enseigne tout en haut : un crop centré la couperait.
-    imagePosition: "object-top",
-    mapUrl: "https://maps.app.goo.gl/g4mfVCriqtop4SwS7",
-  },
-];
+// Adresses, horaires et réseaux viennent de la source unique : cette section
+// en gardait sa propre copie, qui avait fini par écrire les horaires
+// autrement que la page Contact (« Lun – Jeu, Sam – Dim » contre « Samedi à
+// jeudi »).
+import {
+  OPENING_HOURS,
+  SOCIALS,
+  STORE_LOCATIONS,
+} from "@/config/locations";
 
 // Largeur d'AFFICHAGE de la photo, pas le poids du fichier : le navigateur
 // choisit la variante du srcset avec cette seule information, avant même
 // d'avoir appliqué le CSS. Suit le max-w-4xl de la grille : une colonne
 // pleine sous md, ~430 px par carte au-delà.
 const FACADE_SIZES = "(max-width: 768px) 100vw, 440px";
-
-const SOCIALS = [
-  {
-    href: "https://www.facebook.com/niwafood",
-    label: "Niwa Food sur Facebook",
-    icon: "icon-[mdi--facebook]",
-    bg: "bg-blue-700/30",
-    fg: "bg-blue-700",
-  },
-  {
-    href: "https://www.instagram.com/niwafood/",
-    label: "Niwa Food sur Instagram",
-    icon: "icon-[line-md--instagram]",
-    bg: "bg-rose-500/20",
-    fg: "bg-rose-600",
-  },
-  {
-    href: "https://www.tiktok.com/@niwafood",
-    label: "Niwa Food sur Tiktok",
-    icon: "icon-[line-md--tiktok]",
-    bg: "bg-black/80",
-    fg: "bg-white",
-  },
-];
 
 export function Contact() {
   return (
@@ -79,7 +40,7 @@ export function Contact() {
             levier le plus efficace pour alléger les cartes, sans toucher au
             cadre doré de la section, qui reste large comme les autres. */}
         <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-2">
-          {LOCATIONS.map((location) => (
+          {STORE_LOCATIONS.map((location) => (
             // overflow-hidden + padding porté par le bloc de texte, et non par
             // la carte : c'est ce qui permet à la photo d'aller bord à bord
             // tout en respectant l'arrondi.
@@ -115,10 +76,14 @@ export function Contact() {
               </div>
 
               <div className="flex flex-1 flex-col gap-2.5 p-5">
-                <p className="text-sm text-accent-green">{location.address}</p>
+                <p className="text-sm text-accent-green">
+                  {location.addressDetail
+                    ? `${location.address}, ${location.addressDetail}`
+                    : location.address}
+                </p>
 
                 <a
-                  href={`tel:${location.phone.replace(/\s/g, "")}`}
+                  href={location.phoneHref}
                   className="flex items-center gap-2 font-semibold text-foreground hover:underline"
                 >
                   <span
@@ -136,8 +101,11 @@ export function Contact() {
                     className="icon-[mdi--clock-outline] mt-0.5 text-base"
                   />
                   <div className="leading-relaxed">
-                    <p>Lun – Jeu, Sam – Dim : 11h00 – 00h30</p>
-                    <p>Vendredi : 18h00 – 00h30</p>
+                    {OPENING_HOURS.map((slot) => (
+                      <p key={slot.days}>
+                        {slot.days} : {slot.hours}
+                      </p>
+                    ))}
                   </div>
                 </div>
 

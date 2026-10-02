@@ -2,27 +2,35 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// « 7j/7 » et non plus « 13h+ d'ouverture par jour » : le vendredi, la
+// cuisine n'ouvre qu'à 18h, le chiffre était donc faux un jour sur sept.
+const FINAL_STATS = { addresses: 2, homemade: 100, days: 7 };
+const ZERO_STATS = { addresses: 0, homemade: 0, days: 0 };
+
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [stats, setStats] = useState({ addresses: 0, homemade: 0, hours: 0 });
+  // Valeurs finales dès le rendu serveur : c'est ce que lisent Google et les
+  // aperçus de liens, qui n'exécutent pas l'animation. Partir de 0 leur
+  // montrait « 0 adresses, 0% fait maison ». Le compteur est remis à zéro
+  // côté client, juste avant d'animer.
+  const [stats, setStats] = useState(FINAL_STATS);
 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const finalStats = { addresses: 2, homemade: 100, hours: 13 };
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (prefersReducedMotion) {
-      const frameId = requestAnimationFrame(() => setStats(finalStats));
-      return () => cancelAnimationFrame(frameId);
-    }
+    // Mouvement réduit : les valeurs finales sont déjà affichées, rien à faire.
+    if (prefersReducedMotion) return;
 
-    let frameId = 0;
+    // Sous la ligne de flottaison, la section est encore invisible : la remise
+    // à zéro ne se voit pas, et l'animation repart de 0 à son arrivée.
+    let frameId = requestAnimationFrame(() => setStats(ZERO_STATS));
     let hasStarted = false;
 
     const animate = () => {
@@ -36,9 +44,9 @@ export function About() {
         const easedProgress = 1 - (1 - progress) ** 3;
 
         setStats({
-          addresses: Math.round(finalStats.addresses * easedProgress),
-          homemade: Math.round(finalStats.homemade * easedProgress),
-          hours: Math.round(finalStats.hours * easedProgress),
+          addresses: Math.round(FINAL_STATS.addresses * easedProgress),
+          homemade: Math.round(FINAL_STATS.homemade * easedProgress),
+          days: Math.round(FINAL_STATS.days * easedProgress),
         });
 
         if (progress < 1) frameId = requestAnimationFrame(update);
@@ -144,10 +152,10 @@ export function About() {
             </div>
             <div className="min-w-0 rounded-2xl border border-primary/60 bg-background/70 p-2 text-center sm:p-3 md:p-4">
               <p className="font-heading text-2xl font-bold text-accent-green sm:text-3xl">
-                {stats.hours}h+
+                {stats.days}j/7
               </p>
               <p className="text-xs font-semibold leading-tight text-foreground/80 wrap-break-words sm:text-sm">
-                D&apos;ouverture/jour
+                Ouvert
               </p>
             </div>
           </div>
